@@ -74,7 +74,6 @@ export async function deleteArticle(id: string) {
   
   revalidatePath("/admin/articles");
   revalidatePath("/");
-  return true;
 }
 
 export async function attachTagsToArticle(articleId: string, tagIds: string[]) {
