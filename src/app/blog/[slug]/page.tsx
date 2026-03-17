@@ -94,8 +94,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   />
                   <div className="flex-1">
                     <div className="text-[16px] font-bold text-[#1d1d1f]">Tela Team</div>
-                    <div className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins" suppressHydrationWarning>
-                      4 min read • {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}
+                    <div className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins">
+                      4 min read • March 17, 2026
                     </div>
                   </div>
                   {/* Social share inline on desktop */}

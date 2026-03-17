@@ -106,13 +106,13 @@ export default async function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]" suppressHydrationWarning>
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
       {/* Search overlay placeholder / hidden by default but structural */}
       <Navbar />
 
       <main className="pt-24 md:pt-[140px]">
         {/* APPLE-STYLE HERO: Centered, Massive, Blending Background */}
-        <section className="relative px-4 md:px-8 mb-24 lg:mb-32 max-w-[1400px] mx-auto">
+        <section className="relative px-6 md:px-8 mb-24 lg:mb-32 max-w-7xl mx-auto">
           <GsapReveal direction="up" className="text-center max-w-4xl mx-auto mb-16 relative z-10">
             <h1 className="text-5xl md:text-7xl lg:text-[88px] font-bold tracking-[-0.03em] mb-6 leading-[1.05] text-[#1d1d1f]">
               {siteSettings.hero_title}
@@ -140,7 +140,7 @@ export default async function Home() {
         </section>
 
         {/* CENTRAL FEATURED - Image on TOP like Grey Business screenshot */}
-        <section className="px-4 md:px-8 max-w-[1200px] mx-auto mb-16 relative">
+        <section className="px-6 md:px-8 max-w-7xl mx-auto mb-16 relative">
           <GsapReveal direction="up">
             <Link href={`/blog/${featuredArticle.slug}`} className="group block relative rounded-[2.5rem] overflow-hidden bg-white shadow-[0_10px_40px_rgb(0,0,0,0.06)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.12)] transition-shadow duration-500 border border-black/5">
                  
@@ -178,7 +178,7 @@ export default async function Home() {
 
         {/* CATEGORY TABS SCROLLABLE */}
         <section className="mb-8 pt-2 pb-6 md:pb-12">
-          <div className="container mx-auto px-2 md:px-8 max-w-[1280px] flex md:justify-center justify-start overflow-hidden">
+          <div className="container mx-auto px-6 md:px-8 max-w-7xl flex md:justify-center justify-start overflow-hidden">
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-3 px-4 bg-white rounded-full shadow-sm border border-black/5 max-w-full">
               {CATEGORIES.map((cat, i) => (
                 <Link key={cat} href={`/categories/${cat.toLowerCase().replace(' ', '-')}`} className={`whitespace-nowrap px-5 py-2.5 text-[15px] font-semibold rounded-full transition-all duration-300 ${i === 0 ? 'bg-[#093C15] text-white shadow-md' : 'text-[#1d1d1f]/70 hover:text-[#093C15] hover:bg-black/5'}`}>
@@ -190,7 +190,7 @@ export default async function Home() {
         </section>
 
         {/* ALL ARTICLES GRID */}
-        <section className="container mx-auto px-4 md:px-8 max-w-[1400px] mb-16">
+        <section className="container mx-auto px-6 md:px-8 max-w-7xl mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-12">
             {articles.map((article: any, i: number) => (
               <GsapReveal key={article.id} direction="up" delay={0.05 * i}>
@@ -242,7 +242,7 @@ export default async function Home() {
         </section>
 
         {/* LIGHT NEWSLETTER SIGNUP SECTION */}
-        <section className="px-4 md:px-8 max-w-[1100px] mx-auto mb-32 relative">
+        <section className="px-6 md:px-8 max-w-7xl mx-auto mb-32 relative">
           <GsapReveal direction="up" className="relative group">
             {/* The subtle glow under the card */}
             <div className="absolute inset-x-12 -bottom-2 h-16 bg-[#41cc00] rounded-full blur-[40px] opacity-10 transform translate-y-2"></div>
@@ -294,7 +294,7 @@ export default async function Home() {
 
       {/* FOOTER with matching gradient */}
       <footer className="bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] border-t border-[#41cc00]/10 text-[#1d1d1f]/80 py-20 pb-10">
-        <div className="container mx-auto px-4 md:px-8 max-w-[1280px]">
+        <div className="container mx-auto px-6 md:px-8 max-w-7xl">
            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-20">
               <div className="lg:col-span-2">
                 <div className="flex flex-col items-start gap-6">

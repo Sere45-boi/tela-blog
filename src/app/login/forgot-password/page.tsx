@@ -12,101 +12,129 @@ import Link from "next/link";
 
 type Step = "email" | "otp" | "password";
 
+const supabase = createClient();
+
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const supabase = createClient();
-  
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message?: string }>({ type: "idle" });
   const [loading, setLoading] = useState(false);
 
   const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+    
     setStatus({ type: "idle" });
     setLoading(true);
 
-    // Using signInWithOtp for more reliable 6-digit code delivery
-    // This allows us to get a valid session via OTP and then update password
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: false,
-      }
-    });
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
 
-    if (error) {
-      setStatus({ type: "error", message: error.message || "Could not send code. Is this email registered?" });
-      setLoading(false);
-    } else {
-      setStatus({ type: "success", message: "A 6-digit code has been sent to your email." });
-      setStep("otp");
+      if (error) {
+        let message = error.message;
+        if (message.includes("rate limit")) {
+          message = "Email rate limit exceeded. Please wait a few minutes before trying again or check your Supabase dashboard settings.";
+        }
+        setStatus({ type: "error", message: message || "Could not send code. Is this email registered?" });
+      } else {
+        setStatus({ type: "success", message: "A 6-digit recovery code has been sent to your email." });
+        setStep("otp");
+      }
+    } catch (err: any) {
+      setStatus({ type: "error", message: "An unexpected error occurred." });
+    } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+    
     setStatus({ type: "idle" });
     setLoading(true);
 
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: 'email' // signInWithOtp uses 'email' type for verification
-    });
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'recovery' // Recovery type for password resets
+      });
 
-    if (error) {
-      setStatus({ type: "error", message: "Invalid or expired code." });
-      setLoading(false);
-    } else {
-      setStatus({ type: "success", message: "Code verified! You can now set a new password." });
-      setStep("password");
+      if (error) {
+        setStatus({ type: "error", message: "Invalid or expired recovery code." });
+      } else {
+        setStatus({ type: "success", message: "Code verified! You can now set a new password." });
+        setStep("password");
+      }
+    } catch (err: any) {
+      setStatus({ type: "error", message: "Verification failed. Please try again." });
+    } finally {
       setLoading(false);
     }
   };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+    
     if (newPassword.length < 6) {
       setStatus({ type: "error", message: "Password must be at least 6 characters." });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setStatus({ type: "error", message: "Passwords do not match." });
       return;
     }
     
     setStatus({ type: "idle" });
     setLoading(true);
 
-    // Now that the user has a valid session from verifyOtp, we can update their password
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword
-    });
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
 
-    if (error) {
-      setStatus({ type: "error", message: error.message });
+      if (error) {
+        setStatus({ type: "error", message: error.message });
+      } else {
+        setStatus({ type: "success", message: "Password updated successfully! Redirecting..." });
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      }
+    } catch (err: any) {
+      setStatus({ type: "error", message: "Failed to update password." });
+    } finally {
       setLoading(false);
-    } else {
-      setStatus({ type: "success", message: "Password updated successfully! Redirecting..." });
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
     }
   };
 
   const handleResendOtp = async () => {
+    if (loading) return;
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false }
-    });
-    if (error) {
-      setStatus({ type: "error", message: error.message });
-    } else {
-      setStatus({ type: "success", message: "A new code has been sent." });
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) {
+        setStatus({ type: "error", message: error.message });
+      } else {
+        setStatus({ type: "success", message: "A new recovery code has been sent." });
+      }
+    } catch (err: any) {
+      setStatus({ type: "error", message: "Resend failed." });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -148,8 +176,8 @@ export default function ForgotPasswordPage() {
               {step === "password" && "New Password"}
             </h1>
             <p className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins">
-              {step === "email" && "Enter your email address and we'll send you a 6-digit OTP code to reset your password."}
-              {step === "otp" && `We've sent a 6-digit code to ${email}. Please enter it below.`}
+              {step === "email" && "Enter your email address and we'll send you an 8-digit recovery code to reset your password."}
+              {step === "otp" && `We've sent an 8-digit code to ${email}. Please enter it below.`}
               {step === "password" && "Enter your new password below."}
             </p>
           </div>
@@ -180,7 +208,7 @@ export default function ForgotPasswordPage() {
             {step === "otp" && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1" htmlFor="otp">6-Digit OTP Code</label>
+                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1" htmlFor="otp">Recovery Code</label>
                   <div className="relative">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
                       <KeyRound className="h-4 w-4" />
@@ -188,12 +216,12 @@ export default function ForgotPasswordPage() {
                     <Input
                       id="otp"
                       type="text"
-                      placeholder="123456"
+                      placeholder="12345678"
                       className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 transition-all font-medium tracking-widest"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       required
-                      maxLength={6}
+                      maxLength={8}
                       disabled={loading}
                     />
                   </div>
@@ -213,22 +241,45 @@ export default function ForgotPasswordPage() {
             )}
 
             {step === "password" && (
-              <div className="space-y-2">
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1" htmlFor="newPassword">New Password</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
-                    <Lock className="h-4 w-4" />
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1" htmlFor="newPassword">New Password</label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
+                      <Lock className="h-4 w-4" />
+                    </div>
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 transition-all font-medium"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      disabled={loading}
+                    />
                   </div>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 transition-all font-medium"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                    disabled={loading}
-                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1" htmlFor="confirmPassword">Retype New Password</label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
+                      <Lock className="h-4 w-4" />
+                    </div>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 transition-all font-medium"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      disabled={loading}
+                    />
+                  </div>
                 </div>
               </div>
             )}
