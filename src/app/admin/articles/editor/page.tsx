@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Eye, Save, Send } from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 export default function ArticleEditor() {
   const router = useRouter();
@@ -106,13 +107,11 @@ export default function ArticleEditor() {
               </div>
               
               <div>
-                <label className="text-sm font-medium text-muted-foreground ml-1 mb-2 block">Content (HTML/Markdown support)</label>
-                <textarea 
-                  className="w-full h-96 rounded-xl border border-border bg-background p-4 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground resize-none font-mono text-sm leading-relaxed"
+                <label className="text-sm font-medium text-muted-foreground ml-1 mb-2 block">Article Content</label>
+                <RichTextEditor
                   value={formData.content}
-                  onChange={e => setFormData({...formData, content: e.target.value})}
-                  placeholder="<p>Write your amazing story here...</p>"
-                  required
+                  onChange={(content) => setFormData({...formData, content})}
+                  placeholder="Start writing your article here... Use the toolbar above to format text, add images, links, and more."
                 />
               </div>
 
