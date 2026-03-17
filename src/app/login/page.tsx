@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] selection:bg-[#41cc00]/30 selection:text-[#093C15] relative overflow-hidden">
       <LoginClient />
     </div>
   );

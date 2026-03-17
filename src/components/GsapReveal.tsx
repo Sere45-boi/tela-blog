@@ -23,30 +23,23 @@ export const GsapReveal = ({
     const ctx = gsap.context(() => {
       if (!containerRef.current) return;
 
-      const yOffset = direction === "up" ? 40 : direction === "down" ? -40 : 0;
-      const xOffset = direction === "left" ? 40 : direction === "right" ? -40 : 0;
+      const yOffset = direction === "up" ? 20 : direction === "down" ? -20 : 0;
+      const xOffset = direction === "left" ? 20 : direction === "right" ? -20 : 0;
 
-      gsap.fromTo(
-        containerRef.current,
-        {
-          opacity: 0,
-          y: yOffset,
-          x: xOffset,
+      // Content is already visible (opacity:1 in CSS).
+      // Animation is a subtle enhancement only — never hides content.
+      gsap.from(containerRef.current, {
+        y: yOffset,
+        x: xOffset,
+        duration: 0.8,
+        delay: delay,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 90%",
+          toggleActions: "play none none none", // play once, never reverse
         },
-        {
-          opacity: 1,
-          y: 0,
-          x: 0,
-          duration: 1.2,
-          delay: delay,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 85%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
+      });
     }, containerRef);
 
     return () => ctx.revert();

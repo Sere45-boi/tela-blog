@@ -1,10 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 export function Navbar() {
   return (
-    <div className="sticky top-6 z-50 flex justify-center w-full px-4 md:px-8 pointer-events-none transition-transform duration-300">
+    <div className="sticky top-6 z-50 flex justify-center w-full px-4 md:px-8 pointer-events-none transition-transform duration-300" suppressHydrationWarning>
       <header className="pointer-events-auto rounded-full bg-white/80 backdrop-blur-2xl border border-black/5 shadow-[0_8px_32px_rgb(0,0,0,0.06)] w-full max-w-[1000px] transition-all duration-500 hover:bg-white/95">
         <div className="flex h-[72px] items-center justify-between px-6 md:px-8">
           <div className="flex items-center gap-10">

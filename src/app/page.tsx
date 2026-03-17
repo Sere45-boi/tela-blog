@@ -3,6 +3,7 @@ import { GsapReveal } from "@/components/GsapReveal";
 import { getPublishedArticles, getFeaturedArticle } from "@/app/queries/content";
 import Link from "next/link";
 import { Search, ChevronRight } from "lucide-react";
+import { createClient } from "@/utils/supabase/server";
 
 // Pre-defined categories
 const CATEGORIES = [
@@ -86,16 +87,26 @@ const MOCK_ARTICLES = [
 ];
 
 export default async function Home() {
-  const [featuredArticleResult, articlesResult] = await Promise.all([
+  const supabase = await createClient();
+  const [featuredArticleResult, articlesResult, settingsResult] = await Promise.all([
     getFeaturedArticle().catch(() => null),
-    getPublishedArticles().catch(() => ({ data: [] }))
+    getPublishedArticles().catch(() => ({ data: [] })),
+    supabase.from("site_settings").select("*").eq("id", 1).single()
   ]);
   
   const featuredArticle = featuredArticleResult || MOCK_FEATURED;
   const articles = (articlesResult?.data && articlesResult.data.length > 0) ? articlesResult.data : MOCK_ARTICLES;
+  const siteSettings = settingsResult?.data || {
+    hero_title: "The Tela Blog.",
+    hero_subtitle: "Ideas that grow.",
+    hero_description: "Insights on borderless business, global payments, and financial tools for modern companies.",
+    newsletter_title: "Insights that drive growth.",
+    newsletter_description: "Join thousands of founders getting weekly updates on finance, startups, and product building.",
+    footer_description: "Tela is the borderless financial OS for ambitious businesses in emerging markets. Built for global scale.",
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]" suppressHydrationWarning>
       {/* Search overlay placeholder / hidden by default but structural */}
       <Navbar />
 
@@ -104,14 +115,14 @@ export default async function Home() {
         <section className="relative px-4 md:px-8 mb-24 lg:mb-32 max-w-[1400px] mx-auto">
           <GsapReveal direction="up" className="text-center max-w-4xl mx-auto mb-16 relative z-10">
             <h1 className="text-5xl md:text-7xl lg:text-[88px] font-bold tracking-[-0.03em] mb-6 leading-[1.05] text-[#1d1d1f]">
-              The Tela Blog.
+              {siteSettings.hero_title}
               <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#093C15] to-[#41cc00]">
-                Ideas that grow.
+                {siteSettings.hero_subtitle}
               </span>
             </h1>
             <p className="text-xl md:text-[26px] text-[#1d1d1f]/60 leading-[1.4] max-w-2xl mx-auto font-medium">
-              Insights on borderless business, global payments, and financial tools for modern companies.
+              {siteSettings.hero_description}
             </p>
             
             {/* Search Input elegantly styled */}
@@ -242,10 +253,10 @@ export default async function Home() {
               {/* Left Side: Text Details */}
               <div className="w-full md:w-1/2">
                 <h2 className="text-[40px] md:text-[48px] lg:text-[56px] font-bold leading-[1.1] mb-5 tracking-tight text-[#093C15] font-bricolage">
-                  Insights that<br/>drive growth.
+                  {siteSettings.newsletter_title}
                 </h2>
                 <p className="text-[#093C15]/70 text-[18px] leading-relaxed max-w-[360px] font-medium font-poppins">
-                  Join thousands of founders getting weekly updates on finance, startups, and product building.
+                  {siteSettings.newsletter_description}
                 </p>
               </div>
 
@@ -291,7 +302,7 @@ export default async function Home() {
                     <img src="/images/logo.PNG" className="h-[28px] w-auto mix-blend-multiply opacity-90" alt="Tela Footer Logo"/>
                   </div>
                   <p className="text-[15px] text-[#1d1d1f]/60 max-w-[300px] leading-relaxed font-medium">
-                    Tela is the borderless financial OS for ambitious businesses in emerging markets. Built for global scale.
+                    {siteSettings.footer_description}
                   </p>
                 </div>
               </div>
@@ -336,11 +347,11 @@ export default async function Home() {
            </div>
            
            <div className="pt-8 border-t border-[#1d1d1f]/10 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-[#1d1d1f]/50 font-medium">
-             <p>© {new Date().getFullYear()} Tela Technologies. All rights reserved.</p>
+             <p>© {new Date().getFullYear()} {siteSettings.site_title || 'Tela'} Technologies. All rights reserved.</p>
              <div className="flex items-center gap-6">
-               <Link href="/" className="hover:text-[#1d1d1f] transition-colors">Twitter</Link>
-               <Link href="/" className="hover:text-[#1d1d1f] transition-colors">LinkedIn</Link>
-               <Link href="/" className="hover:text-[#1d1d1f] transition-colors">Instagram</Link>
+               <Link href={siteSettings.twitter_handle ? `https://twitter.com/${siteSettings.twitter_handle.replace('@', '')}` : "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">Twitter</Link>
+               <Link href={siteSettings.linkedin_url || "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">LinkedIn</Link>
+               <Link href={siteSettings.instagram_url || "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">Instagram</Link>
              </div>
            </div>
         </div>

@@ -16,13 +16,43 @@ const bricolage = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "Tela | Insights & Updates",
-  description: "Discover insights, updates, and stories from the Tela team.",
+  title: {
+    default: "Tela Blog | Insights on Global Payments & Business",
+    template: "%s | Tela Blog",
+  },
+  description: "Discover expert insights on borderless business, global payments, multi-currency finance, and tools for modern companies operating across Africa and the world.",
+  keywords: ["global payments", "fintech Africa", "business blog", "cross-border payments", "virtual dollar card", "Nigeria fintech", "Tela", "USD account Nigeria"],
+  authors: [{ name: "Tela Team" }],
+  creator: "Tela Technologies",
+  publisher: "Tela",
+  metadataBase: new URL("https://tela.ng"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Tela | Insights & Updates",
-    description: "Discover insights, updates, and stories from the Tela team.",
-    siteName: "Tela",
+    title: "Tela Blog | Insights on Global Payments & Business",
+    description: "Discover expert insights on borderless business, global payments, and financial tools for modern companies.",
+    siteName: "Tela Blog",
     type: "website",
+    locale: "en_US",
+    url: "https://tela.ng",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tela Blog | Insights on Global Payments & Business",
+    description: "Discover expert insights on borderless business, global payments, and financial tools for modern companies.",
+    creator: "@taborahq",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -31,8 +61,26 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // JSON-LD Organization schema for Google Knowledge Graph
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Tela",
+    url: "https://tela.ng",
+    logo: "https://tela.ng/images/logo.PNG",
+    sameAs: [
+      "https://twitter.com/taborahq",
+      "https://linkedin.com/company/tela",
+      "https://instagram.com/tela",
+    ],
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+      </head>
       <body className={`${poppins.variable} ${bricolage.variable} font-sans bg-noise antialiased selection:bg-accent selection:text-accent-foreground`}>
         {children}
       </body>
