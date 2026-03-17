@@ -41,15 +41,22 @@ export async function upsertArticle(articleData: {
   is_featured?: boolean;
   meta_title?: string;
   meta_description?: string;
+  og_image_url?: string;
+  tags?: string[];
+  read_time_minutes?: number;
+  author_id?: string;
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error("Unauthorized");
 
+  // Determine actual author (defaults to current user if not provided)
+  const finalAuthorId = articleData.author_id || user.id;
+
   const payload = {
     ...articleData,
-    author_id: user.id,
+    author_id: finalAuthorId,
     ...(articleData.status === "published" && !articleData.id ? { published_at: new Date().toISOString() } : {})
   };
 

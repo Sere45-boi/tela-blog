@@ -1,246 +1,140 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/server";
+import { GsapReveal } from "@/components/GsapReveal";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Image as ImageIcon, Plus, Trash2, Edit2, Link as LinkIcon, Eye, EyeOff, Loader2 } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
-import { upsertAd, deleteAd } from "@/app/actions/settings";
+import { Plus, Megaphone, Trash2, ExternalLink, BarChart3, Edit2 } from "lucide-react";
+import Link from "next/link";
+import { deleteAd } from "@/app/actions/ads";
 
-export default function AdsManagementPage() {
-  const supabase = createClient();
-  const [ads, setAds] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isAdding, setIsAdding] = useState(false);
-  
-  const [newAd, setNewAd] = useState({
-    title: "",
-    image_url: "",
-    destination_url: "",
-    is_active: true
-  });
+export const metadata = {
+  title: "Ad Management | Tela CMS",
+};
 
-  const fetchAds = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("ads")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
-    if (!error && data) setAds(data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchAds();
-  }, []);
-
-  const handleToggleActive = async (ad: any) => {
-    const updated = { ...ad, is_active: !ad.is_active };
-    try {
-      await upsertAd(updated);
-      setAds(ads.map(a => a.id === ad.id ? updated : a));
-    } catch (err: any) {
-      alert("Error updating ad: " + err.message);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this ad? It will be removed from the blog sidebar immediately.")) {
-      try {
-        await deleteAd(id);
-        setAds(ads.filter(ad => ad.id !== id));
-      } catch (err: any) {
-        alert("Error deleting ad: " + err.message);
-      }
-    }
-  };
-
-  const handleCreateAd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await upsertAd(newAd);
-      await fetchAds();
-      setIsAdding(false);
-      setNewAd({ title: "", image_url: "", destination_url: "", is_active: true });
-    } catch (err: any) {
-      alert("Error creating ad: " + err.message);
-    }
-    setLoading(false);
-  };
+export default async function AdminAdsPage() {
+  const supabase = await createClient();
+  const { data: ads } = await supabase
+    .from("ads")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   return (
-    <div className="max-w-5xl">
-      <div className="flex items-center justify-between mb-10">
+    <div className="max-w-6xl">
+      <GsapReveal direction="up" className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-2">Ads Manager</h1>
-          <p className="text-[#1d1d1f]/50 font-medium">Manage the promotional cards displayed in the blog article sidebar.</p>
+          <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage mb-2">Campaign Management</h1>
+          <p className="text-[#1d1d1f]/60">Manage your advertisement campaigns and track performance metrics.</p>
         </div>
-        <Button 
-          variant="primary" 
-          onClick={() => setIsAdding(!isAdding)}
-          className="gap-2"
-        >
-          {isAdding ? "Cancel" : <><Plus className="h-4 w-4" /> New Ad</>}
-        </Button>
-      </div>
+        <Link href="/admin/ads/editor">
+          <Button variant="primary" className="gap-2 rounded-xl bg-[#093C15] text-white h-11 px-6 shadow-sm">
+            <Plus className="h-4 w-4" /> New Campaign
+          </Button>
+        </Link>
+      </GsapReveal>
 
-      {isAdding && (
-        <div className="bg-white rounded-2xl border border-[#41cc00]/30 shadow-[0_8px_30px_rgb(65,204,0,0.06)] p-6 md:p-8 mb-10 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex items-center gap-3 pb-4 border-b border-black/5 mb-6">
-            <div className="p-2 rounded-xl bg-[#41cc00]/10">
-              <Plus className="w-4 h-4 text-[#093C15]" />
+      {/* Metrics Summary Grid */}
+      <GsapReveal direction="up" delay={0.1} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="bg-white/80 backdrop-blur-xl p-8 rounded-2xl border border-black/5 shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-[#1d1d1f]/40">
+                <Megaphone className="w-5 h-5 text-[#41cc00]" />
+                <span className="text-[12px] font-bold uppercase tracking-wider">Active Campaigns</span>
             </div>
-            <h2 className="text-[16px] font-bold text-[#1d1d1f]">Create New Ad</h2>
-          </div>
-
-          <form onSubmit={handleCreateAd} className="space-y-5">
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Ad Title (Internal Reference & Screen Readers)</label>
-              <Input 
-                value={newAd.title} 
-                onChange={(e) => setNewAd({...newAd, title: e.target.value})} 
-                placeholder="e.g. Tela USD Cards Spring Promo"
-                required
-              />
+            <div className="text-4xl font-bold text-[#1d1d1f] font-bricolage">
+                {ads?.filter(a => a.status === 'active').length || 0}
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Image URL</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#1d1d1f]/40">
-                    <ImageIcon className="h-4 w-4" />
-                  </div>
-                  <Input 
-                    className="pl-10"
-                    placeholder="https://..."
-                    value={newAd.image_url} 
-                    onChange={(e) => setNewAd({...newAd, image_url: e.target.value})} 
-                    required
-                  />
-                </div>
-                <p className="text-[11px] text-[#1d1d1f]/40 mt-1">Recommended aspect ratio: 3:2 (e.g., 600x400px)</p>
-              </div>
-              <div>
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Destination Link</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#1d1d1f]/40">
-                    <LinkIcon className="h-4 w-4" />
-                  </div>
-                  <Input 
-                    className="pl-10"
-                    placeholder="https://tela.ng/..."
-                    value={newAd.destination_url} 
-                    onChange={(e) => setNewAd({...newAd, destination_url: e.target.value})} 
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-4">
-              <Button type="button" variant="secondary" onClick={() => setIsAdding(false)}>Cancel</Button>
-              <Button type="submit" variant="primary">Save Ad</Button>
-            </div>
-          </form>
-
-          {/* Realtime Ad Preview */}
-          {newAd.image_url && (
-            <div className="mt-8 pt-8 border-t border-black/5">
-              <h3 className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-4">Live Preview</h3>
-              <div className="w-[340px] rounded-2xl overflow-hidden bg-white border border-black/5 shadow-sm">
-                <div className="aspect-[3/2] w-full overflow-hidden relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={newAd.image_url} alt="Preview" className="w-full h-full object-cover" />
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                    <p className="text-white text-[13px] font-bold">{newAd.title || 'Ad Title Preview'}</p>
-                  </div>
-                </div>
-                <div className="px-3 pb-2 pt-3 text-center">
-                  <span className="text-[10px] uppercase tracking-wider text-[#1d1d1f]/30 font-bold">Sponsored</span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-      )}
-
-      {/* Existing Ads List */}
-      <div className="bg-white rounded-2xl border border-black/5 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-black/5 bg-black/[0.02]">
-          <h2 className="text-[15px] font-bold text-[#1d1d1f]">Active Campaigns ({ads.filter(a => a.is_active).length})</h2>
+        <div className="bg-white/80 backdrop-blur-xl p-8 rounded-2xl border border-black/5 shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-[#1d1d1f]/40">
+                <BarChart3 className="w-5 h-5 text-[#093C15]" />
+                <span className="text-[12px] font-bold uppercase tracking-wider">Total Impressions</span>
+            </div>
+            <div className="text-4xl font-bold text-[#1d1d1f] font-bricolage tabular-nums">
+                {ads?.reduce((acc, curr) => acc + (curr.impression_count || 0), 0).toLocaleString() || 0}
+            </div>
         </div>
-        
-        <div className="divide-y divide-black/5">
-          {ads.map((ad) => (
-            <div key={ad.id} className={`p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center transition-colors ${!ad.is_active ? 'opacity-60 bg-black/[0.02]' : 'hover:bg-black/[0.01]'}`}>
-              {/* Ad Image Thumb */}
-              <div className="w-40 aspect-[3/2] rounded-xl overflow-hidden shrink-0 border border-black/10 relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={ad.image_url} alt={ad.title} className="w-full h-full object-cover" />
-                {!ad.is_active && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
-                    <span className="bg-black/80 text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full">Inactive</span>
-                  </div>
+        <div className="bg-white/80 backdrop-blur-xl p-8 rounded-2xl border border-black/5 shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-[#1d1d1f]/40">
+                <ExternalLink className="w-5 h-5 text-[#41cc00]" />
+                <span className="text-[12px] font-bold uppercase tracking-wider">Total Clicks</span>
+            </div>
+            <div className="text-4xl font-bold text-[#1d1d1f] font-bricolage tabular-nums">
+                {ads?.reduce((acc, curr) => acc + (curr.click_count || 0), 0).toLocaleString() || 0}
+            </div>
+        </div>
+      </GsapReveal>
+
+      <GsapReveal direction="up" delay={0.2}>
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-[11px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider bg-black/[0.02] border-b border-black/5">
+                <tr>
+                  <th className="px-6 py-4">Campaign Name</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Position</th>
+                  <th className="px-6 py-4 text-right">Impressions</th>
+                  <th className="px-6 py-4 text-right">Clicks</th>
+                  <th className="px-6 py-4 text-right">CTR</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-black/5">
+                {ads?.map((ad) => {
+                  const ctr = ad.impression_count ? ((ad.click_count / ad.impression_count) * 100).toFixed(2) : "0.00";
+                  return (
+                    <tr key={ad.id} className="hover:bg-[#41cc00]/5 transition-colors group">
+                      <td className="px-6 py-4 font-bold text-[#1d1d1f]">
+                        <div className="flex items-center gap-3">
+                            <img src={ad.image_url} className="w-10 h-10 rounded-lg object-cover border border-black/5" alt="" />
+                            <span className="max-w-[180px] truncate">{ad.title}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`capitalize inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase ${
+                          ad.status === 'active' ? 'bg-[#41cc00]/10 text-[#093C15]' : 'bg-black/5 text-[#1d1d1f]/40'
+                        }`}>
+                          {ad.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-[#1d1d1f]/60 font-medium">
+                        {ad.position.replace('_', ' ')}
+                      </td>
+                      <td className="px-6 py-4 text-right tabular-nums text-[#1d1d1f]/60 font-medium">
+                        {ad.impression_count?.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 text-right tabular-nums text-[#1d1d1f]/60 font-medium">
+                        {ad.click_count?.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 text-right tabular-nums font-bold text-[#093C15]">
+                        {ctr}%
+                      </td>
+                      <td className="px-6 py-4 text-right space-x-2">
+                        <Link 
+                            href={`/admin/ads/editor?id=${ad.id}`} 
+                            className="p-2 inline-block text-[#1d1d1f]/40 hover:text-[#093C15] transition-colors"
+                        >
+                            <Edit2 className="h-4 w-4" />
+                        </Link>
+                        <form action={deleteAd.bind(null, ad.id)} className="inline-block">
+                          <button className="p-2 text-[#1d1d1f]/40 hover:text-red-500 transition-colors">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {(!ads || ads.length === 0) && (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-[#1d1d1f]/40 font-medium">
+                      No active campaigns. Start driving growth today.
+                    </td>
+                  </tr>
                 )}
-              </div>
-
-              {/* Ad Details */}
-              <div className="flex-1 min-w-0">
-                <h3 className="text-[16px] font-bold text-[#1d1d1f] mb-1">{ad.title}</h3>
-                <a href={ad.destination_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-[13px] text-blue-500 hover:text-blue-600 truncate mb-3 group">
-                  <LinkIcon className="h-3 w-3" />
-                  <span className="group-hover:underline">{ad.destination_url}</span>
-                </a>
-                
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider ${
-                    ad.is_active ? 'bg-green-500/10 text-green-600' : 'bg-[#1d1d1f]/10 text-[#1d1d1f]/60'
-                  }`}>
-                    {ad.is_active ? 'Running' : 'Paused'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 shrink-0">
-                <button 
-                  onClick={() => handleToggleActive(ad.id)}
-                  className={`p-2.5 rounded-xl border transition-colors flex items-center justify-center ${
-                    ad.is_active 
-                      ? 'border-yellow-500/20 text-yellow-600 hover:bg-yellow-500/10' 
-                      : 'border-green-500/20 text-green-600 hover:bg-green-500/10'
-                  }`}
-                  title={ad.is_active ? "Pause Ad" : "Activate Ad"}
-                >
-                  {ad.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-                <button className="p-2.5 rounded-xl border border-black/5 text-[#1d1d1f]/40 hover:text-[#1d1d1f] hover:bg-black/5 transition-colors">
-                  <Edit2 className="h-4 w-4" />
-                </button>
-                <button 
-                  onClick={() => handleDelete(ad.id)}
-                  className="p-2.5 rounded-xl border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          ))}
-
-          {ads.length === 0 && (
-            <div className="p-12 text-center">
-              <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mx-auto mb-4">
-                <ImageIcon className="h-5 w-5 text-[#1d1d1f]/40" />
-              </div>
-              <h3 className="text-[15px] font-bold text-[#1d1d1f] mb-1">No ads found</h3>
-              <p className="text-[14px] text-[#1d1d1f]/50">Create an ad to display promotional content in the blog sidebar.</p>
-            </div>
-          )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </GsapReveal>
     </div>
   );
 }

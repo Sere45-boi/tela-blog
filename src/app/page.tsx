@@ -11,91 +11,20 @@ const CATEGORIES = [
   "Escrow", "Invoices", "Vendor management", "International payments"
 ];
 
-const MOCK_FEATURED = {
-  id: "mock-1",
-  slug: "meet-tela-business",
-  title: "Meet Tela Business: the growth engine for global finances",
-  excerpt: "Manage global payments, business operations, and local collections in one place. Open a USD, EUR, and GBP account for your business in minutes.",
-  featured_image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2000&q=80",
-  published_at: new Date().toISOString(),
-  categories: { name: "Latest Blog" },
-  profiles: { full_name: "Chukwudi from Tela", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" },
-  read_time: 4
-};
-
-const MOCK_ARTICLES = [
-  {
-    id: "mock-2",
-    slug: "receive-ach",
-    title: "Receive ACH payments in Nigeria with a US bank",
-    excerpt: "You can open a virtual US bank account with Tela and start receiving ACH payments directly from anywhere.",
-    featured_image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1000&q=80",
-    published_at: "2026-03-10T00:00:00.000Z",
-    categories: { name: "Payments" },
-    profiles: { full_name: "Bolanle from Tela", avatar_url: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=200&q=80" }
-  },
-  {
-    id: "mock-3",
-    slug: "tela-remittance",
-    title: "How to receive global payments in Nigeria securely",
-    excerpt: "The best way to get paid by global clients, directly to your local bank account at the best exchange rates.",
-    featured_image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80",
-    published_at: "2026-03-08T00:00:00.000Z",
-    categories: { name: "International payments" },
-    profiles: { full_name: "James Obi", avatar_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" }
-  },
-  {
-    id: "mock-4",
-    slug: "no-paypal",
-    title: "How Nigerian freelancers get paid without PayPal",
-    excerpt: "PayPal restrictions in Nigeria don't have to stop you from working globally. Here's exactly how to get around it securely.",
-    featured_image: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&w=1000&q=80",
-    published_at: "2026-03-01T00:00:00.000Z",
-    categories: { name: "Freelancers" },
-    profiles: { full_name: "Adeola Somolu", avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" }
-  },
-  {
-    id: "mock-5",
-    slug: "dollar-card",
-    title: "What is a virtual dollar card and how does it work?",
-    excerpt: "Everything you need to know about virtual dollar cards and how they can help you pay for SaaS tools globally.",
-    featured_image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1000&q=80",
-    published_at: "2026-02-24T00:00:00.000Z",
-    categories: { name: "Finance" },
-    profiles: { full_name: "Emeka Tela", avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80" }
-  },
-  {
-    id: "mock-6",
-    slug: "remote-jobs",
-    title: "Top 10 remote job boards for African developers",
-    excerpt: "Looking for remote work? Here are the best platforms to find high-paying tech roles across the globe.",
-    featured_image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1000&q=80",
-    published_at: "2026-02-18T00:00:00.000Z",
-    categories: { name: "Business" },
-    profiles: { full_name: "Nneka Okoye", avatar_url: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80" }
-  },
-  {
-    id: "mock-7",
-    slug: "usd-account",
-    title: "Automating your invoices for global clients",
-    excerpt: "A step-by-step guide to setting up automated invoice tracking using Tela's built-in business suite.",
-    featured_image: "https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?auto=format&fit=crop&w=1000&q=80",
-    published_at: "2026-02-10T00:00:00.000Z",
-    categories: { name: "Invoices" },
-    profiles: { full_name: "Tela Product Team", avatar_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80" }
-  }
-];
+import { AdSpace } from "@/components/blog/AdSpace";
 
 export default async function Home() {
   const supabase = await createClient();
-  const [featuredArticleResult, articlesResult, settingsResult] = await Promise.all([
+  const [featuredArticleResult, articlesResult, settingsResult, categoriesResult] = await Promise.all([
     getFeaturedArticle().catch(() => null),
     getPublishedArticles().catch(() => ({ data: [] })),
-    supabase.from("site_settings").select("*").eq("id", 1).single()
+    supabase.from("site_settings").select("*").eq("id", 1).single(),
+    supabase.from("categories").select("name, slug").order("name")
   ]);
   
-  const featuredArticle = featuredArticleResult || MOCK_FEATURED;
-  const articles = (articlesResult?.data && articlesResult.data.length > 0) ? articlesResult.data : MOCK_ARTICLES;
+  const featuredArticle = featuredArticleResult || null;
+  const articles = articlesResult?.data || [];
+  const categories = categoriesResult?.data || [];
   const siteSettings = settingsResult?.data || {
     hero_title: "The Tela Blog.",
     hero_subtitle: "Ideas that grow.",
@@ -107,11 +36,10 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
-      {/* Search overlay placeholder / hidden by default but structural */}
       <Navbar />
 
       <main className="pt-24 md:pt-[140px]">
-        {/* APPLE-STYLE HERO: Centered, Massive, Blending Background */}
+        {/* APPLE-STYLE HERO */}
         <section className="relative px-6 md:px-8 mb-24 lg:mb-32 max-w-7xl mx-auto">
           <GsapReveal direction="up" className="text-center max-w-4xl mx-auto mb-16 relative z-10">
             <h1 className="text-5xl md:text-7xl lg:text-[88px] font-bold tracking-[-0.03em] mb-6 leading-[1.05] text-[#1d1d1f]">
@@ -125,7 +53,6 @@ export default async function Home() {
               {siteSettings.hero_description}
             </p>
             
-            {/* Search Input elegantly styled */}
             <div className="w-full max-w-[600px] mx-auto mt-12 relative group">
                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none transition-colors group-focus-within:text-[#093C15]">
                  <Search className="h-5 w-5 text-[#1d1d1f]/40" />
@@ -139,55 +66,63 @@ export default async function Home() {
           </GsapReveal>
         </section>
 
-        {/* CENTRAL FEATURED - Image on TOP like Grey Business screenshot */}
-        <section className="px-6 md:px-8 max-w-7xl mx-auto mb-16 relative">
-          <GsapReveal direction="up">
-            <Link href={`/blog/${featuredArticle.slug}`} className="group block relative rounded-[2.5rem] overflow-hidden bg-white shadow-[0_10px_40px_rgb(0,0,0,0.06)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.12)] transition-shadow duration-500 border border-black/5">
-                 
-                 {/* IMAGE ON TOP - Full width banner */}
-                 <div className="w-full aspect-[16/9] md:aspect-[2.2/1] shrink-0 relative bg-[#1a1a1a] overflow-hidden">
-                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                   <img 
-                     src={featuredArticle.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2000&q=80"} 
-                     alt={featuredArticle.title} 
-                     decoding="async"
-                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90" 
-                   />
-                 </div>
-
-                 {/* Text content below image */}
-                 <div className="p-8 md:p-10 w-full bg-white">
-                    <h2 className="text-3xl md:text-4xl lg:text-[44px] font-bold leading-[1.15] mb-4 max-w-4xl tracking-tight text-[#1d1d1f] font-bricolage">
-                      {featuredArticle.title}
-                    </h2>
-                    <p className="text-[#1d1d1f]/60 text-[17px] md:text-[19px] leading-relaxed max-w-3xl font-medium line-clamp-2 mb-6 font-poppins">
-                      {featuredArticle.excerpt}
-                    </p>
-                    <div className="flex items-center gap-3">
-                       <img 
-                         src={featuredArticle.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(featuredArticle.profiles?.full_name || 'T')}&background=e8f5e8&color=093C15&size=96&bold=true`}
-                         alt={featuredArticle.profiles?.full_name || 'Author'}
-                         className="w-10 h-10 rounded-full object-cover border border-black/5"
-                       />
-                       <span className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wide">{featuredArticle.profiles?.full_name || 'Tela Team'}</span>
-                    </div>
-                 </div>
-            </Link>
-          </GsapReveal>
-        </section>
-
+        {/* CENTRAL FEATURED */}
+        {featuredArticle && (
+          <section className="px-6 md:px-8 max-w-7xl mx-auto mb-16 relative">
+            <GsapReveal direction="up">
+              <Link href={`/blog/${featuredArticle.slug}`} className="group block relative rounded-[2.5rem] overflow-hidden bg-white shadow-[0_10px_40px_rgb(0,0,0,0.06)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.12)] transition-shadow duration-500 border border-black/5">
+                   <div className="w-full aspect-[16/9] md:aspect-[2.2/1] shrink-0 relative bg-[#1a1a1a] overflow-hidden">
+                     <img 
+                       src={featuredArticle.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"} 
+                       alt={featuredArticle.title} 
+                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90" 
+                     />
+                   </div>
+                   <div className="p-8 md:p-10 w-full bg-white">
+                      <h2 className="text-3xl md:text-4xl lg:text-[44px] font-bold leading-[1.15] mb-4 max-w-4xl tracking-tight text-[#1d1d1f] font-bricolage">
+                        {featuredArticle.title}
+                      </h2>
+                      <p className="text-[#1d1d1f]/60 text-[17px] md:text-[19px] leading-relaxed max-w-3xl font-medium line-clamp-2 mb-6 font-poppins">
+                        {featuredArticle.excerpt}
+                      </p>
+                      <div className="flex items-center gap-3">
+                         <img 
+                           src={featuredArticle.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(featuredArticle.profiles?.full_name || 'T')}&background=e8f5e8&color=093C15&size=96&bold=true`}
+                           alt={featuredArticle.profiles?.full_name || 'Author'}
+                           className="w-10 h-10 rounded-full object-cover border border-black/5"
+                         />
+                         <span className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wide">{featuredArticle.profiles?.full_name || 'Tela Team'}</span>
+                      </div>
+                   </div>
+              </Link>
+            </GsapReveal>
+          </section>
+        )}
         {/* CATEGORY TABS SCROLLABLE */}
-        <section className="mb-8 pt-2 pb-6 md:pb-12">
-          <div className="container mx-auto px-6 md:px-8 max-w-7xl flex md:justify-center justify-start overflow-hidden">
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-3 px-4 bg-white rounded-full shadow-sm border border-black/5 max-w-full">
-              {CATEGORIES.map((cat, i) => (
-                <Link key={cat} href={`/categories/${cat.toLowerCase().replace(' ', '-')}`} className={`whitespace-nowrap px-5 py-2.5 text-[15px] font-semibold rounded-full transition-all duration-300 ${i === 0 ? 'bg-[#093C15] text-white shadow-md' : 'text-[#1d1d1f]/70 hover:text-[#093C15] hover:bg-black/5'}`}>
-                  {cat}
-                </Link>
-              ))}
-            </div>
+        <section className="mb-12 pt-2">
+          <div className="container mx-auto px-6 md:px-8 max-w-7xl flex flex-wrap justify-center gap-3">
+            <Link 
+              href="/" 
+              className="whitespace-nowrap px-6 py-2.5 text-[15px] font-bold rounded-full transition-all duration-300 bg-[#093C15] text-white shadow-lg border border-[#093C15]"
+            >
+              All Stories
+            </Link>
+            {categories.map((cat) => (
+              <Link 
+                key={cat.slug} 
+                href={`/blog/category/${cat.slug}`} 
+                className="whitespace-nowrap px-6 py-2.5 text-[15px] font-bold rounded-full transition-all duration-300 text-[#1d1d1f]/60 bg-white hover:text-[#093C15] hover:bg-[#41cc00]/10 border border-black/5 hover:border-[#41cc00]/20"
+              >
+                {cat.name}
+              </Link>
+            ))}
           </div>
         </section>
+
+        {/* Ad Space after Featured */}
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <AdSpace position="home_middle" />
+        </div>
 
         {/* ALL ARTICLES GRID */}
         <section className="container mx-auto px-6 md:px-8 max-w-7xl mb-16">
@@ -195,19 +130,16 @@ export default async function Home() {
             {articles.map((article: any, i: number) => (
               <GsapReveal key={article.id} direction="up" delay={0.05 * i}>
                 <Link href={`/blog/${article.slug}`} className="group flex flex-col h-full bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-shadow duration-500 border-none">
-                  {/* Aspect ratio container for images */}
                   <div className="aspect-[4/3] w-full bg-[#f5f5f7] overflow-hidden relative">
                     <img 
-                        src={article.featured_image} 
+                        src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"} 
                         alt={article.title} 
-                        loading="lazy"
-                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
                     />
                   </div>
                   <div className="flex-1 flex flex-col p-8 bg-white z-10 relative">
                     <div className="flex items-center gap-2 text-[12px] font-bold text-[#41cc00] uppercase tracking-widest mb-4">
-                      <span>{(article.categories as any)?.name || 'Guide'}</span>
+                      <span>{article.categories?.name || 'Insights'}</span>
                     </div>
                     <h4 className="text-[24px] font-bold mb-3 text-[#1d1d1f] line-clamp-2 leading-[1.2] tracking-tight group-hover:text-[#093C15] transition-colors">
                       {article.title}
@@ -223,7 +155,7 @@ export default async function Home() {
                       />
                       <span className="text-[#1d1d1f]">{article.profiles?.full_name || 'Tela'}</span>
                       <span className="px-1">•</span>
-                      <span suppressHydrationWarning>{new Date(article.published_at!).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                      <span suppressHydrationWarning>{new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                     </div>
                   </div>
                 </Link>

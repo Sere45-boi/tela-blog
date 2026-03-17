@@ -56,6 +56,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -83,6 +85,7 @@ export default function RootLayout({
       </head>
       <body className={`${poppins.variable} ${bricolage.variable} font-sans bg-noise antialiased selection:bg-accent selection:text-accent-foreground`}>
         {children}
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );
