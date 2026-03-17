@@ -1,121 +1,91 @@
-import { Metadata, ResolvingMetadata } from "next";
-import { getArticleBySlug } from "@/app/queries/content";
-import { notFound } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { GsapReveal } from "@/components/GsapReveal";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
-interface Props {
-  params: Promise<{ slug: string }>;
-}
-
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-
-  if (!article) return { title: "Article Not Found" };
-
-  const previousImages = (await parent).openGraph?.images || [];
-  const imageUrl = article.featured_image || previousImages[0];
-
-  return {
-    title: article.meta_title || `${article.title} | Tela Blog`,
-    description: article.meta_description || article.excerpt,
-    openGraph: {
-      title: article.title,
-      description: article.excerpt,
-      images: imageUrl ? [imageUrl] : [],
-      type: "article",
-      publishedTime: article.published_at,
-      authors: [article.profiles?.full_name || "Tela Team"],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.title,
-      description: article.excerpt,
-      images: imageUrl ? [imageUrl] : [],
-    },
-    alternates: {
-      canonical: `https://tela.ng/blog/${slug}`,
-    },
-  };
-}
-
-export default async function ArticlePage({ params }: Props) {
-  const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-
-  if (!article) {
-    notFound();
-  }
-
-  // JSON-LD schema for SEO
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: article.title,
-    image: article.featured_image ? [article.featured_image] : [],
-    datePublished: article.published_at,
-    dateModified: article.updated_at,
-    author: [{
-      "@type": "Person",
-      name: article.profiles?.full_name || "Tela Team"
-    }],
-    abstract: article.excerpt,
-  };
-
-  // Estimate read time (rough estimate: 200 words per minute)
-  const wordCount = article.content ? article.content.split(/\s+/).length : 0;
-  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug || '';
+  
+  // Clean up slug for display pseudo-title
+  const displayTitle = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
       <Navbar />
       
-      {/* Article Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <main className="pt-32 pb-24 md:pt-40">
+         <GsapReveal direction="up">
+           <article className="max-w-[800px] mx-auto px-4 md:px-8">
+              
+              <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
+                <ChevronLeft className="w-4 h-4" />
+                Back to all articles
+              </Link>
 
-      <article className="container mx-auto px-4 md:px-8 py-12 md:py-24 max-w-4xl">
-        <GsapReveal direction="up">
-          <header className="mb-12 text-center">
-            <div className="flex items-center justify-center gap-4 text-sm font-medium text-muted-foreground mb-6">
-              <span className="text-accent bg-accent/10 px-3 py-1 rounded-full">
-                {(article.categories as any)?.name}
-              </span>
-              <span>{new Date(article.published_at!).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-              <span>{readingTime} min read</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-foreground mb-6">
-              {article.title}
-            </h1>
-            {article.excerpt && (
-              <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto">
-                {article.excerpt}
-              </p>
-            )}
-          </header>
-        </GsapReveal>
+              <header className="mb-12 text-left">
+                <div className="flex items-center gap-3 mb-6">
+                   <span className="text-[#41cc00] font-bold tracking-[0.15em] text-[12px] uppercase">
+                     Latest Blog
+                   </span>
+                </div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-8 leading-[1.1]">
+                  {displayTitle}
+                </h1>
+                
+                <div className="flex items-center gap-4 border-y border-black/5 py-6">
+                   <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center font-bold text-[#1d1d1f] text-[16px]">
+                     T
+                   </div>
+                   <div>
+                     <div className="text-[16px] font-bold text-[#1d1d1f]">Tela Team</div>
+                     <div className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins" suppressHydrationWarning>
+                       4 min read • {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}
+                     </div>
+                   </div>
+                </div>
+              </header>
+              
+              <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-white rounded-[2rem] overflow-hidden mb-16 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-black/5">
+                 <img 
+                   src="https://images.unsplash.com/photo-1664575602276-acd073f104c1?auto=format&fit=crop&w=2000&q=80" 
+                   alt="Cover" 
+                   className="w-full h-full object-cover mix-blend-multiply" 
+                 />
+              </div>
 
-        <GsapReveal direction="up" delay={0.2}>
-          {article.featured_image && (
-            <div className="w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden mb-16 border border-border/50">
-              <img src={article.featured_image} alt={article.title} className="w-full h-full object-cover" />
-            </div>
-          )}
-        </GsapReveal>
+              <div className="prose prose-lg prose-p:text-[#1d1d1f]/80 prose-headings:text-[#1d1d1f] prose-headings:font-bricolage mx-auto font-poppins leading-relaxed max-w-none">
+                 <p className="text-xl md:text-2xl leading-relaxed text-[#1d1d1f] font-medium mb-8">
+                   This is a beautifully generated placeholder page for the article slug <strong>{slug}</strong>.
+                 </p>
+                 
+                 <p>
+                   Manage global payments, business operations, and local collections in one place. Open a USD, EUR, and GBP account for your business in minutes. The modern tech stack relies on seamless integrations.
+                 </p>
+                 
+                 <h2 className="text-3xl mt-12 mb-6 tracking-tight">The Future of Global Finance</h2>
+                 
+                 <p>
+                   As markets expand beyond borders, companies need robust infrastructure to handle complex, multi-currency operations without friction. 
+                   With Tela, you can automate invoices, track vendor payouts, and ensure your team is always aligned with local compliance regulations everywhere you do business.
+                 </p>
 
-        <GsapReveal direction="up" delay={0.3}>
-          <div 
-            className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-medium prose-a:text-accent hover:prose-a:text-accent/80"
-            dangerouslySetInnerHTML={{ __html: article.content }}
-          />
-        </GsapReveal>
-      </article>
+                 <div className="bg-[#f0fbf0] border border-[#41cc00]/20 rounded-2xl p-8 my-10">
+                   <h3 className="text-[#093C15] font-bricolage font-bold text-2xl mb-4 mt-0">Why this matters</h3>
+                   <ul className="space-y-3 mb-0">
+                     <li className="flex items-start gap-2"><span className="text-[#41cc00] mt-1">•</span> Global collections are instantly verified</li>
+                     <li className="flex items-start gap-2"><span className="text-[#41cc00] mt-1">•</span> Automated routing mitigates exchange risks</li>
+                     <li className="flex items-start gap-2"><span className="text-[#41cc00] mt-1">•</span> Deep integrations with your existing ERP seamlessly</li>
+                   </ul>
+                 </div>
+
+                 <p>
+                   Building an international company inherently requires trust. That's why every transaction processed through our architecture prioritizes end-to-end security and real-time visibility for all stakeholders.
+                 </p>
+              </div>
+           </article>
+         </GsapReveal>
+      </main>
     </div>
   );
 }

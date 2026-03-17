@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { GlassCard } from "@/components/ui/Card";
 import { Lock, Mail, ArrowRight } from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
+import Link from "next/link";
 
 export function LoginClient() {
   const [email, setEmail] = useState("");
@@ -33,23 +34,8 @@ export function LoginClient() {
       return;
     }
 
-    // Check user role
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      
-      if (profile && (profile.role === "admin" || profile.role === "author")) {
-        router.push("/admin");
-      } else {
-        router.push("/");
-      }
-    }
-    
-    // Router refresh to let middleware handle session
+    // Let the protected server layout at /admin handle the strict RLS checks
+    router.push("/admin");
     router.refresh();
   };
 
@@ -87,7 +73,12 @@ export function LoginClient() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground ml-1" htmlFor="password">Password</label>
+            <div className="flex items-center justify-between ml-1">
+              <label className="text-xs font-medium text-muted-foreground" htmlFor="password">Password</label>
+              <Link href="/login/forgot-password" className="text-xs font-medium text-accent hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 <Lock className="h-4 w-4" />

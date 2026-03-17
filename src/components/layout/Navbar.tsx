@@ -1,32 +1,36 @@
 import React from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import Image from "next/image";
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 glass">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-medium tracking-tight">Tela</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <Link href="/" className="transition-colors hover:text-foreground">Insights</Link>
-            <Link href="/categories/engineering" className="transition-colors hover:text-foreground">Engineering</Link>
-            <Link href="/categories/product" className="transition-colors hover:text-foreground">Product</Link>
-            <Link href="/categories/design" className="transition-colors hover:text-foreground">Design</Link>
-          </nav>
+    <div className="sticky top-6 z-50 flex justify-center w-full px-4 md:px-8 pointer-events-none transition-transform duration-300">
+      <header className="pointer-events-auto rounded-full bg-white/80 backdrop-blur-2xl border border-black/5 shadow-[0_8px_32px_rgb(0,0,0,0.06)] w-full max-w-[1000px] transition-all duration-500 hover:bg-white/95">
+        <div className="flex h-[72px] items-center justify-between px-6 md:px-8">
+          <div className="flex items-center gap-10">
+            <Link href="/" className="flex items-center focus:outline-none shrink-0 border border-transparent hover:opacity-80 transition-opacity">
+              <img 
+                src="/images/logo.PNG" 
+                alt="Tela Logo" 
+                className="object-contain h-[28px] w-auto mix-blend-multiply" 
+              />
+            </Link>
+            <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-[#093C15]/70">
+              <Link href="/" className="transition-colors hover:text-[#093C15]">Products</Link>
+              <Link href="/blog" className="transition-colors text-[#093C15] font-semibold">Learn</Link>
+              <Link href="/company" className="transition-colors hover:text-[#093C15]">Company</Link>
+            </nav>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="hidden sm:inline-flex text-[15px] font-medium text-[#093C15] hover:opacity-70 transition-opacity px-4 py-2">
+              Log in
+            </Link>
+            <Link href="/signup" className="hidden sm:inline-flex h-[44px] items-center justify-center rounded-full bg-[#093C15] px-6 text-[15px] font-semibold text-white transition-transform hover:scale-105 shadow-sm">
+              Get started
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button className="text-muted-foreground transition-colors hover:text-foreground" aria-label="Search">
-            <Search className="h-5 w-5" />
-          </button>
-          <Button variant="primary" size="sm" className="hidden sm:inline-flex rounded-full">
-            Subscribe
-          </Button>
-        </div>
-      </div>
-    </header>
+      </header>
+    </div>
   );
 }
