@@ -15,11 +15,14 @@ export default async function AdminDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const [adsRes, analyticsRes, pageImpressionsRes, notificationsRes] = await Promise.all([
+  // Fetch all basic stats
+  const [adsRes, analyticsRes, pageImpressionsRes, notificationsRes, allArticlesRes] = await Promise.all([
     supabase.from("ads").select("impression_count, click_count"),
     supabase.from("analytics").select("read_time_seconds, article_id, reader_id, created_at"),
     supabase.from("page_impressions").select("type, created_at"),
     supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(5),
+    // Fetch top 5 articles by view_count as a broader fallback
+    supabase.from("articles").select("id, title, slug, view_count, featured_image, status").order("view_count", { ascending: false }).limit(5)
   ]);
 
   // ---- Reader Attention ----
@@ -31,17 +34,29 @@ export default async function AdminDashboard() {
     : "No data";
   const uniqueReaders = new Set(analyticsRows.map((r) => r.reader_id)).size;
 
-  // ---- Top post from analytics (most read sessions) ----
+  // ---- Logic to find the Top Performer ----
+  // 1. First, try to find based on real interactive analytics sessions
   const sessionsByArticle: Record<string, number> = {};
   analyticsRows.forEach((r) => {
     if (r.article_id) sessionsByArticle[r.article_id] = (sessionsByArticle[r.article_id] || 0) + 1;
   });
-  const topArticleId = Object.entries(sessionsByArticle).sort((a, b) => b[1] - a[1])[0]?.[0];
-  const topPostRes = topArticleId
-    ? await supabase.from("articles").select("id, title, slug, view_count, featured_image").eq("id", topArticleId).maybeSingle()
-    : await supabase.from("articles").select("id, title, slug, view_count, featured_image").order("view_count", { ascending: false }).limit(1).maybeSingle();
-  const topPost = topPostRes.data;
-  const topPostSessions = topArticleId ? (sessionsByArticle[topArticleId] || 0) : 0;
+  const topArticleByAnalyticsId = Object.entries(sessionsByArticle).sort((a, b) => b[1] - a[1])[0]?.[0];
+  
+  let topPost = null;
+  let topPostSessions = 0;
+
+  if (topArticleByAnalyticsId) {
+    // If we have an ID from analytics, explicitly fetch that one
+    const { data } = await supabase.from("articles").select("id, title, slug, view_count, featured_image").eq("id", topArticleByAnalyticsId).maybeSingle();
+    topPost = data;
+    topPostSessions = sessionsByArticle[topArticleByAnalyticsId] || 0;
+  }
+
+  // 2. If no analytics-based top post (or it failed), pick the most-viewed one from the pre-fetched list
+  if (!topPost && allArticlesRes.data && allArticlesRes.data.length > 0) {
+    topPost = allArticlesRes.data[0];
+    topPostSessions = 0; // we don't have session data for this one if it wasn't in analyticsRecords
+  }
 
   // ---- Ads ----
   const adStats = adsRes.data || [];
@@ -49,13 +64,12 @@ export default async function AdminDashboard() {
   const totalAdClicks = adStats.reduce((acc, ad: any) => acc + (ad.click_count || 0), 0);
   const ctr = totalAdImpressions > 0 ? (totalAdClicks / totalAdImpressions * 100).toFixed(2) : "0.00";
 
-  // ---- Traffic breakdown (fix: if no data, all are 0%) ----
+  // ---- Traffic breakdown ----
   const rawTraffic = (pageImpressionsRes.data || []) as { type: string; created_at: string }[];
   const totalEvents = rawTraffic.length;
   const homeVisits = rawTraffic.filter((t) => t.type === "visit").length;
   const articleReads = rawTraffic.filter((t) => t.type === "read").length;
   const otherEvents = rawTraffic.filter((t) => t.type !== "visit" && t.type !== "read").length;
-  // Fix: all percentages are 0 when totalEvents is 0 — never fallback to 100
   const organicPct = totalEvents > 0 ? Math.round((homeVisits / totalEvents) * 100) : 0;
   const readPct = totalEvents > 0 ? Math.round((articleReads / totalEvents) * 100) : 0;
   const otherPct = totalEvents > 0 ? Math.round((otherEvents / totalEvents) * 100) : 0;
@@ -175,7 +189,7 @@ export default async function AdminDashboard() {
             </GlassCard>
           </GsapReveal>
 
-            {/* Top Performer */}
+          {/* Top Performer */}
           <GsapReveal direction="up" delay={0.5} className="flex-1">
             <GlassCard className="p-6 border-l-4 border-l-[#41cc00] overflow-hidden group shadow-sm h-full flex flex-col justify-center">
               <div className="flex flex-col sm:flex-row items-center gap-8">
@@ -194,7 +208,7 @@ export default async function AdminDashboard() {
                   <h4 className="text-xl font-bold text-[#1d1d1f] mb-4 font-bricolage group-hover:text-[#41cc00] transition-colors line-clamp-2">
                     {topPost?.title || "No posts yet"}
                   </h4>
-                  <div className="flex items-center gap-6 flex-wrap">
+                  <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-2">
                       <Eye className="w-4 h-4 text-black/20" />
                       <span className="text-[14px] font-bold text-[#1d1d1f]">{topPost?.view_count?.toLocaleString() || "0"} views</span>

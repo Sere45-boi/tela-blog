@@ -106,9 +106,9 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   );
 
   return (
-    <div className="border border-border rounded-2xl overflow-hidden bg-white shadow-sm">
-      {/* Word-like Toolbar */}
-      <div className="bg-[#fafafa] border-b border-border px-3 py-2">
+    <div className="border border-black/5 rounded-[1.5rem] overflow-hidden bg-white shadow-sm flex flex-col h-full">
+      {/* Word-like Toolbar - Sticky */}
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-black/5 px-4 py-3">
         {/* Row 1: Main formatting */}
         <div className="flex items-center gap-0.5 flex-wrap">
           {/* Text Style Dropdown-like buttons */}

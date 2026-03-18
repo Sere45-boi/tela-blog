@@ -6,7 +6,12 @@ import { createClient } from "@/utils/supabase/client";
 import { upsertArticle } from "@/app/actions/content";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Eye, Save, Send, Plus, Loader2, ChevronLeft, Layout, Globe, Image as ImageIcon, BarChart, Settings, Share2, Info, Timer, Type, AlignLeft } from "lucide-react";
+import { 
+  Eye, Save, Send, Plus, Loader2, ChevronLeft, 
+  Settings, Share2, Info, Timer, Type, AlignLeft,
+  Calendar, User, FolderTree, Tag, Globe, Image as ImageIcon,
+  Activity, ArrowUpRight, CheckCircle2, AlertCircle, Layout
+} from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { toast } from "sonner";
@@ -70,7 +75,6 @@ export default function ArticleEditor() {
           });
         }
       } else {
-        // Set default author to current user for new articles
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           setFormData(prev => ({ ...prev, author_id: user.id }));
@@ -83,7 +87,7 @@ export default function ArticleEditor() {
   const calculateReadTime = (content: string) => {
     const wordsPerMinute = 200;
     const noHtml = content.replace(/<[^>]*>/g, '');
-    const words = noHtml.trim().split(/\s+/).length;
+    const words = noHtml.trim().split(/\s+/).filter(w => w.length > 0).length;
     return Math.max(1, Math.ceil(words / wordsPerMinute));
   };
 
@@ -112,6 +116,7 @@ export default function ArticleEditor() {
         read_time_minutes: read_time,
         status: statusToSave,
       });
+      toast.success(isPublishing ? "Article published!" : "Draft saved!");
       router.push("/admin/articles");
       router.refresh();
     } catch (err) {
@@ -122,296 +127,388 @@ export default function ArticleEditor() {
   };
 
   return (
-    <>
-      <form className="max-w-6xl pb-20 relative" onSubmit={(e) => handleSubmit(e, false)}>
-        <GsapReveal direction="up" className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage">{id ? "Edit Post" : "Draft New Post"}</h1>
-            <p className="text-[#1d1d1f]/60 mt-1">Refine your ideas and prepare for publication.</p>
+    <div className="min-h-screen bg-[#fbfbfd] pb-20">
+      <form onSubmit={(e) => handleSubmit(e, false)} className="max-w-7xl mx-auto px-6">
+        {/* Superior Header - Following user sketch */}
+        <GsapReveal direction="up" className="flex items-center justify-between h-24 mb-6">
+          <div className="flex items-center gap-4">
+            <button 
+              type="button"
+              onClick={() => router.back()}
+              className="p-2 -ml-2 rounded-lg hover:bg-black/5 text-black/40 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage tracking-tight">
+              {id ? "Edit Article" : "Draft New Article"}
+            </h1>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setIsPreviewing(true)} type="button" className="rounded-xl border-black/5 bg-white shadow-sm flex items-center gap-2">
+
+          <div className="flex items-center gap-2.5">
+            <Button 
+              type="button"
+              variant="ghost" 
+              onClick={() => setIsPreviewing(true)} 
+              className="h-10 px-6 rounded-xl text-[13px] font-bold border-black/5 bg-white shadow-sm flex items-center gap-2"
+            >
               <Eye className="w-4 h-4 text-[#41cc00]" /> Preview
             </Button>
-            <Button variant="secondary" type="submit" isLoading={loading} className="gap-2 rounded-xl border-black/5 bg-white shadow-sm">
-              <Save className="h-4 w-4" /> Save Draft
+            <Button 
+              type="submit"
+              variant="secondary" 
+              isLoading={loading} 
+              className="h-10 px-6 rounded-xl text-[13px] font-bold border-black/5 bg-white shadow-sm flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" /> Save Draft
             </Button>
-            <Button variant="primary" type="button" onClick={(e) => handleSubmit(e, true)} isLoading={loading} className="gap-2 rounded-xl bg-[#093C15] text-white">
-              <Send className="h-4 w-4" /> Publish Post
+            <Button 
+              type="button"
+              onClick={(e) => handleSubmit(e, true)}
+              variant="primary" 
+              isLoading={loading} 
+              className="h-10 px-7 rounded-xl text-[13px] font-bold bg-[#093C15] text-white flex items-center gap-2 shadow-lg"
+            >
+              <Send className="w-4 h-4" /> Publish
             </Button>
           </div>
         </GsapReveal>
 
-        <div className="space-y-12">
-          <div className="space-y-8 flex flex-col h-full">
+        {/* Global Page Layout - Unified Scrolling as per sketch */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          
+          {/* LEFT: Editor & Title (lg:col-span-2) */}
+          <div className="lg:col-span-2 space-y-8">
             <GsapReveal direction="up" delay={0.1} className="flex-1">
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 p-8 shadow-sm space-y-8 h-full flex flex-col">
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Post Title</label>
-                  <Input 
+              <div className="bg-white rounded-3xl border border-black/5 p-8 shadow-sm space-y-8 h-full flex flex-col">
+                <div className="space-y-4">
+                  <label className="text-[12px] font-bold text-black/30 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                    <Type className="w-3 h-3 text-[#41cc00]" /> Post Title
+                  </label>
+                  <textarea
                     value={formData.title} 
-                    onChange={e => setFormData({...formData, title: e.target.value, slug: id ? formData.slug : e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')})} 
-                    placeholder="The Future of Digital Growth..." 
-                    required
-                    className="text-xl font-bold h-14 rounded-xl bg-black/[0.02] border-black/5 px-6"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Content</label>
-                  <div className="flex-1 flex flex-col space-y-8">
-                    <div className="bg-white rounded-[2.5rem] border border-black/5 shadow-[0_8px_40px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col min-h-[700px] group hover:shadow-[0_20px_60px_rgba(0,0,0,0.04)] transition-shadow duration-500">
-                      <div className="p-10 flex-1 flex flex-col">
-                        <RichTextEditor 
-                          value={formData.content} 
-                          onChange={(content) => setFormData({ ...formData, content })} 
-                        />
-                      </div>
-                      
-                      {/* Editor Status Bar */}
-                      <div className="px-10 py-5 bg-black/[0.01] border-t border-black/5 flex items-center justify-between text-[12px] font-bold text-black/30 uppercase tracking-[0.15em]">
-                        <div className="flex items-center gap-6">
-                          <div className="flex items-center gap-2">
-                            <Type className="w-3.5 h-3.5 text-[#41cc00]" />
-                            <span>{formData.content.replace(/<[^>]*>/g, '').length.toLocaleString()} Characters</span>
-                          </div>
-                          <div className="w-1 h-1 rounded-full bg-black/10" />
-                          <div className="flex items-center gap-2">
-                            <AlignLeft className="w-3.5 h-3.5 text-[#41cc00]" />
-                            <span>{formData.content.trim().split(/\s+/).filter(word => word.length > 0).length} Words</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#41cc00] animate-pulse" />
-                          <span>Live Tracking Active</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </GsapReveal>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div className="space-y-8 flex flex-col h-full">
-              <GsapReveal direction="up" delay={0.2}>
-                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 p-8 shadow-sm space-y-8 h-full flex flex-col">
-<div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Excerpt & Summary</label>
-                  <textarea 
-                    className="w-full h-32 rounded-xl border border-black/5 bg-black/[0.02] p-4 text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#41cc00]/20 focus:border-[#41cc00] transition-all resize-none text-sm font-medium"
-                    value={formData.excerpt}
-                    onChange={e => setFormData({...formData, excerpt: e.target.value})}
-                    placeholder="A compelling summary for the catalog..."
+                    onChange={e => setFormData({
+                      ...formData, 
+                      title: e.target.value, 
+                      slug: id ? formData.slug : e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+                    })} 
+                    placeholder="Enter your compelling title..." 
+                    className="w-full text-4xl font-bold font-bricolage text-[#1d1d1f] placeholder-black/10 focus:outline-none resize-none leading-[1.2] overflow-hidden bg-black/[0.02] p-6 rounded-2xl border border-black/5"
+                    rows={1}
+                    onInput={(e) => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = "auto";
+                      target.style.height = target.scrollHeight + "px";
+                    }}
                   />
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Tags</label>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {formData.tags.map(tag => (
-                      <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#41cc00]/10 text-[#093C15] text-[13px] font-bold">
-                        {tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 transition-colors">
-                          <Plus className="w-3.5 h-3.5 rotate-45" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Input 
-                      value={tagInput}
-                      onChange={e => setTagInput(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                      placeholder="Add a tag..."
-                      className="bg-black/[0.02] border-black/5 h-11"
+                  <label className="text-[12px] font-bold text-black/30 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                    <AlignLeft className="w-3 h-3 text-[#41cc00]" /> Content
+                  </label>
+                  <div className="relative min-h-[600px]">
+                    <RichTextEditor 
+                      value={formData.content} 
+                      onChange={(content) => setFormData({ ...formData, content })} 
+                      placeholder="Start your story here..."
                     />
-                    <Button type="button" onClick={addTag} variant="secondary" className="h-11 px-6 rounded-xl border-black/5 bg-white">Add</Button>
                   </div>
                 </div>
               </div>
             </GsapReveal>
           </div>
 
-          <div className="space-y-8 flex flex-col h-full">
+          {/* RIGHT: Metadata Cards (lg:col-span-1) */}
+          <div className="lg:col-span-1 space-y-8">
+            {/* Card 1: Configuration */}
             <GsapReveal direction="up" delay={0.2}>
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 p-6 shadow-sm space-y-6">
-                <h3 className="text-sm font-bold text-[#1d1d1f] uppercase tracking-wider border-b border-black/5 pb-4">Configuration</h3>
+              <div className="bg-white rounded-3xl border border-black/5 p-6 shadow-sm space-y-6">
+                <h3 className="text-sm font-bold text-[#1d1d1f] uppercase tracking-wider border-b border-black/5 pb-4 flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-[#41cc00]" /> Configuration
+                </h3>
                 
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Primary Author</label>
-                  <select 
-                    className="w-full h-11 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-medium text-[#1d1d1f] focus:outline-none"
-                    value={formData.author_id}
-                    onChange={e => setFormData({...formData, author_id: e.target.value})}
-                  >
-                    <option value="">Assign Author</option>
-                    {authors.map(a => (
-                      <option key={a.id} value={a.id}>{a.full_name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Category</label>
-                  <select 
-                    className="w-full h-11 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-medium text-[#1d1d1f] focus:outline-none"
-                    value={formData.category_id}
-                    onChange={e => setFormData({...formData, category_id: e.target.value})}
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">URL Semantic Slug</label>
-                  <Input 
-                    value={formData.slug} 
-                    onChange={e => setFormData({...formData, slug: e.target.value})} 
-                    placeholder="post-url-slug" 
-                    required
-                    className="bg-black/[0.02] border-black/5 h-11"
-                  />
-                </div>
-
-                <div className="space-y-6">
-                  <ImageUpload 
-                    value={formData.featured_image}
-                    onChange={(url: string) => setFormData({...formData, featured_image: url})}
-                    label="Featured Image"
-                    bucket="content"
-                    folder="articles"
-                    aspectRatio="video"
-                  />
-                </div>
-
-                <div className="flex items-center gap-3 pt-2">
-                  <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-black/[0.05] transition-colors cursor-pointer border border-black/5">
-                    <input 
-                      type="checkbox" 
-                      id="featured" 
-                      checked={formData.is_featured}
-                      onChange={e => setFormData({...formData, is_featured: e.target.checked})}
-                      className="absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ease-in-out ${formData.is_featured ? 'translate-x-6' : 'translate-x-1'}`} />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-black/30 uppercase ml-1">Visibility</label>
+                    <select 
+                      className="w-full h-11 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-bold text-[#1d1d1f] focus:outline-none"
+                      value={formData.status}
+                      onChange={e => setFormData({...formData, status: e.target.value as any})}
+                    >
+                      <option value="draft">Draft</option>
+                      <option value="published">Published</option>
+                      <option value="scheduled">Scheduled</option>
+                    </select>
                   </div>
-                  <label htmlFor="featured" className="text-sm font-bold text-[#1d1d1f]/60 cursor-pointer">Feature on Landing Page</label>
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-black/30 uppercase ml-1">Author</label>
+                    <select 
+                      className="w-full h-11 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-bold text-[#1d1d1f] focus:outline-none"
+                      value={formData.author_id}
+                      onChange={e => setFormData({...formData, author_id: e.target.value})}
+                    >
+                      <option value="">Select Author</option>
+                      {authors.map(a => <option key={a.id} value={a.id}>{a.full_name}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-black/30 uppercase ml-1">Category</label>
+                    <select 
+                      className="w-full h-11 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-bold text-[#1d1d1f] focus:outline-none"
+                      value={formData.category_id}
+                      onChange={e => setFormData({...formData, category_id: e.target.value})}
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-sm font-bold text-[#1d1d1f]/60">Homepage Feature</span>
+                    <div 
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer border border-black/5 ${formData.is_featured ? 'bg-[#41cc00]' : 'bg-black/[0.05]'}`}
+                      onClick={() => setFormData({...formData, is_featured: !formData.is_featured})}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ease-in-out ${formData.is_featured ? 'translate-x-6' : 'translate-x-1'} shadow-sm`} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </GsapReveal>
 
+            {/* Card 2: Media & Labels */}
             <GsapReveal direction="up" delay={0.3}>
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 p-6 shadow-sm space-y-6">
-                <h3 className="text-sm font-bold text-[#1d1d1f] uppercase tracking-wider border-b border-black/5 pb-4 flex items-center justify-between">
-                  <span>SEO Optimization</span>
-                  <Eye className="h-4 w-4 text-[#1d1d1f]/30" />
+              <div className="bg-white rounded-3xl border border-black/5 p-6 shadow-sm space-y-6">
+                <h3 className="text-sm font-bold text-[#1d1d1f] uppercase tracking-wider border-b border-black/5 pb-4 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-[#41cc00]" /> Visuals & Tags
                 </h3>
                 
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Meta Title</label>
-                  <Input 
-                    value={formData.meta_title} 
-                    onChange={e => setFormData({...formData, meta_title: e.target.value})} 
-                    placeholder="Optimal SEO Title" 
-                    className="bg-black/[0.02] border-black/5 h-11"
-                  />
-                  <p className="text-[10px] font-bold text-[#1d1d1f]/30 uppercase text-right">{formData.meta_title.length}/60</p>
-                </div>
-
                 <div className="space-y-6">
-                  <ImageUpload 
-                    value={formData.og_image_url}
-                    onChange={(url: string) => setFormData({...formData, og_image_url: url})}
-                    label="OG Share Image"
-                    bucket="content"
-                    folder="seo"
-                    aspectRatio="video"
-                  />
-                </div>
+                  <div className="p-1 rounded-2xl bg-black/[0.02] border border-black/5">
+                    <ImageUpload 
+                      value={formData.featured_image}
+                      onChange={(url) => setFormData({...formData, featured_image: url})}
+                      bucket="content"
+                      folder="articles"
+                      aspectRatio="video"
+                      className="bg-transparent"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Description</label>
-                  <textarea 
-                    className="w-full h-24 rounded-xl border border-black/5 bg-black/[0.02] p-3 text-sm text-[#1d1d1f] focus:outline-none transition-all resize-none font-medium"
-                    value={formData.meta_description}
-                    onChange={e => setFormData({...formData, meta_description: e.target.value})}
-                    placeholder="Compelling snippet for Google..."
-                  />
-                  <p className="text-[10px] font-bold text-[#1d1d1f]/30 uppercase text-right">{formData.meta_description.length}/160</p>
-                </div>
-
-                {/* Google Snippet preview */}
-                <div className="mt-4 p-5 rounded-2xl bg-white border border-[#dadce0] font-sans shadow-sm">
-                  <div className="text-[#202124] text-xs mb-2 flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-sm bg-[#f1f3f4] flex items-center justify-center font-bold text-[#5f6368] text-[10px]">T</div>
-                    <div>
-                      <span className="block font-bold">Tela Insights</span>
-                      <span className="text-[#5f6368]">https://tela.ng/blog/{formData.slug || 'slug'}</span>
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-bold text-black/30 uppercase ml-1">Tags</label>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {formData.tags.map(tag => (
+                        <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#41cc00]/10 text-[#093C15] text-[12px] font-bold transition-all hover:bg-black/5 hover:text-black/60 group cursor-pointer">
+                          {tag}
+                          <button type="button" onClick={() => removeTag(tag)} className="opacity-40 group-hover:opacity-100">
+                            <Plus className="w-3 h-3 rotate-45" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="relative">
+                      <Input 
+                        value={tagInput}
+                        onChange={e => setTagInput(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                        placeholder="Add tag..."
+                        className="h-10 text-[13px] bg-black/[0.02] border border-black/5 pr-10"
+                      />
+                      <button 
+                        type="button" 
+                        onClick={addTag}
+                        className="absolute right-2 top-2 p-1 rounded-lg bg-white border border-black/5 text-[#093C15] hover:bg-[#41cc00] hover:text-white transition-all shadow-sm"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <p className="text-[#4d5156] text-[14px] line-clamp-2 leading-normal">
-                    {formData.meta_description || formData.excerpt || 'Compelling meta description for Google snippet preview...'}
-                  </p>
+                  
+                  <div className="p-4 rounded-2xl bg-black/[0.02] border border-black/5 break-all">
+                    <label className="text-[11px] font-bold text-black/20 uppercase block h-4 mb-1">Article Permalink</label>
+                    <input 
+                      value={formData.slug} 
+                      onChange={e => setFormData({...formData, slug: e.target.value})} 
+                      className="bg-transparent border-none text-[13px] font-bold text-[#093C15] w-full focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </GsapReveal>
+          </div>
+
+          {/* BOTTOM: Full Width SEO Optimization (lg:col-span-3) */}
+          <div className="lg:col-span-3">
+            <GsapReveal direction="up" delay={0.4}>
+              <div className="bg-white rounded-[2rem] border border-black/5 p-8 shadow-sm space-y-8">
+                <div className="flex items-center justify-between border-b border-black/5 pb-6">
+                  <h3 className="text-xl font-bold text-[#1d1d1f] font-bricolage flex items-center gap-3">
+                    <Globe className="w-6 h-6 text-[#41cc00]" /> SEO Optimization & Search Integrity
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-[#41cc00] bg-[#41cc00]/10 px-3 py-1 rounded-full uppercase tracking-widest">Live Preview Enabled</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <label className="text-[12px] font-bold text-black/30 uppercase tracking-[0.1em]">Meta Title Tag</label>
+                      <Input 
+                        value={formData.meta_title} 
+                        onChange={e => setFormData({...formData, meta_title: e.target.value})} 
+                        placeholder="Page title displayed in search results..." 
+                        className="h-14 text-base font-bold bg-black/[0.02] border-black/5 px-6"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[12px] font-bold text-black/30 uppercase tracking-[0.1em]">Meta Description</label>
+                      <textarea 
+                        value={formData.meta_description} 
+                        onChange={e => setFormData({...formData, meta_description: e.target.value})} 
+                        placeholder="Brief summary used by search engines..." 
+                        className="w-full h-32 rounded-2xl border border-black/5 bg-black/[0.02] p-6 text-base font-medium text-[#1d1d1f] focus:outline-none resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                     <label className="text-[12px] font-bold text-black/30 uppercase tracking-[0.1em]">Google Snippet Preview</label>
+                     <div className="p-8 rounded-[2rem] bg-white border border-[#dadce0] font-sans shadow-sm hover:shadow-md transition-shadow">
+                        <div className="text-[#202124] text-sm mb-2 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#f1f3f4] flex items-center justify-center font-bold text-[#5f6368] text-[10px]">T</div>
+                          <div>
+                            <span className="block font-bold text-sm">Tela Insights</span>
+                            <span className="text-[#5f6368] text-xs">https://tela.ng/blog/{formData.slug || 'slug'}</span>
+                          </div>
+                        </div>
+                        <h4 className="text-[#1a0dab] text-xl font-medium hover:underline cursor-pointer truncate mb-1">
+                          {formData.meta_title || formData.title || 'Your Compelling Page Title'}
+                        </h4>
+                        <p className="text-[#4d5156] text-[14px] line-clamp-3 leading-relaxed">
+                          {formData.meta_description || formData.excerpt || 'This description is what users will see when your article appears in search results. Make it compelling to drive more clicks to your insightful content.'}
+                        </p>
+                     </div>
+                     
+                     <div className="flex items-center gap-6 pt-2">
+                        <div className="flex-1 space-y-2">
+                           <div className="flex justify-between text-[11px] font-bold text-black/30 uppercase">
+                              <span>Title Length</span>
+                              <span>{formData.meta_title.length}/60</span>
+                           </div>
+                           <div className="h-1.5 w-full bg-black/[0.03] rounded-full overflow-hidden">
+                              <div className={`h-full transition-all duration-500 rounded-full ${formData.meta_title.length > 60 ? 'bg-red-500' : 'bg-[#41cc00]'}`} style={{ width: `${Math.min(100, (formData.meta_title.length / 60) * 100)}%` }} />
+                           </div>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                           <div className="flex justify-between text-[11px] font-bold text-black/30 uppercase">
+                              <span>Description Length</span>
+                              <span>{formData.meta_description.length}/160</span>
+                           </div>
+                           <div className="h-1.5 w-full bg-black/[0.03] rounded-full overflow-hidden">
+                              <div className={`h-full transition-all duration-500 rounded-full ${formData.meta_description.length > 160 ? 'bg-red-500' : 'bg-[#41cc00]'}`} style={{ width: `${Math.min(100, (formData.meta_description.length / 160) * 100)}%` }} />
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-black/5 pt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                   <div className="space-y-4">
+                      <label className="text-[12px] font-bold text-black/30 uppercase tracking-[0.1em] ml-1 flex items-center gap-2">
+                        <Share2 className="w-3 h-3 text-[#41cc00]" /> Social Graph Preview [OG Image]
+                      </label>
+                      <div className="p-1 rounded-2xl bg-black/[0.02] border border-black/5">
+                        <ImageUpload 
+                          value={formData.og_image_url}
+                          onChange={(url) => setFormData({...formData, og_image_url: url})}
+                          bucket="content"
+                          folder="seo"
+                          aspectRatio="video"
+                          className="bg-transparent"
+                        />
+                      </div>
+                   </div>
+                   <div className="space-y-4">
+                      <label className="text-[12px] font-bold text-black/30 uppercase tracking-[0.1em] ml-1 flex items-center gap-2">
+                        <Timer className="w-3 h-3 text-[#41cc00]" /> Distribution Info
+                      </label>
+                      <div className="p-6 rounded-2xl bg-[#093C15]/[0.02] border border-[#093C15]/5 space-y-4">
+                         <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-[#1d1d1f]/60">Estimated Read Time</span>
+                            <span className="text-sm font-bold text-[#093C15]">{calculateReadTime(formData.content)} min</span>
+                         </div>
+                         <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-[#1d1d1f]/60">Slug Preview</span>
+                            <span className="text-sm font-bold text-[#093C15]">/{formData.slug}</span>
+                         </div>
+                         <div className="pt-4 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-[#41cc00]/10 flex items-center justify-center">
+                               <CheckCircle2 className="w-5 h-5 text-[#41cc00]" />
+                            </div>
+                            <p className="text-[11px] font-bold text-[#1d1d1f]/40 uppercase leading-normal">Your content is being optimized for accessibility and search fidelity.</p>
+                         </div>
+                      </div>
+                   </div>
                 </div>
               </div>
             </GsapReveal>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
 
       {/* Preview Overlay */}
       {isPreviewing && (
         <div className="fixed inset-0 z-[100] bg-white overflow-y-auto animate-in slide-in-from-bottom-8 duration-500">
           <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-black/5 px-8 h-20 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="px-3 py-1 bg-[#41cc00]/10 text-[#093C15] text-[11px] font-bold rounded-lg uppercase tracking-widest">Preview Mode</span>
+              <span className="px-3 py-1 bg-[#41cc00]/10 text-[#093C15] text-[11px] font-bold rounded-lg uppercase tracking-widest">Live Preview</span>
               <h2 className="text-sm font-bold text-[#1d1d1f] max-w-sm truncate">{formData.title || "Untitled Post"}</h2>
             </div>
-            <Button onClick={() => setIsPreviewing(false)} className="rounded-xl border-black/5 hover:bg-black/5 text-[#1d1d1f]">Exit Preview</Button>
+            <Button onClick={() => setIsPreviewing(false)} className="h-10 px-6 rounded-xl border-black/5 hover:bg-black/5 text-[#1d1d1f] font-bold">Exit Preview</Button>
           </div>
 
-          <div className="max-w-4xl mx-auto px-8 py-20">
+          <div className="max-w-[800px] mx-auto px-8 py-24">
             {formData.featured_image && (
-              <div className="w-full aspect-video rounded-3xl overflow-hidden mb-12 shadow-2xl">
-                <img src={formData.featured_image} className="w-full h-full object-cover" alt="Preview Thumbnail" />
+              <div className="w-full aspect-video rounded-3xl overflow-hidden mb-16 shadow-2xl relative">
+                <img src={formData.featured_image} className="w-full h-full object-cover" alt="Preview" />
               </div>
             )}
-            <h1 className="text-5xl font-bold text-[#1d1d1f] font-bricolage mb-8 leading-tight">{formData.title || "Your Compelling Title Here"}</h1>
+            <h1 className="text-6xl font-bold text-[#1d1d1f] font-bricolage mb-10 leading-[1.1] tracking-tight">{formData.title || "Your Story Starts Here"}</h1>
             
-            <div className="flex items-center gap-6 mb-12 py-6 border-y border-black/5">
-              <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-full bg-black/5 border border-black/5" />
+            <div className="flex items-center gap-8 mb-16 py-8 border-y border-black/5">
+              <div className="flex items-center gap-4">
+                 <div className="w-12 h-12 rounded-full bg-black/[0.03] border border-black/5 flex items-center justify-center text-black/20">
+                    <User className="w-6 h-6" />
+                 </div>
                  <div>
-                    <span className="block text-sm font-bold text-[#1d1d1f]">Assigned Author</span>
-                    <span className="block text-[12px] text-black/30 font-medium">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                    <span className="block text-[15px] font-bold text-[#1d1d1f]">Assigned Author</span>
+                    <span className="block text-[13px] text-black/30 font-medium">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                  </div>
               </div>
-              <div className="h-8 w-px bg-black/5" />
-              <div className="flex items-center gap-2 text-black/30 text-sm font-bold uppercase tracking-widest">
+              <div className="h-10 w-px bg-black/5" />
+              <div className="flex items-center gap-2.5 text-black/30 text-[12px] font-bold uppercase tracking-[0.2em]">
                  <Timer className="w-4 h-4" />
                  <span>{calculateReadTime(formData.content)} MIN READ</span>
               </div>
             </div>
 
             <div 
-              className="prose prose-lg max-w-none text-[#1d1d1f]/80 leading-relaxed font-medium"
-              dangerouslySetInnerHTML={{ __html: formData.content || "<p className='text-black/20 italic'>Post content will appear here...</p>" }}
+              className="prose prose-xl max-w-none text-[#1d1d1f]/90 leading-[1.8] font-medium"
+              dangerouslySetInnerHTML={{ __html: formData.content || "<p className='text-black/10 italic text-2xl text-center py-20'>Content will appear here...</p>" }}
             />
 
-            <div className="mt-20 pt-10 border-t border-black/5 flex flex-wrap gap-3">
+            <div className="mt-24 pt-12 border-t border-black/5 flex flex-wrap gap-4">
               {formData.tags.map(tag => (
-                <span key={tag} className="px-4 py-2 rounded-xl bg-black/5 text-[#1d1d1f] text-sm font-bold">#{tag}</span>
+                <span key={tag} className="px-5 py-2.5 rounded-2xl bg-[#fbfbfd] border border-black/5 text-[#1d1d1f] text-sm font-bold shadow-sm">#{tag}</span>
               ))}
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
