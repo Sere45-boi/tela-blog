@@ -24,23 +24,25 @@ export default function UsersPage() {
   const [inviting, setInviting] = useState(false);
   const [inviteResult, setInviteResult] = useState<{ token: string; inviteUrl: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
+  async function fetchUsersAndSelf() {
+    try {
+      const { data: { user: self } } = await supabase.auth.getUser();
+      if (self) {
+          const { data: profile } = await supabase.from('profiles').select('*').eq('id', self.id).single();
+          setCurrentUser({ ...self, ...profile });
+      }
+      const data = await getUsers();
+      setUsers(data);
+    } catch (error: any) {
+      toast.error("Failed to fetch authors");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchUsersAndSelf() {
-      try {
-        const { data: { user: self } } = await supabase.auth.getUser();
-        if (self) {
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', self.id).single();
-            setCurrentUser({ ...self, ...profile });
-        }
-        const data = await getUsers();
-        setUsers(data);
-      } catch (error: any) {
-        toast.error("Failed to fetch authors");
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchUsersAndSelf();
   }, []);
 
@@ -55,6 +57,36 @@ export default function UsersPage() {
       toast.error(error.message);
     } finally {
       setInviting(false);
+    }
+  };
+
+  const handleRoleToggle = async (userId: string, currentRole: string) => {
+    setProcessingId(userId);
+    const newRole = currentRole === 'admin' ? 'author' : 'admin';
+    try {
+      const { updateUserRole } = await import("@/app/actions/user");
+      await updateUserRole(userId, newRole);
+      toast.success(`Role updated to ${newRole}`);
+      await fetchUsersAndSelf();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleDelete = async (userId: string) => {
+    if (!confirm("Are you sure you want to deactivate this author? Their articles will remain but they will lose dashboard access.")) return;
+    setProcessingId(userId);
+    try {
+      const { deleteUser } = await import("@/app/actions/user");
+      await deleteUser(userId);
+      toast.success("Author deactivated");
+      await fetchUsersAndSelf();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -82,12 +114,12 @@ export default function UsersPage() {
       <GsapReveal direction="up" className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage">Authors & Team</h1>
-          <p className="text-[#1d1d1f]/60 mt-2">Manage your editorial team and their public visibility.</p>
+          <p className="text-[#1d1d1f]/60 mt-2">Manage your editorial team and their platform permissions.</p>
         </div>
         {currentUser?.role === 'admin' && (
           <Button 
             onClick={() => setShowInviteModal(true)}
-            className="h-11 px-6 rounded-xl bg-[#093C15] text-white"
+            className="h-11 px-6 rounded-xl bg-[#093C15] text-white hover:bg-[#0a5a1f] transition-all shadow-lg shadow-[#093C15]/10"
           >
             Invite Author
           </Button>
@@ -108,7 +140,7 @@ export default function UsersPage() {
             {!inviteResult ? (
               <>
                 <h2 className="text-2xl font-bold text-[#1d1d1f] font-bricolage mb-2">Invite New Author</h2>
-                <p className="text-[#1d1d1f]/60 text-sm mb-8">Generated links expire in 7 days.</p>
+                <p className="text-[#1d1d1f]/60 text-sm mb-8">Generated links expire in <span className="text-[#093C15] font-bold">2 hours</span>.</p>
 
                 <form onSubmit={handleInvite} className="space-y-6">
                   <div className="space-y-2">
@@ -128,7 +160,7 @@ export default function UsersPage() {
                     <select 
                       value={inviteRole}
                       onChange={(e: any) => setInviteRole(e.target.value)}
-                      className="w-full h-12 px-5 rounded-xl bg-black/[0.02] border border-black/5 text-sm font-bold text-[#1d1d1f] focus:outline-none appearance-none cursor-pointer"
+                      className="w-full h-12 px-5 rounded-xl bg-black/[0.02] border border-black/5 text-sm font-bold text-[#1d1d1f] focus:outline-none appearance-none cursor-pointer hover:bg-black/[0.04] transition-colors"
                     >
                       <option value="author">Contributor (Author)</option>
                       <option value="admin">Administrator</option>
@@ -138,7 +170,7 @@ export default function UsersPage() {
                   <Button 
                     type="submit" 
                     isLoading={inviting}
-                    className="w-full h-12 bg-[#093C15] text-white rounded-xl shadow-lg shadow-[#093C15]/10"
+                    className="w-full h-12 bg-[#093C15] text-white rounded-xl shadow-lg shadow-[#093C15]/10 active:scale-[0.98]"
                   >
                     Generate Invite Link
                   </Button>
@@ -197,7 +229,6 @@ export default function UsersPage() {
                   <th className="px-6 py-4 text-[12px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider">Role</th>
                   <th className="px-6 py-4 text-[12px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-4 text-[12px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider">Articles</th>
-                  <th className="px-6 py-4 text-[12px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider">Joined</th>
                   <th className="px-6 py-4 text-[12px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
@@ -220,7 +251,7 @@ export default function UsersPage() {
                             {user.full_name || "Unknown Author"}
                             {user.role === 'admin' && <Shield className="w-3 h-3 text-[#41cc00]" />}
                           </div>
-                          <div className="text-[13px] text-[#1d1d1f]/50 font-medium">{user.role === 'admin' ? 'Administrator' : 'Contributor'}</div>
+                          <div className="text-[13px] text-[#1d1d1f]/50 font-medium lowercase">@{user.full_name?.replace(/\s/g, '').toLowerCase() || 'author'}</div>
                         </div>
                       </div>
                     </td>
@@ -232,9 +263,9 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 text-[12px] font-bold ${user.is_public ? 'text-[#41cc00]' : 'text-black/30'}`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${user.is_public ? 'bg-[#41cc00]' : 'bg-black/20'}`} />
-                            {user.is_public ? 'Public' : 'Private'}
+                        <span className={`inline-flex items-center gap-1.5 text-[12px] font-bold ${user.is_active !== false ? 'text-[#41cc00]' : 'text-red-500'}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${user.is_active !== false ? 'bg-[#41cc00]' : 'bg-red-500'}`} />
+                            {user.is_active !== false ? 'Active' : 'Deactivated'}
                         </span>
                     </td>
                     <td className="px-6 py-4">
@@ -242,21 +273,27 @@ export default function UsersPage() {
                         {user.articles?.[0]?.count || 0}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-[14px] text-[#1d1d1f]/50 font-medium">
-                      {new Date(user.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 hover:bg-[#41cc00]/10 rounded-lg transition-colors text-[#093C15]" title="Edit Permissions">
-                          <ShieldAlert className="w-4 h-4" />
-                        </button>
-                        <button className="p-2 hover:bg-black/5 rounded-lg transition-colors text-[#1d1d1f]/60" title="View Profile">
-                          <ExternalLink className="w-4 h-4" />
-                        </button>
-                        <button className="p-2 hover:bg-black/5 rounded-lg transition-colors text-[#1d1d1f]/60">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {currentUser?.role === 'admin' && user.id !== currentUser.id && (
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            disabled={processingId === user.id}
+                            onClick={() => handleRoleToggle(user.id, user.role)}
+                            className="p-2 hover:bg-[#41cc00]/10 rounded-lg transition-colors text-[#093C15] disabled:opacity-50" 
+                            title="Toggle Role (Admin/Author)"
+                          >
+                            {processingId === user.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldAlert className="w-4 h-4" />}
+                          </button>
+                          <button 
+                             disabled={processingId === user.id || user.is_active === false}
+                             onClick={() => handleDelete(user.id)}
+                             className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500 disabled:opacity-50" 
+                             title="Deactivate Author"
+                          >
+                            {processingId === user.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

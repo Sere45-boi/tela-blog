@@ -1,7 +1,25 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, FileText, Settings, Tags, LogOut, Image, Globe, Users, UserCircle } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Settings, 
+  Tags, 
+  LogOut, 
+  ImageIcon, 
+  Globe, 
+  Users, 
+  UserCircle, 
+  Search, 
+  Bell, 
+  Share2, 
+  MoreHorizontal, 
+  Plus,
+  ChevronRight,
+  ChevronDown
+} from "lucide-react";
+import { NotificationCenter } from "@/components/admin/NotificationCenter";
 
 export default async function AdminLayout({
   children,
@@ -16,79 +34,155 @@ export default async function AdminLayout({
   }
 
   // Check roles (admin | author)
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const [profileRes, teamRes, settingsRes] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase.from("profiles").select("avatar_url, full_name").eq('is_active', true).order('created_at', { ascending: false }).limit(6),
+    supabase.from("site_settings").select("header_governance_text").eq('id', 1).single()
+  ]);
+
+  const profile = profileRes.data;
+  const team = teamRes.data || [];
+  const siteSettings = settingsRes.data;
 
   if (!profile || (profile.role !== "admin" && profile.role !== "author")) {
     redirect("/"); // Unauthorized
   }
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4]">
+    <div className="min-h-screen flex bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-poppins selection:bg-[#41cc00]/30 selection:text-[#093C15]">
       {/* Sidebar Navigation */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 p-6 flex flex-col z-50 shadow-sm">
-        <div className="mb-10 mt-2">
-          <Link href="/admin" className="block group">
-            <div className="max-w-[140px] transition-opacity group-hover:opacity-80">
-              <img
-                src="/images/IMG_2366.png"
-                alt="Tela Logo"
-                className="w-full h-auto object-contain"
-              />
-            </div>
+      <aside className="fixed inset-y-0 left-0 w-[280px] bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 flex flex-col z-50 overflow-hidden shadow-sm">
+        {/* Logo Section */}
+        <div className="p-6 flex items-center justify-between">
+          <Link href="/admin" className="block max-w-[120px] transition-opacity hover:opacity-80">
+            <img 
+              src="/images/IMG_2366.png" 
+              alt="Tela Logo" 
+              className="w-full h-auto object-contain" 
+            />
           </Link>
+          <button className="p-1.5 rounded-lg border border-black/5 text-black/40 hover:text-black/60 transition-colors">
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
-        <nav className="flex-1 space-y-1">
-          <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <LayoutDashboard className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">Dashboard</span>
-          </Link>
-          <Link href="/admin/articles" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <FileText className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">Post Management</span>
-          </Link>
-          <Link href="/admin/categories" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <Tags className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">Categories</span>
-          </Link>
-          <Link href="/admin/users" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <Users className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">Authors</span>
-          </Link>
-          <Link href="/admin/ads" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <Image className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">Ads Manager</span>
-          </Link>
-          <Link href="/admin/site-settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <Globe className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">Site Settings</span>
-          </Link>
-          <Link href="/admin/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <UserCircle className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">My Profile</span>
-          </Link>
-          <Link href="/admin/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors">
-            <Settings className="h-4 w-4 text-[#41cc00]" />
-            <span className="text-sm font-medium">Account Settings</span>
-          </Link>
-        </nav>
+        {/* Search Input */}
+        <div className="px-6 mb-8">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/20 group-focus-within:text-[#093C15] transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Search components..."
+              className="w-full h-11 bg-black/[0.02] border border-transparent focus:border-[#41cc00]/20 rounded-xl pl-11 pr-4 text-[13px] font-medium outline-none transition-colors duration-200 placeholder:text-black/20"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <span className="text-[10px] font-bold text-black/20 bg-white border border-black/5 px-1.5 py-0.5 rounded-md">⌘ K</span>
+            </div>
+          </div>
+        </div>
 
-        <div className="mt-auto border-t border-[#41cc00]/10 pt-4">
-          <form action="/auth/signout" method="post">
-            <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-red-500 transition-colors">
-              <LogOut className="h-4 w-4" />
-              <span className="text-sm font-medium">Sign Out</span>
-            </button>
-          </form>
+        {/* Navigation Groups */}
+        <div className="flex-1 px-4 overflow-y-auto space-y-6 custom-scrollbar pb-8">
+          <div>
+            <h3 className="px-4 text-[11px] font-bold text-black/30 uppercase tracking-[0.1em] mb-3">Main Menu</h3>
+            <nav className="space-y-1">
+              <Link href="/admin" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
+                <LayoutDashboard className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
+                <span className="text-[14px] font-semibold">Dashboard</span>
+              </Link>
+              <Link href="/admin/articles" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
+                <FileText className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
+                <span className="text-[14px] font-semibold">Post Management</span>
+              </Link>
+              <Link href="/admin/categories" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
+                <Tags className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
+                <span className="text-[14px] font-semibold">Categories</span>
+              </Link>
+              <Link href="/admin/campaigns" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
+                <ImageIcon className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
+                <span className="text-[14px] font-semibold">Campaigns</span>
+              </Link>
+              <Link href="/admin/users" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
+                <Users className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
+                <span className="text-[14px] font-semibold">Authors & Team</span>
+              </Link>
+            </nav>
+          </div>
+
+          <div>
+            <nav className="space-y-1">
+              <Link href="/admin/site-settings" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
+                <Globe className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200" />
+                <span className="text-[14px] font-semibold">Site Branding</span>
+              </Link>
+            </nav>
+          </div>
+        </div>
+
+        {/* User Footer */}
+        <div className="p-4 bg-black/[0.02] border-t border-black/5 mt-auto">
+          <div className="p-3 bg-white rounded-2xl border border-black/5 shadow-sm flex items-center justify-between">
+             <Link href="/admin/profile" className="flex items-center gap-3 overflow-hidden group">
+                <div className="w-9 h-9 rounded-xl overflow-hidden grayscale-[0.5] group-hover:grayscale-0 transition-all border border-black/5 shrink-0">
+                  <img src={profile.avatar_url || "https://images.unsplash.com/photo-1544005313-94ddf0286df2"} alt="Author" className="w-full h-full object-cover" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile.full_name?.split(' ')[0]}</div>
+                  <div className="text-[10px] text-[#41cc00] font-bold uppercase tracking-wider">Settings</div>
+                </div>
+             </Link>
+             <button className="text-black/20 hover:text-black/40 transition-colors">
+                <ChevronDown className="w-4 h-4" />
+             </button>
+          </div>
         </div>
       </aside>
+
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 p-8 md:p-12">
-        {children}
+      <main className="flex-1 ml-[280px] min-h-screen flex flex-col">
+        {/* Global Top Bar */}
+        <header className="h-[80px] px-8 md:px-12 flex items-center justify-between sticky top-0 bg-white/60 backdrop-blur-xl z-40 border-b border-[#41cc00]/5">
+           <div className="flex items-center gap-4">
+              <h2 className="text-[20px] font-bold text-[#1d1d1f] font-bricolage tracking-tight">
+                {siteSettings?.header_governance_text || "Governance"}
+              </h2>
+           </div>
+
+           <div className="flex items-center gap-8">
+              <div className="flex -space-x-3">
+                {team.map((member, i) => (
+                  <div 
+                    key={i} 
+                    className="w-9 h-9 rounded-full border-[2.5px] border-white object-cover shadow-sm bg-white overflow-hidden" 
+                    title={member.full_name}
+                  >
+                    <img 
+                      src={member.avatar_url || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6"} 
+                      className="w-full h-full object-cover" 
+                      alt={member.full_name} 
+                    />
+                  </div>
+                ))}
+                {team.length >= 6 && (
+                  <Link href="/admin/users" className="w-9 h-9 rounded-full bg-white border border-black/5 flex items-center justify-center text-[10px] font-bold text-[#41cc00] hover:bg-[#41cc00]/10 transition-all border-[2.5px] border-white shadow-sm z-10">
+                    +{team.length - 6 || 12}
+                  </Link>
+                )}
+                <Link href="/admin/users" className="w-9 h-9 rounded-full bg-[#093C15] flex items-center justify-center text-white scale-90 -ml-1 shadow-lg shadow-[#093C15]/20 hover:scale-100 transition-transform z-10">
+                  <Plus className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="flex items-center gap-3">
+                 <NotificationCenter />
+              </div>
+           </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="p-8 md:p-12 pt-8 w-full max-w-[1600px] mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

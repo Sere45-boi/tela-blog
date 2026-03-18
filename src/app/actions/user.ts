@@ -68,3 +68,57 @@ export async function getUsers() {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function updateUserRole(userId: string, role: 'admin' | 'author') {
+  const supabase = await createClient();
+  const { data: { user: adminUser } } = await supabase.auth.getUser();
+  
+  if (!adminUser) throw new Error("Unauthorized");
+  
+  // Verify requester is admin
+  const { data: adminProfile } = await supabase.from('profiles').select('role').eq('id', adminUser.id).single();
+  if (adminProfile?.role !== 'admin') throw new Error("Only administrators can change roles.");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role })
+    .eq("id", userId);
+
+  if (error) throw new Error(error.message);
+  
+  revalidatePath("/admin/users");
+  return { success: true };
+}
+
+export async function deleteUser(userId: string) {
+  const supabase = await createClient();
+  const { data: { user: adminUser } } = await supabase.auth.getUser();
+  
+  if (!adminUser) throw new Error("Unauthorized");
+  
+  // Verify requester is admin
+  const { data: adminProfile } = await supabase.from('profiles').select('role').eq('id', adminUser.id).single();
+  if (adminProfile?.role !== 'admin') throw new Error("Only administrators can deactivate users.");
+
+  // Soft delete: Mark as inactive
+  const { error } = await supabase
+    .from("profiles")
+    .update({ is_active: false })
+    .eq("id", userId);
+
+  if (error) throw new Error(error.message);
+  
+  revalidatePath("/admin/users");
+  return { success: true };
+}
+
+export async function updatePassword(password: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw new Error(error.message);
+
+  return { success: true };
+}

@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Save, Globe, Type, FileText, Share2, Loader2 } from "lucide-react";
+import { Save, Globe, Type, FileText, Share2, Loader2, Image as ImageIcon } from "lucide-react";
 import { updateSiteSettings } from "@/app/actions/settings";
 import { createClient } from "@/utils/supabase/client";
+import { GsapReveal } from "@/components/GsapReveal";
+import { GlassCard } from "@/components/ui/Card";
 
 export default function SiteSettingsPage() {
   const supabase = createClient();
@@ -22,6 +24,12 @@ export default function SiteSettingsPage() {
     newsletter_title: "Insights that drive growth.",
     newsletter_description: "Join thousands of founders getting weekly updates on finance, startups, and product building.",
     footer_description: "Tela is the borderless financial OS for ambitious businesses in emerging markets. Built for global scale.",
+    header_governance_text: "Governance",
+    footer_copyright_text: "© 2026 Tela Blog. All rights reserved.",
+    footer_link_1_label: "Privacy Policy",
+    footer_link_1_url: "/privacy",
+    footer_link_2_label: "Terms of Service",
+    footer_link_2_url: "/terms",
     meta_keywords: "global payments, fintech Africa, business blog, cross-border payments, virtual dollar card, Nigeria fintech",
     twitter_handle: "@taborahq",
     linkedin_url: "https://linkedin.com/company/tela",
@@ -61,135 +69,283 @@ export default function SiteSettingsPage() {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  const Section = ({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) => (
-    <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6 md:p-8 space-y-5">
-      <div className="flex items-center gap-3 pb-4 border-b border-black/5">
-        <div className="p-2 rounded-xl bg-[#41cc00]/10">
-          <Icon className="w-4 h-4 text-[#093C15]" />
+  const Section = ({ title, icon: Icon, children, description }: { title: string; icon: any; children: React.ReactNode; description?: string }) => (
+    <GsapReveal direction="up" delay={0.1}>
+      <GlassCard className="p-8 md:p-10 space-y-8 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-5 pb-6 border-b border-black/5">
+          <div className="p-3 rounded-2xl bg-[#41cc00]/10 text-[#093C15]">
+            <Icon className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-[#1d1d1f] tracking-tight">{title}</h2>
+            {description && <p className="text-[13px] text-black/30 font-medium">{description}</p>}
+          </div>
         </div>
-        <h2 className="text-[16px] font-bold text-[#1d1d1f]">{title}</h2>
-      </div>
-      {children}
-    </div>
+        <div className="space-y-6">
+          {children}
+        </div>
+      </GlassCard>
+    </GsapReveal>
   );
 
   return (
-    <div className="max-w-4xl">
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-2">Site Settings</h1>
-          <p className="text-[#1d1d1f]/50 font-medium">Manage your blog&apos;s content, branding, and SEO configuration.</p>
-        </div>
-        <Button 
-          variant="primary" 
-          onClick={handleSave} 
-          isLoading={saving}
-          className="gap-2"
-          disabled={loading}
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {saved ? "Saved ✓" : "Save Changes"}
-        </Button>
+    <div className="max-w-[1400px]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <GsapReveal direction="up">
+          <h1 className="text-3xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-2">Site Environment</h1>
+          <p className="text-[#1d1d1f]/40 font-medium tracking-tight">Configure global branding, content systems, and SEO architecture.</p>
+        </GsapReveal>
+        
+        <GsapReveal direction="up" delay={0.1}>
+          <Button 
+            onClick={handleSave} 
+            isLoading={saving}
+            className="h-12 px-8 bg-[#093C15] group shadow-lg shadow-[#093C15]/10 hover:bg-[#0a5a1f] transition-all"
+            disabled={loading}
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 group-hover:scale-110 transition-transform mr-2" />}
+            {saved ? "Configuration Saved ✓" : "Save Changes"}
+          </Button>
+        </GsapReveal>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center p-20">
-          <Loader2 className="h-8 w-8 animate-spin text-[#41cc00]" />
+        <div className="flex items-center justify-center p-32">
+          <Loader2 className="h-10 w-10 animate-spin text-[#41cc00]" />
         </div>
       ) : (
-        <div className="space-y-6">
-          <Section title="General" icon={Globe}>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Site Title</label>
-              <Input value={settings.site_title} onChange={(e) => updateField("site_title", e.target.value)} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start pb-20">
+          <Section 
+            title="Identity & SEO" 
+            icon={Globe}
+            description="Manage the core identity and discoverability of the platform."
+          >
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Site Title</label>
+              <Input 
+                value={settings.site_title} 
+                onChange={(e) => updateField("site_title", e.target.value)}
+                className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+              />
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Tagline</label>
-              <Input value={settings.site_tagline} onChange={(e) => updateField("site_tagline", e.target.value)} />
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Universal Tagline</label>
+              <Input 
+                value={settings.site_tagline} 
+                onChange={(e) => updateField("site_tagline", e.target.value)}
+                className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+              />
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Site Meta Description (SEO)</label>
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Global SEO Description</label>
               <textarea 
-                className="w-full h-24 rounded-xl border border-black/10 bg-white p-4 text-[#1d1d1f] text-[14px] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 outline-none transition-all resize-none"
+                className="w-full h-32 rounded-xl border border-black/5 bg-white/50 p-4 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none"
                 value={settings.site_description || ""}
                 onChange={(e) => updateField("site_description", e.target.value)}
               />
-              <p className="text-[11px] text-[#1d1d1f]/40 mt-1 text-right">{(settings.site_description || "").length}/160 recommended</p>
+              <div className="flex justify-end pr-1">
+                <span className={`text-[10px] font-bold ${(settings.site_description || "").length > 160 ? "text-orange-500" : "text-black/20"}`}>
+                  {(settings.site_description || "").length}/160 chars
+                </span>
+              </div>
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Meta Keywords (comma-separated)</label>
-              <Input value={settings.meta_keywords || ""} onChange={(e) => updateField("meta_keywords", e.target.value)} />
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Meta Keywords</label>
+              <Input 
+                value={settings.meta_keywords || ""} 
+                onChange={(e) => updateField("meta_keywords", e.target.value)}
+                className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+              />
             </div>
           </Section>
 
-          <Section title="Homepage Content" icon={Type}>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Hero Title</label>
-              <Input value={settings.hero_title || ""} onChange={(e) => updateField("hero_title", e.target.value)} />
+          <Section 
+            title="Narrative Content" 
+            icon={Type}
+            description="Configure the storytelling elements for the home interface."
+          >
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Primary Heading</label>
+              <Input 
+                value={settings.hero_title || ""} 
+                onChange={(e) => updateField("hero_title", e.target.value)}
+                className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+              />
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Hero Gradient Text</label>
-              <Input value={settings.hero_subtitle || ""} onChange={(e) => updateField("hero_subtitle", e.target.value)} />
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Gradient Accent Text</label>
+              <Input 
+                value={settings.hero_subtitle || ""} 
+                onChange={(e) => updateField("hero_subtitle", e.target.value)}
+                className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+              />
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Hero Description</label>
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Narrative</label>
               <textarea 
-                className="w-full h-20 rounded-xl border border-black/10 bg-white p-4 text-[#1d1d1f] text-[14px] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 outline-none transition-all resize-none"
+                className="w-full h-24 rounded-xl border border-black/5 bg-white/50 p-4 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none"
                 value={settings.hero_description || ""}
                 onChange={(e) => updateField("hero_description", e.target.value)}
               />
             </div>
+            
+            <div className="pt-6 border-t border-black/5">
+              <div className="flex items-center gap-3 mb-6 text-[#093C15]">
+                <FileText className="w-4 h-4" />
+                <span className="text-[14px] font-bold tracking-tight uppercase">Structural Governance</span>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Header Governance Title</label>
+                  <Input 
+                    value={settings.header_governance_text || ""} 
+                    onChange={(e) => updateField("header_governance_text", e.target.value)}
+                    placeholder="Governance"
+                    className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Footer Narrative Copy</label>
+                  <textarea 
+                    className="w-full h-32 rounded-xl border border-black/5 bg-white/50 p-4 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none"
+                    value={settings.footer_description || ""}
+                    onChange={(e) => updateField("footer_description", e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Footer Copyright Marker</label>
+                  <Input 
+                    value={settings.footer_copyright_text || ""} 
+                    onChange={(e) => updateField("footer_copyright_text", e.target.value)}
+                    className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 1 Label</label>
+                      <Input 
+                        value={settings.footer_link_1_label || ""} 
+                        onChange={(e) => updateField("footer_link_1_label", e.target.value)}
+                        className="h-11 bg-white/50 border-black/5"
+                      />
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 1 URL</label>
+                      <Input 
+                        value={settings.footer_link_1_url || ""} 
+                        onChange={(e) => updateField("footer_link_1_url", e.target.value)}
+                        className="h-11 bg-white/50 border-black/5"
+                      />
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 2 Label</label>
+                      <Input 
+                        value={settings.footer_link_2_label || ""} 
+                        onChange={(e) => updateField("footer_link_2_label", e.target.value)}
+                        className="h-11 bg-white/50 border-black/5"
+                      />
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 2 URL</label>
+                      <Input 
+                        value={settings.footer_link_2_url || ""} 
+                        onChange={(e) => updateField("footer_link_2_url", e.target.value)}
+                        className="h-11 bg-white/50 border-black/5"
+                      />
+                   </div>
+                </div>
+              </div>
+            </div>
           </Section>
 
-          <Section title="Newsletter Section" icon={FileText}>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Newsletter Heading</label>
-              <Input value={settings.newsletter_title || ""} onChange={(e) => updateField("newsletter_title", e.target.value)} />
+          <Section 
+            title="Engagement & Social" 
+            icon={Share2}
+            description="Manage social proof and community distribution channels."
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">X (Twitter)</label>
+                <Input 
+                  value={settings.twitter_handle || ""} 
+                  onChange={(e) => updateField("twitter_handle", e.target.value)} 
+                  placeholder="@handle"
+                  className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">LinkedIn</label>
+                <Input 
+                  value={settings.linkedin_url || ""} 
+                  onChange={(e) => updateField("linkedin_url", e.target.value)} 
+                  placeholder="URL"
+                  className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Instagram</label>
+                <Input 
+                  value={settings.instagram_url || ""} 
+                  onChange={(e) => updateField("instagram_url", e.target.value)} 
+                  placeholder="URL"
+                  className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Facebook</label>
+                <Input 
+                  value={settings.facebook_url || ""} 
+                  onChange={(e) => updateField("facebook_url", e.target.value)} 
+                  placeholder="URL"
+                  className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Newsletter Description</label>
-              <textarea 
-                className="w-full h-20 rounded-xl border border-black/10 bg-white p-4 text-[#1d1d1f] text-[14px] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 outline-none transition-all resize-none"
-                value={settings.newsletter_description || ""}
-                onChange={(e) => updateField("newsletter_description", e.target.value)}
-              />
-            </div>
-          </Section>
 
-          <Section title="Social Media" icon={Share2}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Twitter Handle</label>
-                <Input value={settings.twitter_handle || ""} onChange={(e) => updateField("twitter_handle", e.target.value)} placeholder="@handle" />
-              </div>
-              <div>
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">LinkedIn URL</label>
-                <Input value={settings.linkedin_url || ""} onChange={(e) => updateField("linkedin_url", e.target.value)} placeholder="https://linkedin.com/..." />
-              </div>
-              <div>
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Instagram URL</label>
-                <Input value={settings.instagram_url || ""} onChange={(e) => updateField("instagram_url", e.target.value)} placeholder="https://instagram.com/..." />
-              </div>
-              <div>
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Facebook URL</label>
-                <Input value={settings.facebook_url || ""} onChange={(e) => updateField("facebook_url", e.target.value)} placeholder="https://facebook.com/..." />
-              </div>
+            <div className="pt-8 mt-4 border-t border-black/5">
+                <div className="flex items-center gap-3 mb-6 text-[#093C15]">
+                  <ImageIcon className="w-5 h-5" />
+                  <span className="text-[14px] font-bold tracking-tight">Newsletter Strategy</span>
+                </div>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Campaign Heading</label>
+                    <Input 
+                        value={settings.newsletter_title || ""} 
+                        onChange={(e) => updateField("newsletter_title", e.target.value)}
+                        className="h-12 bg-white/50 border-black/5 hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Value Proposition Description</label>
+                    <textarea 
+                        className="w-full h-24 rounded-xl border border-black/5 bg-white/50 p-4 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none"
+                        value={settings.newsletter_description || ""}
+                        onChange={(e) => updateField("newsletter_description", e.target.value)}
+                    />
+                  </div>
+                </div>
             </div>
           </Section>
-
-          <Section title="Footer" icon={Globe}>
-            <div>
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider mb-2 block">Footer Description</label>
-              <textarea 
-                className="w-full h-24 rounded-xl border border-black/10 bg-white p-4 text-[#1d1d1f] text-[14px] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 outline-none transition-all resize-none"
-                value={settings.footer_description || ""}
-                onChange={(e) => updateField("footer_description", e.target.value)}
-              />
-            </div>
-          </Section>
+          
+          <GsapReveal direction="up" delay={0.4}>
+            <GlassCard className="p-10 bg-[#093C15] text-white overflow-hidden relative border-none">
+               <div className="absolute top-0 right-0 w-64 h-64 bg-[#41cc00]/20 rounded-full blur-[80px] -mr-32 -mt-32" />
+               <div className="relative z-10">
+                  <h3 className="text-2xl font-bold font-bricolage mb-4 tracking-tight">Configuration Integrity</h3>
+                  <p className="text-white/60 text-[14px] font-medium leading-relaxed mb-8">
+                    Updates to site settings propagate immediately across the production frontend and edge cache. Ensure meta descriptions maintain SEO length requirements for optimal search ranking.
+                  </p>
+                  <Button variant="ghost" className="h-12 border-white/20 text-white hover:bg-white/10 hover:text-white rounded-xl font-bold px-8">Refresh Global Cache</Button>
+               </div>
+            </GlassCard>
+          </GsapReveal>
         </div>
       )}
-
     </div>
   );
 }

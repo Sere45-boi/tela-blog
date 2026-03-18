@@ -29,7 +29,7 @@ export function AdEditorClient({ ad }: AdFormProps) {
     try {
       const result = await upsertAd(formData);
       toast.success(ad?.id ? "Campaign updated" : "Campaign launched");
-      router.push("/admin/ads");
+      router.push("/admin/campaigns");
       router.refresh();
     } catch (error: any) {
       toast.error(error.message);
@@ -39,9 +39,9 @@ export function AdEditorClient({ ad }: AdFormProps) {
   };
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-[1400px]">
       <GsapReveal direction="up" className="mb-10">
-        <Link href="/admin/ads" className="inline-flex items-center gap-2 text-[#1d1d1f]/40 hover:text-[#093C15] font-bold text-[13px] mb-6 uppercase tracking-wider transition-colors">
+        <Link href="/admin/campaigns" className="inline-flex items-center gap-2 text-[#1d1d1f]/40 hover:text-[#093C15] font-bold text-[13px] mb-6 uppercase tracking-wider transition-colors">
           <ChevronLeft className="w-4 h-4" /> Back to campaigns
         </Link>
         <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage mb-2">
@@ -133,7 +133,7 @@ export function AdEditorClient({ ad }: AdFormProps) {
             </div>
 
             <div className="pt-6 border-t border-black/5 flex justify-end gap-4">
-                <Link href="/admin/ads">
+                <Link href="/admin/campaigns">
                     <Button type="button" variant="ghost" className="h-12 px-8 rounded-xl font-bold text-[#1d1d1f]/40">
                         Cancel
                     </Button>

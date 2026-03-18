@@ -24,13 +24,17 @@ export async function createInvitation(email: string, role: 'author' | 'admin' =
     throw new Error("Only administrators can invite new users.");
   }
 
-  // Generate invitation
+  // Generate invitation with 2-hour expiry
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 2);
+
   const { data, error } = await supabase
     .from("invitations")
     .insert({
       email,
       role,
-      invited_by: user.id
+      invited_by: user.id,
+      expires_at: expiresAt.toISOString()
     })
     .select("token")
     .single();

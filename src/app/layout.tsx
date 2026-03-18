@@ -57,6 +57,8 @@ export const metadata: Metadata = {
 };
 
 import { Toaster } from "sonner";
+import { PageTracker } from "@/components/layout/PageTracker";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -84,6 +86,9 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </head>
       <body className={`${poppins.variable} ${bricolage.variable} font-sans bg-noise antialiased selection:bg-accent selection:text-accent-foreground`}>
+        <Suspense fallback={null}>
+          <PageTracker />
+        </Suspense>
         {children}
         <Toaster position="top-right" richColors closeButton />
       </body>
