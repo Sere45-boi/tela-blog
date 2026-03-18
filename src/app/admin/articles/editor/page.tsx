@@ -142,8 +142,8 @@ export default function ArticleEditor() {
           </div>
         </GsapReveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="lg:col-span-2 space-y-8 flex flex-col h-full">
+        <div className="space-y-12">
+          <div className="space-y-8 flex flex-col h-full">
             <GsapReveal direction="up" delay={0.1} className="flex-1">
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 p-8 shadow-sm space-y-8 h-full flex flex-col">
                 <div className="space-y-2">
@@ -189,8 +189,15 @@ export default function ArticleEditor() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </GsapReveal>
+          </div>
 
-                <div className="space-y-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <div className="space-y-8 flex flex-col h-full">
+              <GsapReveal direction="up" delay={0.2}>
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 p-8 shadow-sm space-y-8 h-full flex flex-col">
+<div className="space-y-2">
                   <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Excerpt & Summary</label>
                   <textarea 
                     className="w-full h-32 rounded-xl border border-black/5 bg-black/[0.02] p-4 text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#41cc00]/20 focus:border-[#41cc00] transition-all resize-none text-sm font-medium"
@@ -227,7 +234,7 @@ export default function ArticleEditor() {
             </GsapReveal>
           </div>
 
-          <div className="space-y-8 lg:sticky lg:top-24">
+          <div className="space-y-8 flex flex-col h-full">
             <GsapReveal direction="up" delay={0.2}>
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 p-6 shadow-sm space-y-6">
                 <h3 className="text-sm font-bold text-[#1d1d1f] uppercase tracking-wider border-b border-black/5 pb-4">Configuration</h3>
@@ -355,7 +362,8 @@ export default function ArticleEditor() {
             </GsapReveal>
           </div>
         </div>
-      </form>
+      </div>
+    </form>
 
       {/* Preview Overlay */}
       {isPreviewing && (

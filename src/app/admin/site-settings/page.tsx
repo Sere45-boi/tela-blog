@@ -9,6 +9,25 @@ import { createClient } from "@/utils/supabase/client";
 import { GsapReveal } from "@/components/GsapReveal";
 import { GlassCard } from "@/components/ui/Card";
 
+const Section = ({ title, icon: Icon, children, description }: { title: string; icon: any; children: React.ReactNode; description?: string }) => (
+  <GsapReveal direction="up" delay={0.1}>
+    <GlassCard className="p-8 md:p-10 space-y-8 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-5 pb-6 border-b border-black/5">
+        <div className="p-3 rounded-2xl bg-[#41cc00]/10 text-[#093C15]">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-[#1d1d1f] tracking-tight">{title}</h2>
+          {description && <p className="text-[13px] text-black/30 font-medium">{description}</p>}
+        </div>
+      </div>
+      <div className="space-y-6">
+        {children}
+      </div>
+    </GlassCard>
+  </GsapReveal>
+);
+
 export default function SiteSettingsPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
@@ -68,25 +87,6 @@ export default function SiteSettingsPage() {
   const updateField = (key: string, value: string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
-
-  const Section = ({ title, icon: Icon, children, description }: { title: string; icon: any; children: React.ReactNode; description?: string }) => (
-    <GsapReveal direction="up" delay={0.1}>
-      <GlassCard className="p-8 md:p-10 space-y-8 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-5 pb-6 border-b border-black/5">
-          <div className="p-3 rounded-2xl bg-[#41cc00]/10 text-[#093C15]">
-            <Icon className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-[#1d1d1f] tracking-tight">{title}</h2>
-            {description && <p className="text-[13px] text-black/30 font-medium">{description}</p>}
-          </div>
-        </div>
-        <div className="space-y-6">
-          {children}
-        </div>
-      </GlassCard>
-    </GsapReveal>
-  );
 
   return (
     <div className="max-w-[1400px]">

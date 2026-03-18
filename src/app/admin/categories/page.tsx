@@ -107,12 +107,14 @@ export default function CategoryManagementPage() {
         </GsapReveal>
         
         <GsapReveal direction="up" delay={0.1}>
-          <Button 
-            onClick={() => isAdding && !editingId ? closeForm() : setIsAdding(true)}
-            className={`h-12 px-6 rounded-2xl font-bold flex items-center gap-2 shadow-lg transition-all active:scale-95 ${isAdding && !editingId ? 'bg-white border-black/5 text-[#1d1d1f] hover:bg-black/5 shadow-sm' : 'bg-[#093C15] text-white hover:bg-[#0a5a1f] shadow-[#093C15]/10'}`}
-          >
-            {isAdding && !editingId ? "Cancel Creation" : <><Plus className="h-4 w-4" /> Initialize Category</>}
-          </Button>
+          {isAdding && !editingId && (
+            <Button 
+              onClick={() => closeForm()}
+              className="h-12 px-6 rounded-2xl font-bold flex items-center gap-2 shadow-sm bg-white border border-black/5 text-[#1d1d1f] hover:bg-black/5 transition-all active:scale-95"
+            >
+              Cancel Creation
+            </Button>
+          )}
         </GsapReveal>
       </div>
 
