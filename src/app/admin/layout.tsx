@@ -4,20 +4,20 @@ import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Settings, 
-  Tags, 
-  LogOut, 
-  ImageIcon, 
-  Globe, 
-  Users, 
-  UserCircle, 
-  Search, 
-  Bell, 
-  Share2, 
-  MoreHorizontal, 
+import {
+  LayoutDashboard,
+  FileText,
+  Settings,
+  Tags,
+  LogOut,
+  ImageIcon,
+  Globe,
+  Users,
+  UserCircle,
+  Search,
+  Bell,
+  Share2,
+  MoreHorizontal,
   Plus,
   ChevronRight,
   ChevronDown
@@ -55,7 +55,7 @@ export default function AdminLayout({
         window.location.href = "/"; // Unauthorized
         return;
       }
-      
+
       setProfile(prof);
       setTeam(teamRes.data || []);
       setLoading(false);
@@ -72,7 +72,7 @@ export default function AdminLayout({
       {/* Sidebar Navigation */}
       <aside className={`fixed inset-y-0 left-0 bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 flex flex-col z-50 overflow-hidden shadow-sm transition-all duration-300 ${isSidebarOpen ? 'w-[280px]' : 'w-[80px]'}`}>
         {/* Logo Section */}
-        <div className="p-6 flex items-center justify-between min-h-[80px]">
+        <div className="p-6 flex items-center justify-between min-h-[64px]">
           {isSidebarOpen ? (
             <Link href="/admin" className="block transition-opacity hover:opacity-80">
               <img
@@ -84,7 +84,7 @@ export default function AdminLayout({
           ) : (
             <Link href="/admin" className="flex items-center justify-center w-10 h-10 rounded-xl hover:opacity-80 transition-opacity">
               <img
-                src="/favicon.ico"
+                src="/images/logo.png"
                 alt="Tela"
                 className="w-8 h-8 object-contain"
               />
@@ -156,22 +156,22 @@ export default function AdminLayout({
         {/* User Footer */}
         <Link href="/admin/profile" className={`block p-4 bg-black/[0.02] border-t border-black/5 mt-auto hover:bg-black/[0.04] transition-colors group ${!isSidebarOpen && 'pb-8 pt-6 flex justify-center'}`}>
           <div className={`bg-white rounded-2xl border border-black/5 shadow-sm flex items-center justify-between group-hover:shadow-md transition-shadow ${isSidebarOpen ? 'p-3' : 'p-2'}`}>
-             <div className="flex items-center gap-3 overflow-hidden">
-                <div className={`rounded-xl overflow-hidden grayscale-[0.5] group-hover:grayscale-0 transition-all border border-black/5 shrink-0 bg-black/5 flex items-center justify-center text-[#1d1d1f] font-bold ${isSidebarOpen ? 'w-9 h-9' : 'w-10 h-10'}`}>
-                  {profile?.avatar_url ? (
-                     <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                     <span className="text-xs uppercase">{(profile?.full_name || authUser?.email || "U").slice(0, 2)}</span>
-                  )}
-                </div>
-                {isSidebarOpen && (
-                  <div className="min-w-0">
-                    <div className="text-[14px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile?.full_name || authUser?.email?.split('@')[0]}</div>
-                    <div className="text-[10px] text-black/30 font-bold uppercase tracking-wider">Account Active</div>
-                  </div>
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className={`rounded-xl overflow-hidden grayscale-[0.5] group-hover:grayscale-0 transition-all border border-black/5 shrink-0 bg-black/5 flex items-center justify-center text-[#1d1d1f] font-bold ${isSidebarOpen ? 'w-9 h-9' : 'w-10 h-10'}`}>
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xs uppercase">{(profile?.full_name || authUser?.email || "U").slice(0, 2)}</span>
                 )}
-             </div>
-             {isSidebarOpen && <ChevronRight className="w-4 h-4 text-black/20 group-hover:text-[#41cc00] transition-colors" />}
+              </div>
+              {isSidebarOpen && (
+                <div className="min-w-0">
+                  <div className="text-[14px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile?.full_name || authUser?.email?.split('@')[0]}</div>
+                  <div className="text-[10px] text-black/30 font-bold uppercase tracking-wider">Account Active</div>
+                </div>
+              )}
+            </div>
+            {isSidebarOpen && <ChevronRight className="w-4 h-4 text-black/20 group-hover:text-[#41cc00] transition-colors" />}
           </div>
         </Link>
       </aside>
@@ -179,46 +179,46 @@ export default function AdminLayout({
       {/* Main Content Area */}
       <main className={`flex-1 min-h-screen flex flex-col transition-all duration-300 ${isSidebarOpen ? 'ml-[280px]' : 'ml-[80px]'}`}>
         {/* Global Top Bar */}
-        <header className="h-[80px] px-8 md:px-12 flex items-center justify-between sticky top-0 bg-white/60 backdrop-blur-xl z-40 border-b border-[#41cc00]/5">
-           <div className="flex items-center gap-4">
-              <h2 className="text-[20px] font-bold text-[#1d1d1f] font-bricolage tracking-tight">
-                {/* Empty instead of the old 'Governance' text */}
-              </h2>
-           </div>
+        <header className="h-16 px-8 md:px-12 flex items-center justify-between sticky top-0 bg-white/60 backdrop-blur-xl z-40 border-b border-[#41cc00]/5">
+          <div className="flex items-center gap-4">
+            <h2 className="text-[20px] font-bold text-[#1d1d1f] font-bricolage tracking-tight">
+              {/* Empty instead of the old 'Governance' text */}
+            </h2>
+          </div>
 
-           <div className="flex items-center gap-8">
-              <div className="flex -space-x-3">
-                {team.map((member, i) => (
-                  <div 
-                    key={i} 
-                    className="w-9 h-9 rounded-full border-[2.5px] border-white object-cover shadow-sm bg-white overflow-hidden" 
-                    title={member.full_name}
-                  >
-                    <img 
-                      src={member.avatar_url || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6"} 
-                      className="w-full h-full object-cover" 
-                      alt={member.full_name} 
-                    />
-                  </div>
-                ))}
-                {team.length >= 6 && (
-                  <Link href="/admin/users" className="w-9 h-9 rounded-full bg-white border border-black/5 flex items-center justify-center text-[10px] font-bold text-[#41cc00] hover:bg-[#41cc00]/10 transition-all border-[2.5px] border-white shadow-sm z-10">
-                    +{team.length - 6 || 12}
-                  </Link>
-                )}
-                <Link href="/admin/users" className="w-9 h-9 rounded-full bg-[#093C15] flex items-center justify-center text-white scale-90 -ml-1 shadow-lg shadow-[#093C15]/20 hover:scale-100 transition-transform z-10">
-                  <Plus className="w-4 h-4" />
+          <div className="flex items-center gap-8">
+            <div className="flex -space-x-3">
+              {team.map((member, i) => (
+                <div
+                  key={i}
+                  className="w-9 h-9 rounded-full border-[2.5px] border-white object-cover shadow-sm bg-white overflow-hidden"
+                  title={member.full_name}
+                >
+                  <img
+                    src={member.avatar_url || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6"}
+                    className="w-full h-full object-cover"
+                    alt={member.full_name}
+                  />
+                </div>
+              ))}
+              {team.length >= 6 && (
+                <Link href="/admin/users" className="w-9 h-9 rounded-full bg-white border border-black/5 flex items-center justify-center text-[10px] font-bold text-[#41cc00] hover:bg-[#41cc00]/10 transition-all border-[2.5px] border-white shadow-sm z-10">
+                  +{team.length - 6 || 12}
                 </Link>
-              </div>
+              )}
+              <Link href="/admin/users" className="w-9 h-9 rounded-full bg-[#093C15] flex items-center justify-center text-white scale-90 -ml-1 shadow-lg shadow-[#093C15]/20 hover:scale-100 transition-transform z-10">
+                <Plus className="w-4 h-4" />
+              </Link>
+            </div>
 
-              <div className="flex items-center gap-3">
-                 <NotificationCenter />
-              </div>
-           </div>
+            <div className="flex items-center gap-3">
+              <NotificationCenter />
+            </div>
+          </div>
         </header>
 
         {/* Page Content */}
-        <div className="p-8 md:p-12 pt-8 w-full max-w-[1600px] mx-auto">
+        <div className="px-8 md:px-12 py-4 md:py-6 w-full max-w-[1600px] mx-auto">
           {children}
         </div>
       </main>

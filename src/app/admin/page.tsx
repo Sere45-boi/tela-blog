@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
     if (r.article_id) sessionsByArticle[r.article_id] = (sessionsByArticle[r.article_id] || 0) + 1;
   });
   const topArticleByAnalyticsId = Object.entries(sessionsByArticle).sort((a, b) => b[1] - a[1])[0]?.[0];
-  
+
   let topPost = null;
   let topPostSessions = 0;
 
@@ -84,15 +84,15 @@ export default async function AdminDashboard() {
   const recentNotifications = notificationsRes.data || [];
   const dynamicInsights = recentNotifications.length > 0
     ? recentNotifications.slice(0, 3).map((n) => ({
-        title: ((n.type || "").charAt(0).toUpperCase() + (n.type || "").slice(1)) + " Alert",
-        detail: n.message || n.body || "Activity detected.",
-        icon: n.type === "like" ? Heart : (n.type === "read" ? Eye : Globe),
-      }))
+      title: ((n.type || "").charAt(0).toUpperCase() + (n.type || "").slice(1)) + " Alert",
+      detail: n.message || n.body || "Activity detected.",
+      icon: n.type === "like" ? Heart : (n.type === "read" ? Eye : Globe),
+    }))
     : [
-        { title: "Quiet Pulse", detail: "System operational. Waiting for next spike.", icon: Clock },
-        { title: "Architecture Stable", detail: "Data ingestion at optimal frequency.", icon: TrendingUp },
-        { title: "Optimization Ready", detail: "Content index tracking within expected parameters.", icon: BarChart3 },
-      ];
+      { title: "Quiet Pulse", detail: "System operational. Waiting for next spike.", icon: Clock },
+      { title: "Architecture Stable", detail: "Data ingestion at optimal frequency.", icon: TrendingUp },
+      { title: "Optimization Ready", detail: "Content index tracking within expected parameters.", icon: BarChart3 },
+    ];
 
   const topCards = [
     { label: "Content Engagement", value: uniqueReaders.toLocaleString(), icon: TrendingUp, color: "bg-[#41cc00]", detail: `${articleReads.toLocaleString()} article reads` },
@@ -111,7 +111,7 @@ export default async function AdminDashboard() {
       {/* Header */}
       <GsapReveal direction="up" className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#1d1d1f] font-bricolage tracking-tight">Dashboard Intelligence</h1>
+          <h1 className="text-2xl font-bold text-[#1d1d1f] font-bricolage tracking-tight">Dashboard</h1>
           <p className="text-[13px] text-[#1d1d1f]/40 font-medium mt-0.5">Real-time engagement, ad performance, and growth insights.</p>
         </div>
         <div className="flex items-center gap-2.5">
@@ -177,7 +177,7 @@ export default async function AdminDashboard() {
             <GlassCard className="p-6 shadow-sm">
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-[16px] font-bold text-[#1d1d1f] font-bricolage tracking-tight">Traffic Ecosystem</h3>
+                  <h3 className="text-[16px] font-bold text-[#1d1d1f] font-bricolage tracking-tight">Number of Reads</h3>
                   <p className="text-[12px] text-black/30 font-medium mt-0.5">Reads per day — filter by period</p>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-[#41cc00]/10 rounded-lg">
@@ -192,41 +192,54 @@ export default async function AdminDashboard() {
           {/* Top Performer */}
           <GsapReveal direction="up" delay={0.5} className="flex-1">
             <GlassCard className="p-6 border-l-4 border-l-[#41cc00] overflow-hidden group shadow-sm h-full flex flex-col justify-center">
-              <div className="flex flex-col sm:flex-row items-center gap-8">
-                <div className="w-full sm:w-56 h-48 rounded-xl overflow-hidden shadow-lg group-hover:scale-105 transition-transform shrink-0">
-                  <img
-                    src={topPost?.featured_image || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"}
-                    className="w-full h-full object-cover"
-                    alt={topPost?.title || "top article"}
-                  />
-                </div>
-                <div className="flex-1 min-w-0 py-2">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2 py-0.5 rounded bg-[#41cc00]/10 text-[#093C15] text-[10px] font-bold uppercase tracking-wider">Top Performer</span>
-                    <span className="text-[12px] text-black/30 font-medium tracking-tight">Highest engagement this month</span>
-                  </div>
-                  <h4 className="text-xl font-bold text-[#1d1d1f] mb-4 font-bricolage group-hover:text-[#41cc00] transition-colors line-clamp-2">
-                    {topPost?.title || "No posts yet"}
-                  </h4>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-black/20" />
-                      <span className="text-[14px] font-bold text-[#1d1d1f]">{topPost?.view_count?.toLocaleString() || "0"} views</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Activity className="w-4 h-4 text-black/20" />
-                      <span className="text-[14px] font-bold text-[#1d1d1f]">{topPostSessions} sessions</span>
-                    </div>
-                    {topPost?.slug && (
-                      <Link href={`/blog/${topPost.slug}`} target="_blank">
-                        <button className="h-9 px-6 rounded-lg text-[12px] font-bold bg-[#093C15] text-white hover:bg-[#0a5a1f] transition-all shadow-md active:scale-95">
-                          View Article
-                        </button>
-                      </Link>
+              {topPost ? (
+                <div className="flex flex-col sm:flex-row items-center gap-8">
+                  <div className="w-full sm:w-56 h-48 rounded-xl overflow-hidden shadow-lg group-hover:scale-105 transition-transform shrink-0 bg-[#f8fcf8] flex items-center justify-center border border-black/5">
+                    {topPost.featured_image ? (
+                      <img
+                        src={topPost.featured_image}
+                        className="w-full h-full object-cover"
+                        alt={topPost.title}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 opacity-20">
+                        <img src="/images/logo.png" className="w-12 h-12 object-contain" alt="Tela" />
+                      </div>
                     )}
                   </div>
+                  <div className="flex-1 min-w-0 py-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="px-2 py-0.5 rounded bg-[#41cc00]/10 text-[#093C15] text-[10px] font-bold uppercase tracking-wider">Top Performer</span>
+                      <span className="text-[12px] text-black/30 font-medium tracking-tight">Highest engagement this month</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-[#1d1d1f] mb-4 font-bricolage group-hover:text-[#41cc00] transition-colors line-clamp-2">
+                      {topPost.title}
+                    </h4>
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-4 h-4 text-black/20" />
+                        <span className="text-[14px] font-bold text-[#1d1d1f]">{topPost.view_count?.toLocaleString() || "0"} views</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-black/20" />
+                        <span className="text-[14px] font-bold text-[#1d1d1f]">{topPostSessions} sessions</span>
+                      </div>
+                      {topPost.slug && (
+                        <Link href={`/blog/${topPost.slug}`} target="_blank">
+                          <button className="h-9 px-6 rounded-lg text-[12px] font-bold bg-[#093C15] text-white hover:bg-[#0a5a1f] transition-all shadow-md active:scale-95">
+                            View Article
+                          </button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 opacity-30">
+                  <TrendingUp className="w-10 h-10 text-[#41cc00]" />
+                  <p className="text-sm font-bold uppercase tracking-widest">Waiting for Engagement Data</p>
+                </div>
+              )}
             </GlassCard>
           </GsapReveal>
         </div>
@@ -239,7 +252,7 @@ export default async function AdminDashboard() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#41cc00]/10 rounded-full blur-[50px] -mr-12 -mt-12" />
               <div className="relative z-10 flex flex-col h-full">
                 <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-[14px] font-bold text-white/80 uppercase tracking-widest">Deep Insights</h3>
+                  <h3 className="text-[14px] font-bold text-white/80 uppercase tracking-widest">AI Insights</h3>
                   <div className="w-2 h-2 rounded-full bg-[#41cc00] animate-pulse" />
                 </div>
                 <div className="space-y-8 flex-1 flex flex-col justify-around">
@@ -257,7 +270,7 @@ export default async function AdminDashboard() {
                 </div>
                 <Link href="/admin/analytics" className="mt-8">
                   <button className="w-full h-11 rounded-xl bg-white/10 text-white/80 hover:bg-white hover:text-[#093C15] text-[12px] font-bold transition-all border border-white/5">
-                    Comprehensive Report
+                    AI Report
                   </button>
                 </Link>
               </div>

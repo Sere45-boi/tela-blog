@@ -127,7 +127,7 @@ export default function ArticleEditor() {
   };
 
   return (
-    <div className="pb-12">
+    <div className="pb-0">
       <form onSubmit={(e) => handleSubmit(e, false)} className="max-w-6xl mx-auto px-6">
         {/* Superior Header - Following second user sketch */}
         <GsapReveal direction="up" className="flex items-center justify-between h-24 mb-4">
@@ -394,7 +394,9 @@ export default function ArticleEditor() {
                   <label className="text-[11px] font-bold text-black/30 uppercase tracking-[0.1em]">Google Snippet Analysis</label>
                   <div className="p-10 rounded-[2.5rem] bg-white border border-[#dadce0] font-sans shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-full flex flex-col justify-between">
                     <div className="text-[#202124] text-sm mb-3 flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[#f1f3f4] flex items-center justify-center font-bold text-[#5f6368] text-[11px]">T</div>
+                      <div className="w-9 h-9 rounded-full bg-white border border-black/5 overflow-hidden flex items-center justify-center">
+                        <img src="/images/logo.png" className="w-5 h-5 object-contain" alt="Tela" />
+                      </div>
                       <div>
                         <span className="block font-bold text-sm">Tela Insights</span>
                         <span className="text-[#5f6368] text-xs">https://tela.ng/blog/{formData.slug || 'permalink'}</span>
@@ -411,47 +413,38 @@ export default function ArticleEditor() {
               </div>
 
               <div className="border-t border-black/5 pt-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
-                <div className="space-y-4">
+                {/* Open Graph Social Image */}
+                <div className="space-y-4 h-full flex flex-col">
                   <label className="text-[11px] font-bold text-black/30 uppercase ml-1 flex items-center gap-2">
                     <Share2 className="w-3.5 h-3.5 text-[#41cc00]" /> Open Graph Social Image
                   </label>
 
-                  <div className="p-1 rounded-2xl bg-black/[0.02] border border-black/5 relative h-full">
+                  <div className="p-8 rounded-[2rem] bg-black/[0.02] border border-black/5 flex-1 flex flex-col justify-center">
                     <style jsx>{`
-                  /* Remove grey background */
-                  .og-clean :global([class*="bg"]) {
-                    background: transparent !important;
-                  }
-
-                  /* Remove dashed / borders */
-                  .og-clean :global([class*="border"]) {
-                    border: none !important;
-                  }
-
-                  /* Remove any shadow */
-                  .og-clean :global(*) {
-                    box-shadow: none !important;
-                  }
+                  /* Clean up ImageUpload inner styles */
+                  .og-clean :global(div) { background: transparent !important; }
+                  .og-clean :global(*) { border: none !important; box-shadow: none !important; }
                 `}</style>
-                    <div className="og-clean">
+                    <div className="og-clean flex-1">
                       <ImageUpload
                         value={formData.og_image_url}
                         onChange={(url) => setFormData({ ...formData, og_image_url: url })}
                         bucket="content"
                         folder="seo"
                         aspectRatio="video"
-                        className="bg-transparent"
+                        className="bg-transparent h-full"
                       />
                     </div>
                   </div>
-
                 </div>
-                <div className="space-y-4 flex flex-col">
+
+                {/* Distribution & Read Time */}
+                <div className="space-y-4 h-full flex flex-col">
                   <label className="text-[11px] font-bold text-black/30 uppercase ml-1 flex items-center gap-2">
                     <Timer className="w-3.5 h-3.5 text-[#41cc00]" /> Distribution & Read Time
                   </label>
 
-                  <div className="p-8 rounded-[2rem] bg-black/[0.015] border border-black/5 space-y-6 h-full flex flex-col justify-between">
+                  <div className="p-8 rounded-[2rem] bg-black/[0.015] border border-black/5 flex-1 flex flex-col justify-between">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-bold text-[#1d1d1f]/40 uppercase">Read Time Intelligence</span>
                       <span className="text-sm font-bold text-[#093C15] bg-[#41cc00]/10 px-4 py-1.5 rounded-lg">{calculateReadTime(formData.content)} MINUTES</span>
@@ -474,6 +467,7 @@ export default function ArticleEditor() {
                   </div>
                 </div>
               </div>
+
             </div>
           </GsapReveal>
         </div>
