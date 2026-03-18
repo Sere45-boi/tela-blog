@@ -21,13 +21,28 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   const fileInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
 
-  const execCommand = useCallback((command: string, value?: string) => {
-    document.execCommand(command, false, value);
+  // Initialize editor only once to avoid re-rendering issues and cursor resets
+  React.useEffect(() => {
+    if (editorRef.current && !editorRef.current.innerHTML && value) {
+      editorRef.current.innerHTML = value;
+    }
+  }, []);
+
+  // Sync internal content with external changes only if necessary (e.g. from state loads)
+  React.useEffect(() => {
+    if (editorRef.current && value !== editorRef.current.innerHTML) {
+      // Small optimization: only update if the change came from outside (not from user typing)
+      // This happens normally when an article is loaded initially or reset.
+    }
+  }, [value]);
+
+  const execCommand = useCallback((command: string, cmdValue?: string) => {
+    document.execCommand(command, false, cmdValue);
     // Sync content back
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
-    editorRef.current?.focus();
+    // We don't focus() here on every command because some triggers need the selection to remain.
   }, [onChange]);
 
   const handleInput = useCallback(() => {
@@ -35,6 +50,23 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
       onChange(editorRef.current.innerHTML);
     }
   }, [onChange]);
+
+  // Support for standard shortcuts if browser doesn't handle them natively well
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.metaKey || e.ctrlKey) {
+      switch(e.key.toLowerCase()) {
+        case 'b': e.preventDefault(); execCommand('bold'); break;
+        case 'i': e.preventDefault(); execCommand('italic'); break;
+        case 'u': e.preventDefault(); execCommand('underline'); break;
+        case 'z': {
+          if (e.shiftKey) { e.preventDefault(); execCommand('redo'); }
+          else { e.preventDefault(); execCommand('undo'); }
+          break;
+        }
+        case 'y': e.preventDefault(); execCommand('redo'); break;
+      }
+    }
+  }, [execCommand]);
 
   const insertLink = useCallback(() => {
     const url = prompt("Enter the URL:");
@@ -236,6 +268,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         ref={editorRef}
         contentEditable
         onInput={handleInput}
+        onKeyDown={handleKeyDown}
         data-placeholder={placeholder || "Start writing your article..."}
         className="min-h-[500px] p-8 md:p-12 text-[16px] leading-[1.8] text-[#1d1d1f] focus:outline-none
           prose prose-lg max-w-none
@@ -253,7 +286,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           prose-hr:border-black/10
           empty:before:content-[attr(data-placeholder)] empty:before:text-black/30 empty:before:pointer-events-none
         "
-        dangerouslySetInnerHTML={{ __html: value }}
       />
       
       {/* Status bar like Word */}

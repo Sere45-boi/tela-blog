@@ -54,8 +54,11 @@ export async function upsertArticle(articleData: {
   // Determine actual author (defaults to current user if not provided)
   const finalAuthorId = articleData.author_id || user.id;
 
+  // Omit tags and other fields that shouldn't go directly into the articles table
+  const { tags, ...coreArticleData } = articleData;
+
   const payload = {
-    ...articleData,
+    ...coreArticleData,
     author_id: finalAuthorId,
     ...(articleData.status === "published" && !articleData.id ? { published_at: new Date().toISOString() } : {})
   };
@@ -67,6 +70,16 @@ export async function upsertArticle(articleData: {
     .single();
 
   if (error) throw new Error(error.message);
+
+  // If we have tags, attach them
+  if (tags && tags.length > 0) {
+    // We need to resolve tag IDs first, or assume tags are already created if we just pass IDs
+    // For now, let's look for tags by name or ID
+    const { data: tagRecords } = await supabase.from("tags").select("id, name").in("name", tags);
+    if (tagRecords) {
+      await attachTagsToArticle(data.id, tagRecords.map(t => t.id));
+    }
+  }
   
   revalidatePath("/admin/articles");
   revalidatePath("/");
