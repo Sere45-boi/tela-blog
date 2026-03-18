@@ -42,9 +42,15 @@ export function LoginClient() {
   return (
     <>
       {/* Decorative background elements coming up from bottom */}
-      <GsapReveal direction="up" delay={0.1} className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#41cc00]/20 rounded-full blur-[100px] pointer-events-none" />
-      <GsapReveal direction="up" delay={0.2} className="absolute -bottom-40 -right-20 w-[500px] h-[500px] bg-[#093C15]/10 rounded-full blur-[120px] pointer-events-none" />
-      <GsapReveal direction="up" delay={0.3} className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#f3fbf3] rounded-full blur-[80px] pointer-events-none mix-blend-overlay" />
+      <GsapReveal direction="up" delay={0.1} className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#41cc00]/20 rounded-full blur-[100px] pointer-events-none">
+        <div />
+      </GsapReveal>
+      <GsapReveal direction="up" delay={0.2} className="absolute -bottom-40 -right-20 w-[500px] h-[500px] bg-[#093C15]/10 rounded-full blur-[120px] pointer-events-none">
+        <div />
+      </GsapReveal>
+      <GsapReveal direction="up" delay={0.3} className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#f3fbf3] rounded-full blur-[80px] pointer-events-none mix-blend-overlay">
+        <div />
+      </GsapReveal>
 
       <GsapReveal direction="up" className="w-full max-w-md relative z-10">
         <GlassCard className="relative overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.1)] border border-black/5 bg-white/90 backdrop-blur-3xl rounded-3xl p-8 md:p-10">

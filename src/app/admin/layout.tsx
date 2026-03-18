@@ -1,6 +1,9 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+
+import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { 
   LayoutDashboard, 
   FileText, 
@@ -21,37 +24,53 @@ import {
 } from "lucide-react";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const supabase = createClient();
+  const [profile, setProfile] = useState<any>(null);
+  const [team, setTeam] = useState<any[]>([]);
+  const [authUser, setAuthUser] = useState<any>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  if (!user) {
-    redirect("/login");
-  }
+  useEffect(() => {
+    async function loadData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = "/login";
+        return;
+      }
+      setAuthUser(user);
 
-  // Check roles (admin | author)
-  const [profileRes, teamRes, settingsRes] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).single(),
-    supabase.from("profiles").select("avatar_url, full_name").eq('is_active', true).order('created_at', { ascending: false }).limit(6),
-    supabase.from("site_settings").select("header_governance_text").eq('id', 1).single()
-  ]);
+      const [profileRes, teamRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", user.id).single(),
+        supabase.from("profiles").select("avatar_url, full_name").eq('is_active', true).order('created_at', { ascending: false }).limit(6)
+      ]);
 
-  const profile = profileRes.data;
-  const team = teamRes.data || [];
-  const siteSettings = settingsRes.data;
+      const prof = profileRes.data;
+      if (!prof || (prof.role !== "admin" && prof.role !== "author")) {
+        window.location.href = "/"; // Unauthorized
+        return;
+      }
+      
+      setProfile(prof);
+      setTeam(teamRes.data || []);
+      setLoading(false);
+    }
+    loadData();
+  }, []);
 
-  if (!profile || (profile.role !== "admin" && profile.role !== "author")) {
-    redirect("/"); // Unauthorized
+  if (loading) {
+    return <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] flex items-center justify-center">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-poppins selection:bg-[#41cc00]/30 selection:text-[#093C15]">
       {/* Sidebar Navigation */}
-      <aside className="fixed inset-y-0 left-0 w-[280px] bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 flex flex-col z-50 overflow-hidden shadow-sm">
+      <aside className={`fixed inset-y-0 left-0 bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 flex flex-col z-50 overflow-hidden shadow-sm transition-all duration-300 ${isSidebarOpen ? 'w-[280px]' : 'w-[80px]'}`}>
         {/* Logo Section */}
         <div className="p-6 flex items-center justify-between">
           <Link href="/admin" className="block max-w-[120px] transition-opacity hover:opacity-80">
@@ -61,8 +80,8 @@ export default async function AdminLayout({
               className="w-full h-auto object-contain" 
             />
           </Link>
-          <button className="p-1.5 rounded-lg border border-black/5 text-black/40 hover:text-black/60 transition-colors">
-            <ChevronRight className="w-4 h-4" />
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg border border-black/5 text-black/40 hover:text-black/60 transition-colors">
+            <ChevronRight className={`w-4 h-4 transition-transform ${isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
         </div>
 
@@ -120,31 +139,35 @@ export default async function AdminLayout({
         </div>
 
         {/* User Footer */}
-        <div className="p-4 bg-black/[0.02] border-t border-black/5 mt-auto">
-          <div className="p-3 bg-white rounded-2xl border border-black/5 shadow-sm flex items-center justify-between">
-             <Link href="/admin/profile" className="flex items-center gap-3 overflow-hidden group">
-                <div className="w-9 h-9 rounded-xl overflow-hidden grayscale-[0.5] group-hover:grayscale-0 transition-all border border-black/5 shrink-0">
-                  <img src={profile.avatar_url || "https://images.unsplash.com/photo-1544005313-94ddf0286df2"} alt="Author" className="w-full h-full object-cover" />
+        <Link href="/admin/profile" className={`block p-4 bg-black/[0.02] border-t border-black/5 mt-auto hover:bg-black/[0.04] transition-colors group ${!isSidebarOpen && 'pb-8 pt-6 flex justify-center'}`}>
+          <div className={`bg-white rounded-2xl border border-black/5 shadow-sm flex items-center justify-between group-hover:shadow-md transition-shadow ${isSidebarOpen ? 'p-3' : 'p-2'}`}>
+             <div className="flex items-center gap-3 overflow-hidden">
+                <div className={`rounded-xl overflow-hidden grayscale-[0.5] group-hover:grayscale-0 transition-all border border-black/5 shrink-0 bg-black/5 flex items-center justify-center text-[#1d1d1f] font-bold ${isSidebarOpen ? 'w-9 h-9' : 'w-10 h-10'}`}>
+                  {profile?.avatar_url ? (
+                     <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                     <span className="text-xs uppercase">{(profile?.full_name || authUser?.email || "U").slice(0, 2)}</span>
+                  )}
                 </div>
-                <div className="min-w-0">
-                  <div className="text-[13px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile.full_name?.split(' ')[0]}</div>
-                  <div className="text-[10px] text-[#41cc00] font-bold uppercase tracking-wider">Settings</div>
-                </div>
-             </Link>
-             <button className="text-black/20 hover:text-black/40 transition-colors">
-                <ChevronDown className="w-4 h-4" />
-             </button>
+                {isSidebarOpen && (
+                  <div className="min-w-0">
+                    <div className="text-[14px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile?.full_name || authUser?.email?.split('@')[0]}</div>
+                    <div className="text-[10px] text-black/30 font-bold uppercase tracking-wider">Account Active</div>
+                  </div>
+                )}
+             </div>
+             {isSidebarOpen && <ChevronRight className="w-4 h-4 text-black/20 group-hover:text-[#41cc00] transition-colors" />}
           </div>
-        </div>
+        </Link>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-[280px] min-h-screen flex flex-col">
+      <main className={`flex-1 min-h-screen flex flex-col transition-all duration-300 ${isSidebarOpen ? 'ml-[280px]' : 'ml-[80px]'}`}>
         {/* Global Top Bar */}
         <header className="h-[80px] px-8 md:px-12 flex items-center justify-between sticky top-0 bg-white/60 backdrop-blur-xl z-40 border-b border-[#41cc00]/5">
            <div className="flex items-center gap-4">
               <h2 className="text-[20px] font-bold text-[#1d1d1f] font-bricolage tracking-tight">
-                {siteSettings?.header_governance_text || "Governance"}
+                {/* Empty instead of the old 'Governance' text */}
               </h2>
            </div>
 

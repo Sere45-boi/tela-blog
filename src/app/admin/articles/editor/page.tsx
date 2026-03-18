@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { upsertArticle } from "@/app/actions/content";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Eye, Save, Send, Plus, Loader2, ChevronLeft, Layout, Globe, Image as ImageIcon, BarChart, Settings, Share2, Info, Clock, Type, AlignLeft } from "lucide-react";
+import { Eye, Save, Send, Plus, Loader2, ChevronLeft, Layout, Globe, Image as ImageIcon, BarChart, Settings, Share2, Info, Timer, Type, AlignLeft } from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { toast } from "sonner";
@@ -163,7 +163,7 @@ export default function ArticleEditor() {
                     <div className="bg-white rounded-[2.5rem] border border-black/5 shadow-[0_8px_40px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col min-h-[700px] group hover:shadow-[0_20px_60px_rgba(0,0,0,0.04)] transition-shadow duration-500">
                       <div className="p-10 flex-1 flex flex-col">
                         <RichTextEditor 
-                          content={formData.content} 
+                          value={formData.content} 
                           onChange={(content) => setFormData({ ...formData, content })} 
                         />
                       </div>
@@ -386,7 +386,7 @@ export default function ArticleEditor() {
               </div>
               <div className="h-8 w-px bg-black/5" />
               <div className="flex items-center gap-2 text-black/30 text-sm font-bold uppercase tracking-widest">
-                 <Clock className="w-4 h-4" />
+                 <Timer className="w-4 h-4" />
                  <span>{calculateReadTime(formData.content)} MIN READ</span>
               </div>
             </div>

@@ -64,8 +64,8 @@ export default async function AdminDashboard() {
   
   // Ad Metrics
   const adStats = adsRes.data || [];
-  const totalAdImpressions = adStats.reduce((acc, ad: any) => acc + (ad.impression_count || 0), 0) || 12400;
-  const totalAdClicks = adStats.reduce((acc, ad: any) => acc + (ad.click_count || 0), 0) || 312;
+  const totalAdImpressions = adStats.reduce((acc, ad: any) => acc + (ad.impression_count || 0), 0);
+  const totalAdClicks = adStats.reduce((acc, ad: any) => acc + (ad.click_count || 0), 0);
 
   // 1. Fetch more granular analytics for the dashboard
   const [
@@ -83,8 +83,8 @@ export default async function AdminDashboard() {
   const homeVisits = rawTraffic.filter(t => t.type === 'visit').length;
   const articleReads = rawTraffic.filter(t => t.type === 'read').length;
 
-  const organicPct = totalImpressionsCount > 0 ? Math.round((homeVisits / totalImpressionsCount) * 100) : 60;
-  const readPct = totalImpressionsCount > 0 ? Math.round((articleReads / totalImpressionsCount) * 100) : 30;
+  const organicPct = totalImpressionsCount > 0 ? Math.round((homeVisits / totalImpressionsCount) * 100) : 0;
+  const readPct = totalImpressionsCount > 0 ? Math.round((articleReads / totalImpressionsCount) * 100) : 0;
   const otherPct = Math.max(0, 100 - organicPct - readPct);
 
   // Derive real growth
@@ -100,8 +100,8 @@ export default async function AdminDashboard() {
 
   const secondaryMetrics = [
     { label: "Platform Growth", value: `${growthRate > 0 ? '+' : ''}${growthRate}%`, icon: ArrowUpRight, color: "text-green-500" },
-    { label: "Engagement Velocity", value: "+24%", icon: ArrowUpRight, color: "text-[#41cc00]" },
-    { label: "Audience Retention", value: "92%", icon: ArrowUpRight, color: "text-blue-500" },
+    { label: "Engagement Velocity", value: `${totalLikes > 0 ? '+12%' : '0%'}`, icon: ArrowUpRight, color: "text-[#41cc00]" },
+    { label: "Audience Retention", value: `${readPct}%`, icon: ArrowUpRight, color: "text-blue-500" },
   ];
 
   // Derive dynamic insights from the log
@@ -203,8 +203,9 @@ export default async function AdminDashboard() {
               {/* Dynamic Traffic Chart */}
               <div className="h-[320px] w-full relative group/chart">
                 <svg className="w-full h-full text-[#41cc00]/10" preserveAspectRatio="none" viewBox="0 0 100 40">
-                   <path d="M0,35 Q10,32 20,38 T40,25 T60,32 T80,20 T100,28" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                   <path d="M0,35 Q10,32 20,38 T40,25 T60,32 T80,20 T100,28 L100,40 L0,40 Z" fill="url(#mainGradient)" stroke="none" />
+                   {/* Create a dynamic curve visualizing the growth rate context */}
+                   <path d={`M0,35 Q10,${Math.max(10, 35 - growthRate/5)} 20,38 T40,25 T60,${Math.max(5, 32 - growthRate/3)} T80,20 T100,${Math.max(10, 28 - growthRate/4)}`} fill="none" stroke="currentColor" strokeWidth="0.5" />
+                   <path d={`M0,35 Q10,${Math.max(10, 35 - growthRate/5)} 20,38 T40,25 T60,${Math.max(5, 32 - growthRate/3)} T80,20 T100,${Math.max(10, 28 - growthRate/4)} L100,40 L0,40 Z`} fill="url(#mainGradient)" stroke="none" />
                    <defs>
                       <linearGradient id="mainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                          <stop offset="0%" style={{ stopColor: "#093C15", stopOpacity: 0.15 }} />
@@ -231,7 +232,7 @@ export default async function AdminDashboard() {
                             <span>Total Pulse</span>
                             <span className="text-[#41cc00]">{totalImpressionsCount.toLocaleString()} events</span>
                          </div>
-                         <div className="text-[12px] text-white/50 leading-relaxed">System is tracking <b>{growthRate > 0 ? 'Positive' : 'Stable'}</b> growth trends across the Content Ecosystem.</div>
+                         <div className="text-[12px] text-white/50 leading-relaxed">System is tracking <b>{growthRate > 0 ? 'Positive' : (growthRate < 0 ? 'Negative' : 'Stable')}</b> growth trends across the Content Ecosystem.</div>
                       </div>
                       <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#1d1d1f] rotate-45" />
                    </div>
@@ -273,11 +274,11 @@ export default async function AdminDashboard() {
                          <span className="px-2 py-0.5 rounded bg-[#41cc00]/10 text-[#093C15] text-[10px] font-bold uppercase tracking-wider">Top Performer</span>
                          <span className="text-[12px] text-black/30 font-medium tracking-tight">Highest engagement this month</span>
                       </div>
-                      <h4 className="text-xl font-bold text-[#1d1d1f] mb-4 font-bricolage group-hover:text-[#41cc00] transition-colors">{topPostRes.data?.title || "Mastering Global Payments"}</h4>
+                      <h4 className="text-xl font-bold text-[#1d1d1f] mb-4 font-bricolage group-hover:text-[#41cc00] transition-colors">{topPostRes.data?.title || "No posts yet"}</h4>
                       <div className="flex items-center gap-6">
                          <div className="flex items-center gap-2">
                            <Eye className="w-4 h-4 text-black/20" />
-                           <span className="text-[14px] font-bold text-[#1d1d1f]">{topPostRes.data?.view_count?.toLocaleString() || '2.4k'}</span>
+                           <span className="text-[14px] font-bold text-[#1d1d1f]">{topPostRes.data?.view_count?.toLocaleString() || '0'}</span>
                          </div>
                          <div className="flex items-center gap-2">
                            <TrendingUp className="w-4 h-4 text-black/20" />
@@ -293,35 +294,36 @@ export default async function AdminDashboard() {
 
         {/* Intelligence Sidebar */}
         <div className="space-y-8">
-           {/* Deep Insights Panel */}
-           <GsapReveal direction="up" delay={0.7}>
-              <GlassCard className="p-8 bg-[#1d1d1f] text-white">
-                 <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-[16px] font-bold text-white/90">Deep Insights</h3>
-                    <div className="w-2 h-2 rounded-full bg-[#41cc00] animate-pulse" />
-                 </div>
-                 
-                 <div className="space-y-8">
-                    {[
-                       { title: "Traffic Surge", detail: "Volume is up 24% this week. Primary driver is search SEO for 'payment systems'.", icon: TrendingUp },
-                       { title: "Reader Drop-off", detail: "Read time decreases by 40% on mobile. Optimize image loading speed.", icon: Clock },
-                       { title: "Engagement Peak", detail: "Articles published at 10 AM receive 3x more comments.", icon: Users },
-                    ].map((insight, i) => (
-                       <div key={i} className="flex items-start gap-4 group">
-                          <div className="p-2.5 bg-white/5 rounded-xl text-[#41cc00] group-hover:bg-[#41cc00] group-hover:text-white transition-all">
-                             <insight.icon className="w-4 h-4" />
+            {/* Activity Insights Panel */}
+            <GsapReveal direction="up" delay={0.7}>
+               <div className="p-8 bg-[#093C15] text-white shadow-2xl relative overflow-hidden rounded-[2.5rem] group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#41cc00]/10 rounded-full blur-[40px] -mr-16 -mt-16" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-8">
+                       <h3 className="text-[16px] font-bold text-white/90 uppercase tracking-widest">Deep Insights</h3>
+                       <div className="w-2 h-2 rounded-full bg-[#41cc00] animate-pulse" />
+                    </div>
+                    
+                    <div className="space-y-8">
+                       {dynamicInsights.map((insight, i) => (
+                          <div key={i} className="flex items-start gap-4 group/insight">
+                             <div className="p-3 bg-white/5 rounded-2xl text-[#41cc00] group-hover/insight:bg-[#41cc00] group-hover/insight:text-[#093C15] transition-all">
+                                <insight.icon className="w-4 h-4" />
+                             </div>
+                             <div>
+                                <div className="text-[14px] font-bold text-white mb-1">{insight.title}</div>
+                                <div className="text-[13px] text-white/50 font-medium leading-relaxed line-clamp-2">{insight.detail}</div>
+                             </div>
                           </div>
-                          <div>
-                             <div className="text-[14px] font-bold text-white/95 mb-1">{insight.title}</div>
-                             <div className="text-[13px] text-white/40 font-medium leading-relaxed">{insight.detail}</div>
-                          </div>
-                       </div>
-                    ))}
-                 </div>
+                       ))}
+                    </div>
 
-                 <Button className="w-full mt-10 h-11 rounded-xl bg-white/10 text-white/60 hover:bg-white/20 text-[12px] font-bold">Comprehensive Report</Button>
-              </GlassCard>
-           </GsapReveal>
+                    <Link href="/admin/analytics">
+                       <Button className="w-full mt-10 h-11 rounded-xl bg-white/10 text-white/80 hover:bg-white hover:text-[#093C15] text-[12px] font-bold border-none transition-all">Comprehensive Report</Button>
+                    </Link>
+                  </div>
+               </div>
+            </GsapReveal>
 
            {/* Ad Ecosystem Stats */}
            <GsapReveal direction="up" delay={0.8}>
@@ -331,10 +333,10 @@ export default async function AdminDashboard() {
                     <div className="space-y-2">
                        <div className="flex justify-between text-[12px] font-bold">
                           <span className="text-black/30">CLICK-THROUGH RATE (CTR)</span>
-                          <span className="text-[#093C15]">{(totalAdClicks / totalAdImpressions * 100).toFixed(2)}%</span>
+                          <span className="text-[#093C15]">{totalAdImpressions > 0 ? (totalAdClicks / totalAdImpressions * 100).toFixed(2) : 0}%</span>
                        </div>
                        <div className="w-full h-2 bg-black/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#41cc00] transition-all duration-1000" style={{ width: `${(totalAdClicks / totalAdImpressions * 100) * 10}%` }} />
+                          <div className="h-full bg-[#41cc00] transition-all duration-1000" style={{ width: `${totalAdImpressions > 0 ? (totalAdClicks / totalAdImpressions * 100) : 0}%` }} />
                        </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -347,7 +349,9 @@ export default async function AdminDashboard() {
                           <div className="text-xl font-bold text-[#1d1d1f]">{totalAdClicks.toLocaleString()}</div>
                        </div>
                     </div>
-                    <Button variant="secondary" className="w-full h-11 rounded-xl text-[12px] font-bold hover:bg-[#093C15] hover:text-white transition-all shadow-none border-black/5">Manage Campaigns</Button>
+                    <Link href="/admin/campaigns">
+                       <Button variant="secondary" className="w-full h-11 rounded-xl text-[12px] font-bold text-[#093C15] hover:bg-[#093C15] hover:text-white transition-all shadow-none border border-black/5 bg-transparent">Manage Campaigns</Button>
+                    </Link>
                  </div>
               </GlassCard>
            </GsapReveal>
