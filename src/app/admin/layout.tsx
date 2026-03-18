@@ -72,67 +72,82 @@ export default function AdminLayout({
       {/* Sidebar Navigation */}
       <aside className={`fixed inset-y-0 left-0 bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 flex flex-col z-50 overflow-hidden shadow-sm transition-all duration-300 ${isSidebarOpen ? 'w-[280px]' : 'w-[80px]'}`}>
         {/* Logo Section */}
-        <div className="p-6 flex items-center justify-between">
-          <Link href="/admin" className="block max-w-[120px] transition-opacity hover:opacity-80">
-            <img 
-              src="/images/IMG_2366.png" 
-              alt="Tela Logo" 
-              className="w-full h-auto object-contain" 
-            />
-          </Link>
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg border border-black/5 text-black/40 hover:text-black/60 transition-colors">
-            <ChevronRight className={`w-4 h-4 transition-transform ${isSidebarOpen ? 'rotate-180' : ''}`} />
+        <div className="p-6 flex items-center justify-between min-h-[80px]">
+          {isSidebarOpen ? (
+            <Link href="/admin" className="block transition-opacity hover:opacity-80">
+              <img
+                src="/images/IMG_2366.png"
+                alt="Tela Logo"
+                className="h-8 w-auto object-contain"
+              />
+            </Link>
+          ) : (
+            <Link href="/admin" className="flex items-center justify-center w-10 h-10 rounded-xl hover:opacity-80 transition-opacity">
+              <img
+                src="/favicon.ico"
+                alt="Tela"
+                className="w-8 h-8 object-contain"
+              />
+            </Link>
+          )}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-1.5 rounded-lg border border-black/5 text-black/40 hover:text-black/60 transition-colors"
+          >
+            <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
         </div>
 
-        {/* Search Input */}
-        <div className="px-6 mb-8">
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/20 group-focus-within:text-[#093C15] transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Search components..."
-              className="w-full h-11 bg-black/[0.02] border border-transparent focus:border-[#41cc00]/20 rounded-xl pl-11 pr-4 text-[13px] font-medium outline-none transition-colors duration-200 placeholder:text-black/20"
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              <span className="text-[10px] font-bold text-black/20 bg-white border border-black/5 px-1.5 py-0.5 rounded-md">⌘ K</span>
+        {/* Search Input - only shown when expanded */}
+        {isSidebarOpen && (
+          <div className="px-6 mb-8">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/20 group-focus-within:text-[#093C15] transition-colors" />
+              <input
+                type="text"
+                placeholder="Search components..."
+                className="w-full h-11 bg-black/[0.02] border border-transparent focus:border-[#41cc00]/20 rounded-xl pl-11 pr-4 text-[13px] font-medium outline-none transition-colors duration-200 placeholder:text-black/20"
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <span className="text-[10px] font-bold text-black/20 bg-white border border-black/5 px-1.5 py-0.5 rounded-md">⌘ K</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Navigation Groups */}
         <div className="flex-1 px-4 overflow-y-auto space-y-6 custom-scrollbar pb-8">
           <div>
-            <h3 className="px-4 text-[11px] font-bold text-black/30 uppercase tracking-[0.1em] mb-3">Main Menu</h3>
+            {isSidebarOpen && <h3 className="px-4 text-[11px] font-bold text-black/30 uppercase tracking-[0.1em] mb-3">Main Menu</h3>}
             <nav className="space-y-1">
-              <Link href="/admin" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
-                <LayoutDashboard className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
-                <span className="text-[14px] font-semibold">Dashboard</span>
-              </Link>
-              <Link href="/admin/articles" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
-                <FileText className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
-                <span className="text-[14px] font-semibold">Post Management</span>
-              </Link>
-              <Link href="/admin/categories" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
-                <Tags className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
-                <span className="text-[14px] font-semibold">Categories</span>
-              </Link>
-              <Link href="/admin/campaigns" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
-                <ImageIcon className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
-                <span className="text-[14px] font-semibold">Campaigns</span>
-              </Link>
-              <Link href="/admin/users" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
-                <Users className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 transform-gpu will-change-transform" />
-                <span className="text-[14px] font-semibold">Authors & Team</span>
-              </Link>
+              {([
+                { href: "/admin", Icon: LayoutDashboard, label: "Dashboard" },
+                { href: "/admin/articles", Icon: FileText, label: "Post Management" },
+                { href: "/admin/categories", Icon: Tags, label: "Categories" },
+                { href: "/admin/campaigns", Icon: ImageIcon, label: "Campaigns" },
+                { href: "/admin/users", Icon: Users, label: "Authors & Team" },
+              ] as const).map(({ href, Icon, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  title={label}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group ${!isSidebarOpen ? 'justify-center' : ''}`}
+                >
+                  <Icon className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 shrink-0" />
+                  {isSidebarOpen && <span className="text-[14px] font-semibold">{label}</span>}
+                </Link>
+              ))}
             </nav>
           </div>
-
           <div>
             <nav className="space-y-1">
-              <Link href="/admin/site-settings" className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group">
+              <Link
+                href="/admin/site-settings"
+                title="Site Branding"
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group ${!isSidebarOpen ? 'justify-center' : ''}`}
+              >
                 <Globe className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200" />
-                <span className="text-[14px] font-semibold">Site Branding</span>
+                {isSidebarOpen && <span className="text-[14px] font-semibold">Site Branding</span>}
               </Link>
             </nav>
           </div>

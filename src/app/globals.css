@@ -8,9 +8,8 @@
   --border: #e0e8e2;
   --accent: #41cc00;
   --accent-foreground: #ffffff;
-}
 
-@theme inline {
+  /* Theme variables - T4 will pick these up automatically from :root */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
