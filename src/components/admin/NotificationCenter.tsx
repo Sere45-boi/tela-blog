@@ -51,7 +51,7 @@ export function NotificationCenter() {
       .from("notifications")
       .update({ is_read: true })
       .eq("id", id);
-    
+
     setNotifications(notifications.map(n => n.id === id ? { ...n, is_read: true } : n));
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
@@ -69,33 +69,33 @@ export function NotificationCenter() {
 
   return (
     <div className="relative">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-2xl bg-white border border-black/5 transition-all shadow-sm hover:shadow-md ${isOpen ? 'text-[#41cc00] border-[#41cc00]/20' : 'text-black/40 hover:text-[#41cc00]'}`}
       >
         <Bell className="w-4 h-4" />
       </button>
-      
+
       {unreadCount > 0 && (
         <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white shadow-sm" />
       )}
 
       {isOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)} 
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
           />
           <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl border border-black/5 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="p-4 border-b border-black/5 bg-black/[0.01] flex items-center justify-between">
               <h3 className="text-[13px] font-bold text-[#1d1d1f] uppercase tracking-wider">Live Interactions</h3>
               <span className="text-[10px] font-bold text-[#41cc00] bg-[#41cc00]/10 px-2 py-0.5 rounded-full uppercase">{unreadCount} New</span>
             </div>
-            
+
             <div className="max-h-[350px] overflow-y-auto divide-y divide-black/5 custom-scrollbar">
               {notifications.length > 0 ? notifications.map((n) => (
-                <div 
-                  key={n.id} 
+                <div
+                  key={n.id}
                   className={`p-4 hover:bg-[#f3fbf3]/50 transition-colors cursor-pointer group ${!n.is_read ? 'bg-[#41cc00]/[0.02]' : ''}`}
                   onClick={() => {
                     markAsRead(n.id);
@@ -125,13 +125,13 @@ export function NotificationCenter() {
             </div>
 
             <div className="p-3 border-t border-black/5 bg-black/[0.01]">
-                <Link 
-                  href="/admin/notifications" 
-                  onClick={() => setIsOpen(false)}
-                  className="w-full py-2 text-[12px] font-bold text-black/40 hover:text-[#093C15] transition-colors flex items-center justify-center gap-2"
-                >
-                    View Intelligence Log <ChevronRight className="w-3 h-3" />
-                </Link>
+              <Link
+                href="/admin/notifications"
+                onClick={() => setIsOpen(false)}
+                className="w-full py-2 text-[12px] font-bold text-black/40 hover:text-[#093C15] transition-colors flex items-center justify-center gap-2"
+              >
+                View Notifications <ChevronRight className="w-3 h-3" />
+              </Link>
             </div>
           </div>
         </>

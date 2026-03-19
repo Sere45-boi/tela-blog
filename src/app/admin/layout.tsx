@@ -78,7 +78,7 @@ export default function AdminLayout({
               <img
                 src="/images/IMG_2366.png"
                 alt="Tela Logo"
-                className="h-8 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
             </Link>
           ) : (
@@ -147,7 +147,7 @@ export default function AdminLayout({
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group ${!isSidebarOpen ? 'justify-center' : ''}`}
               >
                 <Globe className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200" />
-                {isSidebarOpen && <span className="text-[14px] font-semibold">Site Branding</span>}
+                {isSidebarOpen && <span className="text-[14px] font-semibold">Blog Content</span>}
               </Link>
             </nav>
           </div>
@@ -167,7 +167,7 @@ export default function AdminLayout({
               {isSidebarOpen && (
                 <div className="min-w-0">
                   <div className="text-[14px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile?.full_name || authUser?.email?.split('@')[0]}</div>
-                  <div className="text-[10px] text-black/30 font-bold uppercase tracking-wider">Account Active</div>
+                  <div className="text-[10px] text-black/30 font-bold uppercase tracking-wider">User Account</div>
                 </div>
               )}
             </div>
@@ -181,8 +181,8 @@ export default function AdminLayout({
         {/* Global Top Bar */}
         <header className="h-16 px-8 md:px-12 flex items-center justify-between sticky top-0 bg-white/60 backdrop-blur-xl z-40 border-b border-[#41cc00]/5">
           <div className="flex items-center gap-4">
-            <h2 className="text-[20px] font-bold text-[#1d1d1f] font-bricolage tracking-tight">
-              {/* Empty instead of the old 'Governance' text */}
+            <h2 className="text-[25px] font-bold text-[#1d1d1f] font-bricolage tracking-tight flex items-center gap-2">
+              Pulse <span className="text-[#41cc00]/40 font-medium text-[20px]">by Tela</span>
             </h2>
           </div>
 
