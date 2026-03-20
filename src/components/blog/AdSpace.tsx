@@ -24,7 +24,7 @@ export function AdSpace({ position }: { position: string }) {
         .eq("position", position)
         .eq("status", "active")
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (data) {
         setAd(data);

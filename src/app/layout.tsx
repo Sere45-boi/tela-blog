@@ -58,6 +58,7 @@ export const metadata: Metadata = {
 
 import { Toaster } from "sonner";
 import { PageTracker } from "@/components/layout/PageTracker";
+import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { Suspense } from "react";
 
 export default function RootLayout({
@@ -89,7 +90,9 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <PageTracker />
         </Suspense>
-        {children}
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
         <Toaster position="top-right" richColors closeButton />
       </body>
     </html>

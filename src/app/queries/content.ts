@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 
-export async function getPublishedArticles(page = 1, limit = 9, categorySlug?: string) {
+export async function getPublishedArticles(page = 1, limit = 9, categorySlug?: string, searchTerm?: string) {
   const supabase = await createClient();
   let query = supabase
     .from("articles")
@@ -16,13 +16,17 @@ export async function getPublishedArticles(page = 1, limit = 9, categorySlug?: s
     query = query.eq("categories.slug", categorySlug);
   }
 
+  if (searchTerm) {
+    query = query.ilike("title", `%${searchTerm}%`);
+  }
+
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
   const { data, count, error } = await query.range(from, to);
 
   if (error) {
-    console.error("Error fetching articles:", error);
+    console.error("Error fetching articles:", error.message, error.code, error.details);
     return { data: [], count: 0 };
   }
 
@@ -45,7 +49,7 @@ export async function getFeaturedArticle() {
     .maybeSingle();
 
   if (error) {
-    console.error("Error fetching featured article:", error);
+    console.error("Error fetching featured article:", error.message, error.code, error.details);
   }
   return data;
 }
@@ -58,7 +62,7 @@ export async function getCategories() {
     .order("name", { ascending: true });
 
   if (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching categories:", error.message, error.code, error.details);
     return [];
   }
   return data;
@@ -78,7 +82,7 @@ export async function getArticleBySlug(slug: string) {
     .single();
 
   if (error) {
-    console.error("Error fetching article by slug:", error);
+    console.error("Error fetching article by slug:", error.message, error.code, error.details);
     return null;
   }
   return data;

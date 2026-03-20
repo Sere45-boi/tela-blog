@@ -8,6 +8,62 @@ import { updateSiteSettings } from "@/app/actions/settings";
 import { createClient } from "@/utils/supabase/client";
 import { GsapReveal } from "@/components/GsapReveal";
 import { GlassCard } from "@/components/ui/Card";
+import { Plus, Trash2, PlusCircle, X } from "lucide-react";
+
+const LinkListEditor = ({ label, links, onChange }: { label: string; links: any[]; onChange: (links: any[]) => void }) => {
+  const addLink = () => onChange([...links, { label: "", url: "" }]);
+  const removeLink = (index: number) => onChange(links.filter((_, i) => i !== index));
+  const updateLink = (index: number, key: string, value: string) => {
+    const newLinks = [...links];
+    newLinks[index] = { ...newLinks[index], [key]: value };
+    onChange(newLinks);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between px-1">
+        <label className="text-[12px] font-bold text-[#093C15] uppercase tracking-wider">{label}</label>
+        <button 
+          onClick={addLink}
+          className="p-1.5 rounded-lg bg-[#41cc00]/10 text-[#093C15] hover:bg-[#41cc00]/20 transition-colors flex items-center gap-2 text-[10px] font-bold"
+        >
+          <PlusCircle className="w-3.5 h-3.5" /> ADD LINK
+        </button>
+      </div>
+      <div className="space-y-3">
+        {links.map((link, idx) => (
+          <div key={idx} className="flex gap-3 items-start animate-in fade-in slide-in-from-left-2 duration-300">
+            <div className="flex-1 space-y-2">
+              <Input 
+                placeholder="Label (e.g. Payments)" 
+                value={link.label} 
+                onChange={(e) => updateLink(idx, "label", e.target.value)}
+                className="h-10 text-[13px] bg-white/50 border-black/5"
+              />
+              <Input 
+                placeholder="URL (e.g. /payments)" 
+                value={link.url} 
+                onChange={(e) => updateLink(idx, "url", e.target.value)}
+                className="h-10 text-[13px] bg-white/50 border-black/5 font-mono"
+              />
+            </div>
+            <button 
+              onClick={() => removeLink(idx)}
+              className="p-2.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors mt-1"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+        {links.length === 0 && (
+          <div className="text-center py-6 border border-dashed border-black/10 rounded-2xl bg-black/[0.01]">
+            <p className="text-[11px] text-black/20 font-bold uppercase tracking-widest">No links configured</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Section = ({ title, icon: Icon, children, description }: { title: string; icon: any; children: React.ReactNode; description?: string }) => (
   <GsapReveal direction="up" delay={0.1}>
@@ -54,6 +110,11 @@ export default function SiteSettingsPage() {
     linkedin_url: "https://linkedin.com/company/tela",
     instagram_url: "https://instagram.com/tela",
     facebook_url: "",
+    hero_accent_text: "FINANCIAL OS FOR MODERN BUSINESS",
+    footer_products: [],
+    footer_company: [],
+    footer_resources: [],
+    footer_legal: [],
   });
 
   useEffect(() => {
@@ -84,7 +145,7 @@ export default function SiteSettingsPage() {
     setSaving(false);
   };
 
-  const updateField = (key: string, value: string) => {
+  const updateField = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
@@ -100,7 +161,7 @@ export default function SiteSettingsPage() {
           <Button 
             onClick={handleSave} 
             isLoading={saving}
-            className="h-12 px-8 bg-[#093C15] group shadow-lg shadow-[#093C15]/10 hover:bg-[#0a5a1f] transition-all"
+            className="h-12 px-8 bg-[#093C15] text-white group shadow-lg shadow-[#093C15]/10 hover:bg-[#0a5a1f] transition-all"
             disabled={loading}
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 group-hover:scale-110 transition-transform mr-2" />}
@@ -229,7 +290,16 @@ export default function SiteSettingsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Gradient Accent Text</label>
+                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Gradient Accent Text</label>
+                    <Input 
+                      value={settings.hero_accent_text || ""} 
+                      onChange={(e) => updateField("hero_accent_text", e.target.value)}
+                      placeholder="e.g. FINANCIAL OS FOR MODERN BUSINESS"
+                      className="h-12 bg-white/50 border-black/5 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Subtitle</label>
                     <Input 
                       value={settings.hero_subtitle || ""} 
                       onChange={(e) => updateField("hero_subtitle", e.target.value)}
@@ -277,39 +347,27 @@ export default function SiteSettingsPage() {
                       />
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 1 Label</label>
-                        <Input 
-                          value={settings.footer_link_1_label || ""} 
-                          onChange={(e) => updateField("footer_link_1_label", e.target.value)}
-                          className="h-12 bg-white/50 border-black/5 rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 1 URL</label>
-                        <Input 
-                          value={settings.footer_link_1_url || ""} 
-                          onChange={(e) => updateField("footer_link_1_url", e.target.value)}
-                          className="h-12 bg-white/50 border-black/5 rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 2 Label</label>
-                        <Input 
-                          value={settings.footer_link_2_label || ""} 
-                          onChange={(e) => updateField("footer_link_2_label", e.target.value)}
-                          className="h-12 bg-white/50 border-black/5 rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-black/20 uppercase tracking-widest ml-1">Link 2 URL</label>
-                        <Input 
-                          value={settings.footer_link_2_url || ""} 
-                          onChange={(e) => updateField("footer_link_2_url", e.target.value)}
-                          className="h-12 bg-white/50 border-black/5 rounded-xl"
-                        />
-                      </div>
+                    <div className="space-y-8 pt-4">
+                      <LinkListEditor 
+                        label="Product Links" 
+                        links={settings.footer_products || []} 
+                        onChange={(val) => updateField("footer_products", val)} 
+                      />
+                      <LinkListEditor 
+                        label="Company Links" 
+                        links={settings.footer_company || []} 
+                        onChange={(val) => updateField("footer_company", val)} 
+                      />
+                      <LinkListEditor 
+                        label="Resource Links" 
+                        links={settings.footer_resources || []} 
+                        onChange={(val) => updateField("footer_resources", val)} 
+                      />
+                      <LinkListEditor 
+                        label="Legal Links" 
+                        links={settings.footer_legal || []} 
+                        onChange={(val) => updateField("footer_legal", val)} 
+                      />
                     </div>
                   </div>
                 </div>
