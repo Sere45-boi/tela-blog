@@ -29,7 +29,11 @@ export function LoginClient() {
     });
 
     if (error) {
-      setError(error.message);
+      if (error.message.includes("Email not confirmed")) {
+        setError("Please check your email inbox to verify your account before logging in.");
+      } else {
+        setError(error.message);
+      }
       setLoading(false);
       return;
     }

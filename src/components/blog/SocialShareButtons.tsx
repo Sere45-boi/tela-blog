@@ -1,11 +1,19 @@
 "use client";
 
 import { Twitter, Linkedin, Facebook, Link as LinkIcon, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function SocialShareButtons({ title, slug }: { title: string; slug: string }) {
   const [copied, setCopied] = useState(false);
-  const url = typeof window !== "undefined" ? `${window.location.origin}/blog/${slug}` : `https://tela.ng/blog/${slug}`;
+  const [url, setUrl] = useState(`https://tela.ng/blog/${slug}`);
+
+  // Safely get the real window URL after React has hydrated
+  useEffect(() => {
+    // If we have a local dev environment url env, use that or window origin
+    const origin = typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || "https://tela.ng";
+    setUrl(`${origin}/blog/${slug}`);
+  }, [slug]);
+
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
 

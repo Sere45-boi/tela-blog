@@ -79,6 +79,23 @@ export default async function ArticlePage({
   
   const author = getAuthorAttribution(article.profiles);
   
+  // Fetch top read articles (excluding current)
+  const { data: topArticlesData } = await supabase
+    .from("articles")
+    .select("slug, title, view_count")
+    .eq("status", "published")
+    .neq("slug", slug)
+    .order("view_count", { ascending: false })
+    .limit(3);
+
+  const topArticles = topArticlesData || [];
+  
+  const formatViews = (views?: number) => {
+    if (!views) return "0";
+    if (views >= 1000) return (views / 1000).toFixed(1) + "k";
+    return views.toString();
+  };
+  
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -107,7 +124,7 @@ export default async function ArticlePage({
         )}
 
         <main className="pt-32 pb-24 md:pt-40">
-          <div className="max-w-[1400px] mx-auto px-4 md:px-8 flex flex-col lg:flex-row gap-12 lg:gap-16">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-24 flex flex-col lg:flex-row gap-12 lg:gap-20">
             
             {/* MAIN ARTICLE COLUMN */}
             <article className="flex-1 min-w-0 max-w-[800px]">
@@ -223,20 +240,19 @@ export default async function ArticlePage({
                   <h3 className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wider">Top Read</h3>
                 </div>
                 <div className="space-y-4">
-                  {[
-                    { slug: "receive-ach", title: "Receive ACH payments in Nigeria with a US bank", views: "2.4k" },
-                    { slug: "dollar-card", title: "What is a virtual dollar card and how does it work?", views: "1.8k" },
-                  ].map((post, i) => (
+                  {topArticles.length > 0 ? topArticles.map((post, i) => (
                     <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex items-start gap-3">
                       <span className="text-[24px] font-bold text-[#41cc00]/30 leading-none mt-0.5">{i + 1}</span>
                       <div>
                         <h4 className="text-[15px] font-semibold text-[#1d1d1f] leading-snug group-hover:text-[#093C15] transition-colors line-clamp-2">
                           {post.title}
                         </h4>
-                        <span className="text-[12px] text-[#1d1d1f]/40 font-medium mt-1 block">{post.views} views</span>
+                        <span className="text-[12px] text-[#1d1d1f]/40 font-medium mt-1 block">{formatViews(post.view_count)} views</span>
                       </div>
                     </Link>
-                  ))}
+                  )) : (
+                    <div className="text-[13px] text-black/40 font-medium">No trending articles yet.</div>
+                  )}
                 </div>
               </div>
             </aside>

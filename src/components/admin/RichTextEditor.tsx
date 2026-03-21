@@ -129,6 +129,13 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     const file = e.target.files?.[0];
     if (!file) return;
     
+    // Reject binary formats explicitly to prevent "PK..." garbage text
+    if (file.name.match(/\.(docx?|pdf|rtf)$/i) || (!file.type.startsWith('text/') && !file.name.endsWith('.md'))) {
+      toast.error("Word documents are binary files. Please just copy & paste your text from Word into the editor, or upload a plain .txt file.");
+      e.target.value = "";
+      return;
+    }
+
     // Read text-based documents
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -263,15 +270,15 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
 
           <ToolbarDivider />
 
-          {/* Upload Document */}
+          {/* Import Text */}
           <button
             type="button"
             onClick={handleDocUpload}
-            title="Upload Word Document"
-            className="flex items-center gap-1.5 px-3 h-8 rounded-md text-[12px] font-bold text-[#093C15] bg-[#e8f5e8] hover:bg-[#d4efd4] transition-colors"
+            title="Import Raw Text File"
+            className="flex items-center gap-1.5 px-3 h-8 rounded-md text-[12px] font-bold text-[#093C15] bg-black/[0.03] hover:bg-black/[0.06] transition-colors border border-black/5"
           >
             <Upload className="w-3.5 h-3.5" />
-            Upload .doc
+            Import .txt
           </button>
         </div>
       </div>
@@ -287,7 +294,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
       <input
         ref={docInputRef}
         type="file"
-        accept=".doc,.docx,.txt,.rtf,.md"
+        accept=".txt,.md,text/plain"
         onChange={handleDocFileUpload}
         className="hidden"
       />

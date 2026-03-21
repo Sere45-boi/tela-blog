@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Plus, Trash2, Edit2, Tag, Loader2, BarChart3, MoreVertical } from "lucide-react";
+import { Plus, Trash2, Edit2, Tag, Loader2, BarChart3 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { GsapReveal } from "@/components/GsapReveal";
 import { GlassCard } from "@/components/ui/Card";
+import { RowActions } from "@/components/admin/RowActions";
 
 export default function CategoryManagementPage() {
   const supabase = createClient();
@@ -229,19 +230,21 @@ export default function CategoryManagementPage() {
                     </div>
 
                     <div className="col-span-4 md:col-span-1 flex items-center justify-end gap-1">
-                      <div className="relative group/actions">
-                        <button className="p-2.5 rounded-xl text-black/20 hover:text-[#093C15] hover:bg-black/5 transition-all">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                        <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-xl border border-black/5 shadow-2xl opacity-0 group-hover/actions:opacity-100 pointer-events-none group-hover/actions:pointer-events-auto transition-all translate-y-2 group-hover/actions:translate-y-0 z-20 p-1.5">
-                          <button onClick={() => handleEdit(category)} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-bold text-[#1d1d1f] hover:bg-[#41cc00]/10 transition-colors text-left">
-                            <Edit2 className="w-3.5 h-3.5" /> Edit
-                          </button>
-                          <button onClick={() => handleDelete(category.id)} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-bold text-red-500 hover:bg-red-500/10 transition-colors text-left">
-                            <Trash2 className="w-3.5 h-3.5" /> Delete
-                          </button>
-                        </div>
-                      </div>
+                      <RowActions
+                        actions={[
+                          {
+                            label: "Edit",
+                            icon: <Edit2 className="w-3.5 h-3.5" />,
+                            onClick: () => handleEdit(category),
+                          },
+                          {
+                            label: "Delete",
+                            icon: <Trash2 className="w-3.5 h-3.5" />,
+                            variant: "danger",
+                            onClick: () => handleDelete(category.id),
+                          },
+                        ]}
+                      />
                     </div>
                   </div>
                 ))}

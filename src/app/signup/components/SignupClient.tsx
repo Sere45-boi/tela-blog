@@ -31,6 +31,7 @@ export function SignupClient() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
   useEffect(() => {
     async function checkToken() {
@@ -91,13 +92,19 @@ export function SignupClient() {
       }
 
       setSuccess(true);
-      toast.success("Account created successfully!");
-
-      // Redirect after a short delay
-      setTimeout(() => {
-        router.push("/admin");
-        router.refresh();
-      }, 2000);
+      
+      // 3. Check if email confirmation is required (session will be null)
+      if (!authData.session) {
+        setNeedsEmailConfirmation(true);
+        toast.success("Account created! Please check your email.");
+      } else {
+        toast.success("Account created successfully!");
+        // Redirect only if they actually have a session
+        setTimeout(() => {
+          router.push("/admin");
+          router.refresh();
+        }, 2000);
+      }
 
     } catch (err: any) {
       setError(err.message);
@@ -138,11 +145,20 @@ export function SignupClient() {
           <div className="w-20 h-20 bg-[#41cc00]/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
             <CheckCircle2 className="w-10 h-10 text-[#41cc00]" />
           </div>
-          <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage mb-4">Welcome to the Team!</h1>
+          <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage mb-4">
+            {needsEmailConfirmation ? "Check Your Email" : "Welcome to the Team!"}
+          </h1>
           <p className="text-[#1d1d1f]/60 mb-8 font-medium">
-            Your account has been created and your <b>{invitation.role}</b> permissions have been assigned. Redirecting you to the dashboard...
+            {needsEmailConfirmation 
+              ? "We've sent a confirmation link to your email address. Please click the link to verify your account before logging in."
+              : `Your account has been created and your permissions have been assigned. Redirecting you to the dashboard...`}
           </p>
-          <Loader2 className="w-6 h-6 animate-spin text-[#41cc00] mx-auto" />
+          {!needsEmailConfirmation && <Loader2 className="w-6 h-6 animate-spin text-[#41cc00] mx-auto" />}
+          {needsEmailConfirmation && (
+            <Link href="/login">
+              <Button variant="secondary" className="w-full h-12 rounded-xl">Go to Login</Button>
+            </Link>
+          )}
         </GlassCard>
       </GsapReveal>
     );

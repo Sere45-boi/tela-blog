@@ -473,52 +473,147 @@ export default function ArticleEditor() {
         </div>
       </form>
 
-      {/* Preview Overlay */}
+      {/* Premium Cinematic Preview Overlay */}
       {isPreviewing && (
-        <div className="fixed inset-0 z-[100] bg-white overflow-y-auto animate-in slide-in-from-bottom-8 duration-500">
-          <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-black/5 px-8 h-20 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="px-5 py-1.5 bg-[#41cc00]/10 text-[#093C15] text-[12px] font-bold rounded-xl uppercase tracking-widest border border-[#41cc00]/10">Preview Console</span>
-              <h2 className="text-base font-bold text-[#1d1d1f] max-w-sm truncate">{formData.title || "Untitled Post"}</h2>
-            </div>
-            <Button onClick={() => setIsPreviewing(false)} className="h-10 px-8 rounded-2xl border-black/5 hover:bg-black/5 text-[#1d1d1f] font-bold shadow-sm">Exit Preview</Button>
+        <div data-lenis-prevent className="fixed inset-0 z-[100] bg-[#f8fcf8] overflow-y-auto overflow-x-hidden overscroll-contain animate-in fade-in zoom-in-95 duration-500 font-poppins selection:bg-[#41cc00]/30 selection:text-[#093C15]">
+          
+          {/* Subtle Background Elements */}
+          <div className="fixed inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#41cc00]/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#093C15]/5 rounded-full blur-[150px] translate-y-1/2 -translate-x-1/4" />
           </div>
 
-          <div className="max-w-[850px] mx-auto px-8 py-24">
-            {formData.featured_image && (
-              <div className="w-full aspect-video rounded-[2.5rem] overflow-hidden mb-16 shadow-[0_30px_100px_rgba(0,0,0,0.06)] relative ring-1 ring-black/5">
-                <img src={formData.featured_image} className="w-full h-full object-cover" alt="Preview" />
-              </div>
-            )}
-            <h1 className="text-6xl font-bold text-[#1d1d1f] font-bricolage mb-10 leading-[1.1] tracking-tighter">{formData.title || "Your New Insight"}</h1>
-
-            <div className="flex items-center gap-10 mb-20 py-10 border-y border-black/5">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-black/[0.03] border border-black/5 flex items-center justify-center text-black/10">
-                  <User className="w-7 h-7" />
+          {/* Floating Glass Toolbar */}
+          <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl px-2">
+            <div className="bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-full h-16 px-4 flex items-center justify-between">
+              <div className="flex items-center gap-3 pl-2">
+                <div className="w-8 h-8 rounded-full bg-[#41cc00]/10 flex items-center justify-center -ml-1">
+                  <Eye className="w-4 h-4 text-[#093C15]" />
                 </div>
                 <div>
-                  <span className="block text-base font-bold text-[#1d1d1f]">Editorial Board</span>
-                  <span className="block text-[13px] text-black/30 font-bold uppercase tracking-widest mt-0.5">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  <div className="text-[10px] font-bold text-black/40 uppercase tracking-widest leading-none mb-1">Preview Mode</div>
+                  <div className="text-[14px] font-bold text-[#1d1d1f] leading-none max-w-[200px] truncate">{formData.title || "Untitled Draft"}</div>
                 </div>
               </div>
-              <div className="h-12 w-px bg-black/5" />
-              <div className="flex items-center gap-3 text-black/30 text-[13px] font-bold uppercase tracking-[0.25em]">
-                <Timer className="w-5 h-5" />
-                <span>{calculateReadTime(formData.content)} MIN READ</span>
+              
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-black/[0.03] border border-black/5 mr-2">
+                  <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                  <span className="text-[11px] font-bold text-black/50 uppercase tracking-widest">{formData.status}</span>
+                </div>
+                <Button 
+                  onClick={() => setIsPreviewing(false)} 
+                  variant="secondary"
+                  className="h-10 rounded-full px-6 bg-black/[0.03] border-none hover:bg-black/10 text-[#1d1d1f] font-bold shadow-none transition-all group"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+                  Return to Editor
+                </Button>
               </div>
             </div>
+          </div>
 
-            <div
-              className="prose prose-xl max-w-none text-[#1d1d1f]/90 leading-[1.9] font-medium"
-              dangerouslySetInnerHTML={{ __html: formData.content || "<p className='text-black/10 italic text-2xl text-center py-20'>Content stream will emerge here...</p>" }}
-            />
+          {/* Main Editorial Content */}
+          <div className="relative z-10 w-full max-w-[900px] mx-auto pt-40 pb-32 px-6 sm:px-12">
+            
+            {/* Hero Image */}
+            {formData.featured_image ? (
+              <GsapReveal direction="up" delay={0.1} className="w-full aspect-[21/9] rounded-[2.5rem] overflow-hidden mb-16 shadow-[0_30px_100px_rgba(0,0,0,0.12)] relative ring-1 ring-black/5 bg-black/5 group">
+                <img 
+                  src={formData.featured_image} 
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                  alt="Featured Hero" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              </GsapReveal>
+            ) : (
+              <div className="w-full aspect-[21/9] rounded-[2.5rem] bg-black/[0.02] border border-black/5 mb-16 flex items-center justify-center flex-col gap-4 text-black/20">
+                <ImageIcon className="w-12 h-12" />
+                <span className="text-sm font-bold uppercase tracking-widest">No Featured Image</span>
+              </div>
+            )}
 
-            <div className="mt-32 pt-16 border-t border-black/5 flex flex-wrap gap-5">
-              {formData.tags.map(tag => (
-                <span key={tag} className="px-6 py-3 rounded-2xl bg-[#f5f5f7] border border-black/5 text-[#1d1d1f] text-sm font-bold shadow-sm transition-all hover:bg-[#41cc00] hover:text-white cursor-pointer">#{tag}</span>
-              ))}
-            </div>
+            {/* Header Content */}
+            <GsapReveal direction="up" delay={0.2} className="text-center max-w-[800px] mx-auto mb-16">
+              <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+                {categories.find(c => c.id === formData.category_id) && (
+                  <span className="px-4 py-1.5 rounded-full bg-[#093C15] text-white text-[11px] font-bold uppercase tracking-widest shadow-md hover:bg-[#0a5a1f] transition-colors cursor-default">
+                    {categories.find(c => c.id === formData.category_id)?.name}
+                  </span>
+                )}
+                {formData.is_featured && (
+                  <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-400 to-rose-400 text-white text-[11px] font-bold uppercase tracking-widest shadow-md">
+                    Featured
+                  </span>
+                )}
+              </div>
+              
+              <h1 className="text-5xl sm:text-7xl font-bold text-[#1d1d1f] font-bricolage mb-8 leading-[1.1] tracking-tighter text-balance">
+                {formData.title || "Your New Masterpiece Begins Here"}
+              </h1>
+
+              {formData.excerpt && (
+                <p className="text-xl sm:text-2xl text-[#1d1d1f]/60 font-medium leading-[1.6] text-balance mb-12">
+                  {formData.excerpt}
+                </p>
+              )}
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 py-8 border-y border-black/5">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-white shadow-md border border-black/5 flex items-center justify-center text-black/10 relative overflow-hidden">
+                    {authors.find(a => a.id === formData.author_id) ? (
+                      <span className="text-lg font-bold text-[#093C15]">
+                        {authors.find(a => a.id === formData.author_id)?.full_name?.slice(0, 2).toUpperCase()}
+                      </span>
+                    ) : (
+                      <img src="/images/logo.png" className="w-6 h-6 object-contain grayscale opacity-50" alt="Author" />
+                    )}
+                  </div>
+                  <div className="text-left">
+                    <span className="block text-base font-bold text-[#1d1d1f]">
+                      {authors.find(a => a.id === formData.author_id)?.full_name || "The Tela Board"}
+                    </span>
+                    <span className="block text-[12px] text-black/40 font-bold uppercase tracking-widest mt-0.5">
+                      {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-black/10" />
+                
+                <div className="flex items-center gap-3 text-black/40 text-[12px] font-bold uppercase tracking-widest bg-black/[0.02] px-5 py-2.5 rounded-2xl border border-black/5">
+                  <Timer className="w-4 h-4 text-[#41cc00]" />
+                  <span>{calculateReadTime(formData.content)} Minute Read</span>
+                </div>
+              </div>
+            </GsapReveal>
+
+            {/* Rich Text Output */}
+            <GsapReveal direction="up" delay={0.3} className="max-w-[750px] mx-auto">
+              <div
+                className="prose prose-lg sm:prose-xl max-w-none 
+                  prose-headings:font-bricolage prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[#1d1d1f]
+                  prose-p:font-poppins prose-p:text-[#1d1d1f]/80 prose-p:leading-[1.8] prose-p:font-medium
+                  prose-a:text-[#41cc00] prose-a:font-bold prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-[#093C15] prose-strong:font-bold
+                  prose-blockquote:border-l-[#41cc00] prose-blockquote:bg-[#41cc00]/5 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:text-[#093C15]/80 prose-blockquote:font-medium prose-blockquote:italic
+                  prose-img:rounded-3xl prose-img:shadow-2xl prose-img:border prose-img:border-black/5
+                  marker:text-[#41cc00]"
+                dangerouslySetInnerHTML={{ __html: formData.content || "<p className='text-black/20 italic text-2xl text-center py-20 font-light'>Your story will unfold here...</p>" }}
+              />
+
+              {/* Tags */}
+              {formData.tags.length > 0 && (
+                <div className="mt-24 pt-12 border-t border-black/5 flex flex-wrap justify-center gap-3">
+                  {formData.tags.map(tag => (
+                    <span key={tag} className="px-5 py-2 rounded-xl bg-white border border-black/5 text-[#1d1d1f]/60 text-sm font-bold shadow-sm transition-all hover:bg-[#093C15] hover:text-white hover:border-[#093C15] hover:shadow-md cursor-pointer hover:-translate-y-0.5">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </GsapReveal>
+
           </div>
         </div>
       )}

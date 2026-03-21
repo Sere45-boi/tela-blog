@@ -7,9 +7,10 @@ import { ExternalLink } from "lucide-react";
 interface Ad {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   image_url: string;
-  link_url: string;
+  target_url: string;
+  shape?: "rectangle" | "square";
 }
 
 export function AdSpace({ position }: { position: string }) {
@@ -49,14 +50,14 @@ export function AdSpace({ position }: { position: string }) {
   return (
     <div className="w-full my-12 group">
       <a 
-        href={ad.link_url} 
+        href={ad.target_url} 
         target="_blank" 
         rel="noopener noreferrer" 
         onClick={handleClick}
         className="block relative overflow-hidden rounded-[2rem] border border-[#41cc00]/20 bg-gradient-to-br from-[#f0fbf0] to-white shadow-sm hover:shadow-xl transition-all duration-500"
       >
         <div className="flex flex-col md:flex-row items-center gap-8 p-8 md:p-10">
-          <div className="w-full md:w-[300px] aspect-video md:aspect-square rounded-2xl overflow-hidden shadow-lg border border-black/5">
+          <div className={`w-full ${ad.shape === "square" ? "md:w-48 aspect-square" : "md:w-[300px] aspect-video"} rounded-2xl overflow-hidden shadow-lg border border-black/5 shrink-0`}>
             <img 
               src={ad.image_url} 
               alt={ad.title} 
@@ -70,9 +71,11 @@ export function AdSpace({ position }: { position: string }) {
             <h3 className="text-2xl md:text-3xl font-bold font-bricolage text-[#1d1d1f] mb-4 leading-tight">
               {ad.title}
             </h3>
-            <p className="text-[#1d1d1f]/60 text-[16px] font-medium mb-6 line-clamp-2 md:line-clamp-none">
-              {ad.description}
-            </p>
+            {ad.description && (
+              <p className="text-[#1d1d1f]/60 text-[16px] font-medium mb-6 line-clamp-2 md:line-clamp-none">
+                {ad.description}
+              </p>
+            )}
             <div className="flex items-center justify-center md:justify-start gap-2 text-[#093C15] font-bold group-hover:gap-3 transition-all underline decoration-[#41cc00]/30 underline-offset-8">
               Learn More <ExternalLink className="w-4 h-4" />
             </div>

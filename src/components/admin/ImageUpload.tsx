@@ -98,7 +98,7 @@ export function ImageUpload({
   const ratioClasses = {
     square: "aspect-square",
     video: "aspect-video",
-    auto: "aspect-auto h-auto min-h-[160px]",
+    auto: "h-48",
   };
 
   return (

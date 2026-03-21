@@ -1,10 +1,10 @@
 import { createClient } from "@/utils/supabase/server";
 import { GsapReveal } from "@/components/GsapReveal";
 import { Button } from "@/components/ui/Button";
-import { Plus, Megaphone, Trash2, ExternalLink, BarChart3, Edit2, TrendingUp, MoreVertical } from "lucide-react";
+import { Plus, Megaphone, Trash2, ExternalLink, BarChart3, Edit2, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { deleteAd } from "@/app/actions/ads";
 import { GlassCard } from "@/components/ui/Card";
+import { CampaignActions } from "./CampaignActions";
 
 export const metadata = {
   title: "Campaign Intelligence | Tela CMS",
@@ -148,21 +148,7 @@ export default async function AdminAdsPage() {
                         </div>
                       </td>
                       <td className="px-8 py-5 text-right">
-                        <div className="relative group/actions inline-block">
-                          <button className="p-2.5 rounded-xl text-black/20 hover:text-[#093C15] hover:bg-black/5 transition-all">
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-                          <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-xl border border-black/5 shadow-2xl opacity-0 group-hover/actions:opacity-100 pointer-events-none group-hover/actions:pointer-events-auto transition-all translate-y-2 group-hover/actions:translate-y-0 z-20 p-1.5">
-                            <Link href={`/admin/campaigns/editor?id=${ad.id}`} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-bold text-[#1d1d1f] hover:bg-[#41cc00]/10 transition-colors text-left">
-                              <Edit2 className="w-3.5 h-3.5" /> Edit
-                            </Link>
-                            <form action={deleteAd.bind(null, ad.id)} className="w-full">
-                              <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-bold text-red-500 hover:bg-red-500/10 transition-colors text-left font-bold">
-                                <Trash2 className="w-3.5 h-3.5" /> Delete
-                              </button>
-                            </form>
-                          </div>
-                        </div>
+                        <CampaignActions adId={ad.id} />
                       </td>
                     </tr>
                   );

@@ -3,6 +3,13 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
+// PostgreSQL does not support null bytes (\u0000) in text fields.
+// Pasting from Word can sometimes introduce these hidden characters.
+function sanitizeString(str?: string) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/\0/g, '');
+}
+
 export async function createCategory(name: string, slug: string, description?: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -59,6 +66,11 @@ export async function upsertArticle(articleData: {
 
   const payload = {
     ...coreArticleData,
+    title: sanitizeString(coreArticleData.title) as string,
+    content: sanitizeString(coreArticleData.content) as string,
+    excerpt: sanitizeString(coreArticleData.excerpt),
+    meta_title: sanitizeString(coreArticleData.meta_title),
+    meta_description: sanitizeString(coreArticleData.meta_description),
     author_id: finalAuthorId,
     ...(articleData.status === "published" && !articleData.id ? { published_at: new Date().toISOString() } : {})
   };

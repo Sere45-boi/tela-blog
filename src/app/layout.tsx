@@ -86,7 +86,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </head>
-      <body className={`${poppins.variable} ${bricolage.variable} font-sans bg-noise antialiased selection:bg-accent selection:text-accent-foreground`}>
+      <body suppressHydrationWarning className={`${poppins.variable} ${bricolage.variable} font-sans bg-noise antialiased selection:bg-accent selection:text-accent-foreground`}>
         <Suspense fallback={null}>
           <PageTracker />
         </Suspense>

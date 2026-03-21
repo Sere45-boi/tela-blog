@@ -20,9 +20,12 @@ import {
   MoreHorizontal,
   Plus,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Lock
 } from "lucide-react";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
+import { signOut } from "@/app/actions/user";
+import { toast } from "sonner";
 
 export default function AdminLayout({
   children,
@@ -56,9 +59,10 @@ export default function AdminLayout({
       console.log("Admin Check - Profile Error:", profError);
       console.log("Admin Check - User:", user);
 
+      // If missing profile, inactive, or not an admin/author, mark as unauthorized
       if (!prof || (prof.role !== "admin" && prof.role !== "author") || prof.is_active === false) {
         console.error("Access Denied - Reason:", !prof ? `Profile Missing (Error: ${profError?.message})` : prof.is_active === false ? "Inactive" : `Invalid Role: ${prof.role}`);
-        // window.location.href = "/"; // Temporarily disabled for debugging
+        setProfile({ unauthorized: true, reason: !prof ? "Missing Profile" : prof.is_active === false ? "Account Deactivated" : "Insufficient Permissions" });
         setLoading(false); 
         return;
       }
@@ -72,6 +76,37 @@ export default function AdminLayout({
 
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] flex items-center justify-center">Loading...</div>;
+  }
+
+  if (profile?.unauthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] p-4 text-center">
+        <div className="bg-white/80 backdrop-blur-xl border border-red-500/20 rounded-3xl p-10 max-w-md w-full shadow-2xl">
+          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-bold font-bricolage text-[#1d1d1f] mb-3">Access Denied</h1>
+          <p className="text-[#1d1d1f]/60 mb-8 font-poppins">
+            {profile.reason === "Account Deactivated"
+              ? "Your account has been deactivated by an administrator."
+              : "You do not have the required permissions to view the dashboard. Please log in with an Administrator or Author account."}
+          </p>
+          <button 
+            onClick={async () => {
+              try {
+                await signOut();
+                window.location.href = '/login';
+              } catch (e: any) {
+                toast.error(e.message);
+              }
+            }}
+            className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors shadow-[0_4px_14px_0_rgba(220,38,38,0.39)]"
+          >
+            Log Out & Switch Accounts
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
