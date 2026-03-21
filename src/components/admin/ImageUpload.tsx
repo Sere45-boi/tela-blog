@@ -48,12 +48,16 @@ export function ImageUpload({
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = folder ? `${folder}/${fileName}` : fileName;
+      console.log(`[Storage] Attempting upload to bucket: "${bucket}", path: "${filePath}"`);
 
       const { data, error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error(`[Storage Error] Bucket: "${bucket}", Error:`, uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from(bucket)

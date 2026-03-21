@@ -78,28 +78,13 @@ export async function claimInvitation(token: string, userId: string) {
   const supabase = await createClient();
   
   // Mark invitation as claimed
+  // This is a safety cleanup, as the trigger already handles this during signup.
   const { error: inviteError } = await supabase
     .from("invitations")
     .update({ claimed_at: new Date().toISOString() })
     .eq("token", token);
 
-  if (inviteError) throw new Error(inviteError.message);
-
-  // Update user profile with the invited role
-  const { data: invite } = await supabase
-    .from("invitations")
-    .select("role")
-    .eq("token", token)
-    .single();
-
-  if (invite) {
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({ role: invite.role })
-      .eq("id", userId);
-      
-    if (profileError) console.error("Error setting role:", profileError.message);
-  }
+  if (inviteError) console.error("Invitation claim cleanup error:", inviteError.message);
 
   revalidatePath("/admin/users");
   return { success: true };

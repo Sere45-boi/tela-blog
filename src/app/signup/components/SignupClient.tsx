@@ -20,14 +20,14 @@ export function SignupClient() {
 
   const [invitation, setInvitation] = useState<any>(null);
   const [checkingInvite, setCheckingInvite] = useState(true);
-  
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -92,7 +92,7 @@ export function SignupClient() {
 
       setSuccess(true);
       toast.success("Account created successfully!");
-      
+
       // Redirect after a short delay
       setTimeout(() => {
         router.push("/admin");
@@ -160,13 +160,13 @@ export function SignupClient() {
       <GsapReveal direction="up" className="w-full max-w-md relative z-10">
         <GlassCard className="relative overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.1)] border border-black/5 bg-white/90 backdrop-blur-3xl rounded-3xl p-8 md:p-10">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#41cc00] to-[#093C15] opacity-80"></div>
-          
+
           <div className="mb-10 text-center">
-             <div className="inline-block px-3 py-1 rounded-full bg-[#41cc00]/10 text-[#093C15] text-[10px] font-bold uppercase tracking-widest mb-4">
-               Invitation Confirmed
-             </div>
+            <div className="inline-block px-3 py-1 rounded-full bg-[#41cc00]/10 text-[#093C15] text-[10px] font-bold uppercase tracking-widest mb-4">
+              Invitation Confirmed
+            </div>
             <h1 className="mb-2 text-3xl tracking-tight text-[#1d1d1f] font-bricolage">
-              Join <span className="font-bold text-[#093C15]">Tela Insights</span>
+              Join <span className="font-bold text-[#41cc00]">Tela Pulse</span>
             </h1>
             <p className="text-[15px] text-[#1d1d1f]/60 font-medium font-poppins">
               Create your account to start contributing to the platform.
@@ -182,7 +182,7 @@ export function SignupClient() {
                 </div>
                 <Input
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Adeyemo Damilare"
                   className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] font-medium"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
@@ -254,7 +254,7 @@ export function SignupClient() {
               {!loading && <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
             </Button>
           </form>
-          
+
           <p className="mt-8 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
             Already have an account? <Link href="/login" className="text-[#093C15] font-bold hover:underline">Sign in</Link>
           </p>

@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Join the Team | Tela Admin",
+  title: "Join the Team | Pulse by Tela",
   description: "Create your author account to start publishing on Tela.",
 };
 

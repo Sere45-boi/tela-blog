@@ -6,18 +6,19 @@ import { Search, ChevronRight } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import { FloatingIconsHero } from "@/components/ui/floating-icons-hero-section";
 import { SearchBar } from "@/components/blog/SearchBar";
+import { getAuthorAttribution } from "@/utils/author";
 
 // --- Business & Fintech Icons (Vibrant Multi-color Palette) ---
 const HERO_ICONS = [
-  { id: 1, icon: 'stripe', className: 'top-[15%] left-[10%]', iconColor: 'text-[#635BFF]', bgColor: 'bg-indigo-50/80 shadow-[0_8px_30px_rgb(99,91,255,0.15)]' },
-  { id: 2, icon: 'vercel', className: 'top-[25%] right-[15%]', iconColor: 'text-slate-900', bgColor: 'bg-slate-50/80 shadow-[0_8px_30px_rgb(0,0,0,0.1)]' },
-  { id: 4, icon: 'briefcase', className: 'top-[35%] right-[8%]', iconColor: 'text-[#093C15]', bgColor: 'bg-green-50/80 shadow-[0_8px_30px_rgb(9,60,21,0.1)]' },
-  { id: 5, icon: 'trending', className: 'bottom-[15%] right-[20%]', iconColor: 'text-[#41cc00]', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(65,204,0,0.15)]' },
-  { id: 6, icon: 'chart', className: 'top-[5%] left-[25%]', iconColor: 'text-blue-600', bgColor: 'bg-blue-50/80 shadow-[0_8px_30px_rgb(37,99,235,0.15)]' },
-  { id: 8, icon: 'globe', className: 'top-[50%] left-[5%]', iconColor: 'text-sky-600', bgColor: 'bg-sky-50/80 shadow-[0_8px_30px_rgb(2,132,199,0.15)]' },
-  { id: 9, icon: 'wallet', className: 'top-[75%] left-[30%]', iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(16,185,129,0.15)]' },
-  { id: 10, icon: 'shield', className: 'top-[65%] right-[15%]', iconColor: 'text-violet-600', bgColor: 'bg-violet-50/80 shadow-[0_8px_30px_rgb(124,58,237,0.15)]' },
-  { id: 11, icon: 'zap', className: 'top-[5%] right-[35%]', iconColor: 'text-yellow-600', bgColor: 'bg-yellow-50/80 shadow-[0_8px_30px_rgb(202,138,4,0.15)]' },
+  { id: 1, icon: 'stripe', className: 'top-[20%] left-[8%]', iconColor: 'text-[#635BFF]', bgColor: 'bg-indigo-50/80 shadow-[0_8px_30px_rgb(99,91,255,0.15)]' },
+  { id: 2, icon: 'vercel', className: 'top-[32%] right-[12%]', iconColor: 'text-slate-900', bgColor: 'bg-slate-50/80 shadow-[0_8px_30px_rgb(0,0,0,0.1)]' },
+  { id: 4, icon: 'briefcase', className: 'top-[48%] right-[6%]', iconColor: 'text-[#093C15]', bgColor: 'bg-green-50/80 shadow-[0_8px_30px_rgb(9,60,21,0.1)]' },
+  { id: 5, icon: 'trending', className: 'bottom-[12%] right-[25%]', iconColor: 'text-[#41cc00]', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(65,204,0,0.15)]' },
+  { id: 6, icon: 'chart', className: 'top-[12%] left-[15%]', iconColor: 'text-blue-600', bgColor: 'bg-blue-50/80 shadow-[0_8px_30px_rgb(37,99,235,0.15)]' },
+  { id: 8, icon: 'globe', className: 'top-[62%] left-[12%]', iconColor: 'text-sky-600', bgColor: 'bg-sky-50/80 shadow-[0_8px_30px_rgb(2,132,199,0.15)]' },
+  { id: 9, icon: 'wallet', className: 'bottom-[15%] left-[32%]', iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(16,185,129,0.15)]' },
+  { id: 10, icon: 'shield', className: 'bottom-[30%] right-[10%]', iconColor: 'text-violet-600', bgColor: 'bg-violet-50/80 shadow-[0_8_30px_rgb(124,58,237,0.15)]' },
+  { id: 11, icon: 'zap', className: 'top-[10%] right-[18%]', iconColor: 'text-yellow-600', bgColor: 'bg-yellow-50/80 shadow-[0_8px_30px_rgb(202,138,4,0.15)]' },
 ];
 
 import { AdSpace } from "@/components/blog/AdSpace";
@@ -73,7 +74,6 @@ export default async function Home({
           title={siteSettings.hero_title || "The Tela Blog"}
           subtitle={siteSettings.hero_accent_text || "FINANCIAL OS FOR MODERN BUSINESS"}
           description={siteSettings.hero_description || "Insights on borderless business, global payments, and financial tools for modern companies."}
-          ctaText="Explore Stories"
           ctaHref="#articles"
           icons={HERO_ICONS}
         >
@@ -100,12 +100,19 @@ export default async function Home({
                     {featuredArticle.excerpt}
                   </p>
                   <div className="flex items-center gap-3">
-                    <img
-                      src={featuredArticle.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(featuredArticle.profiles?.full_name || 'T')}&background=e8f5e8&color=093C15&size=96&bold=true`}
-                      alt={featuredArticle.profiles?.full_name || 'Author'}
-                      className="w-10 h-10 rounded-full object-cover border border-black/5"
-                    />
-                    <span className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wide">{featuredArticle.profiles?.full_name || 'Tela Team'}</span>
+                    {(() => {
+                      const author = getAuthorAttribution(featuredArticle.profiles);
+                      return (
+                        <>
+                          <img
+                            src={author.avatar_url}
+                            alt={author.name}
+                            className="w-10 h-10 rounded-full object-cover border border-black/5"
+                          />
+                          <span className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wide">{author.name}</span>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               </Link>
@@ -162,12 +169,19 @@ export default async function Home({
                       {article.excerpt}
                     </p>
                     <div className="flex items-center gap-3 mt-auto text-[14px] font-semibold text-[#1d1d1f]/50">
-                      <img
-                        src={article.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(article.profiles?.full_name || 'T')}&background=e8f5e8&color=093C15&size=96&bold=true`}
-                        alt={article.profiles?.full_name || 'Author'}
-                        className="w-8 h-8 rounded-full object-cover border border-black/5"
-                      />
-                      <span className="text-[#1d1d1f]">{article.profiles?.full_name || 'Tela'}</span>
+                      {(() => {
+                        const author = getAuthorAttribution(article.profiles);
+                        return (
+                          <>
+                            <img
+                              src={author.avatar_url}
+                              alt={author.name}
+                              className="w-8 h-8 rounded-full object-cover border border-black/5"
+                            />
+                            <span className="text-[#1d1d1f]">{author.name}</span>
+                          </>
+                        );
+                      })()}
                       <span className="px-1">•</span>
                       <span suppressHydrationWarning>{new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                     </div>
@@ -314,7 +328,7 @@ export default async function Home({
           </div>
 
           <div className="pt-8 border-t border-[#1d1d1f]/10 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-[#1d1d1f]/50 font-medium">
-            <p>© {new Date().getFullYear()} {siteSettings.site_title || 'Tela'} Technologies. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} {siteSettings.site_title || 'Tela'}. All rights reserved.</p>
             <div className="flex items-center gap-6">
               <Link href={siteSettings.twitter_handle ? `https://twitter.com/${siteSettings.twitter_handle.replace('@', '')}` : "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">Twitter</Link>
               <Link href={siteSettings.linkedin_url || "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">LinkedIn</Link>

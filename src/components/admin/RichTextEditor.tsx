@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 import {
   Bold, Italic, Underline, Strikethrough,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
   List, ListOrdered, Quote, Code,
   Image, Link as LinkIcon, Minus, Undo, Redo,
   Heading1, Heading2, Heading3, Type,
-  Upload
+  Upload, Loader2
 } from "lucide-react";
 
 interface RichTextEditorProps {
@@ -17,9 +19,11 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+  const supabase = createClient();
   const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Initialize editor only once to avoid re-rendering issues and cursor resets
   React.useEffect(() => {
@@ -79,18 +83,43 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     fileInputRef.current?.click();
   }, []);
 
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = `<img src="${event.target?.result}" alt="${file.name}" style="max-width:100%;height:auto;border-radius:12px;margin:16px 0;" />`;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    setIsUploading(true);
+    const toastId = toast.loading("Uploading image to storage...");
+
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `editor/${fileName}`;
+
+      const { data, error: uploadError } = await supabase.storage
+        .from("content")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("content")
+        .getPublicUrl(filePath);
+
+      const img = `<img src="${publicUrl}" alt="${file.name}" style="max-width:100%;height:auto;border-radius:12px;margin:16px 0;" />`;
       execCommand("insertHTML", img);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
-  }, [execCommand]);
+      toast.success("Image integrated successfully", { id: toastId });
+    } catch (error: any) {
+      toast.error("Upload failed: " + error.message, { id: toastId });
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
+    }
+  }, [execCommand, supabase]);
 
   const handleDocUpload = useCallback(() => {
     docInputRef.current?.click();
@@ -218,8 +247,8 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           <ToolbarButton onClick={insertLink} title="Insert Link">
             <LinkIcon className="w-4 h-4" />
           </ToolbarButton>
-          <ToolbarButton onClick={insertImage} title="Insert Image">
-            <Image className="w-4 h-4" />
+          <ToolbarButton onClick={insertImage} title="Insert Image" active={isUploading}>
+            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />}
           </ToolbarButton>
 
           <ToolbarDivider />

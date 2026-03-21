@@ -7,8 +7,10 @@ export async function updateProfile(profileData: {
   full_name?: string;
   bio?: string;
   avatar_url?: string;
+  linkedin_url?: string;
   twitter_handle?: string;
   is_public?: boolean;
+  is_active?: boolean;
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -40,16 +42,24 @@ export async function updateEmail(newEmail: string) {
   return { success: true, message: "Verification codes have been sent. Please check your new email to confirm." };
 }
 
-export async function verifyEmailChange(email: string, token: string) {
+export async function verifyEmailChange(newEmail: string, newToken: string, oldEmail: string, oldToken: string) {
   const supabase = await createClient();
   
-  const { error } = await supabase.auth.verifyOtp({
-    email,
-    token,
+  // 1. Verify token for old email (Identity Verification)
+  const { error: oldError } = await supabase.auth.verifyOtp({
+    email: oldEmail,
+    token: oldToken,
     type: 'email_change'
   });
+  if (oldError) throw new Error("Old email verification failed: " + oldError.message);
 
-  if (error) throw new Error(error.message);
+  // 2. Verify token for new email (Confirmation)
+  const { error: newError } = await supabase.auth.verifyOtp({
+    email: newEmail,
+    token: newToken,
+    type: 'email_change'
+  });
+  if (newError) throw new Error("New email verification failed: " + newError.message);
 
   revalidatePath("/admin/profile");
   return { success: true };
@@ -120,5 +130,12 @@ export async function updatePassword(password: string) {
   const { error } = await supabase.auth.updateUser({ password });
   if (error) throw new Error(error.message);
 
+  return { success: true };
+}
+
+export async function signOut() {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
+  if (error) throw new Error(error.message);
   return { success: true };
 }

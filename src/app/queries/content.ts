@@ -6,7 +6,7 @@ export async function getPublishedArticles(page = 1, limit = 9, categorySlug?: s
     .from("articles")
     .select(`
       *,
-      profiles (full_name, avatar_url),
+      profiles (full_name, avatar_url, is_public),
       categories!inner(id, name, slug)
     `, { count: "exact" })
     .eq("status", "published")
@@ -39,7 +39,7 @@ export async function getFeaturedArticle() {
     .from("articles")
     .select(`
       *,
-      profiles (full_name, avatar_url),
+      profiles (full_name, avatar_url, is_public),
       categories(name, slug)
     `)
     .eq("status", "published")
@@ -74,7 +74,7 @@ export async function getArticleBySlug(slug: string) {
     .from("articles")
     .select(`
       *,
-      profiles (full_name, avatar_url),
+      profiles (full_name, avatar_url, bio, is_public),
       categories(name, slug)
     `)
     .eq("status", "published")

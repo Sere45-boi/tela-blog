@@ -9,6 +9,7 @@ import { getUsers } from "@/app/actions/user";
 import { toast } from "sonner";
 import { createInvitation } from "@/app/actions/invitations";
 import { User, Mail, Shield, ShieldAlert, Loader2, MoreVertical, Search, ExternalLink, Copy, Check, X } from "lucide-react";
+import Link from "next/link";
 
 export default function UsersPage() {
   const supabase = createClient();
@@ -16,7 +17,7 @@ export default function UsersPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Invitation Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -30,8 +31,18 @@ export default function UsersPage() {
     try {
       const { data: { user: self } } = await supabase.auth.getUser();
       if (self) {
-          const { data: profile } = await supabase.from('profiles').select('*').eq('id', self.id).single();
-          setCurrentUser({ ...self, ...profile });
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', self.id).single();
+        
+        // RBAC Guard: If not admin, redirect to dashboard
+        if (profile?.role !== 'admin') {
+          window.location.href = "/admin";
+          return;
+        }
+        
+        setCurrentUser({ ...self, ...profile });
+      } else {
+        window.location.href = "/login";
+        return;
       }
       const data = await getUsers();
       setUsers(data);
@@ -60,20 +71,6 @@ export default function UsersPage() {
     }
   };
 
-  const handleRoleToggle = async (userId: string, currentRole: string) => {
-    setProcessingId(userId);
-    const newRole = currentRole === 'admin' ? 'author' : 'admin';
-    try {
-      const { updateUserRole } = await import("@/app/actions/user");
-      await updateUserRole(userId, newRole);
-      toast.success(`Role updated to ${newRole}`);
-      await fetchUsersAndSelf();
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setProcessingId(null);
-    }
-  };
 
   const handleDelete = async (userId: string) => {
     if (!confirm("Are you sure you want to deactivate this author? Their articles will remain but they will lose dashboard access.")) return;
@@ -96,7 +93,7 @@ export default function UsersPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const filteredUsers = users.filter((user: any) => 
+  const filteredUsers = users.filter((user: any) =>
     user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.role?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -113,11 +110,11 @@ export default function UsersPage() {
     <div className="space-y-8 pb-12 relative">
       <GsapReveal direction="up" className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage">Authors & Team</h1>
+          <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage">Authors</h1>
           <p className="text-[#1d1d1f]/60 mt-2">Manage your editorial team and their platform permissions.</p>
         </div>
         {currentUser?.role === 'admin' && (
-          <Button 
+          <Button
             onClick={() => setShowInviteModal(true)}
             className="h-11 px-6 rounded-xl bg-[#093C15] text-white hover:bg-[#0a5a1f] transition-all shadow-lg shadow-[#093C15]/10"
           >
@@ -130,7 +127,7 @@ export default function UsersPage() {
       {showInviteModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <GsapReveal direction="none" className="w-full max-w-md bg-white rounded-[2rem] p-8 shadow-2xl border border-black/5 relative">
-            <button 
+            <button
               onClick={() => { setShowInviteModal(false); setInviteResult(null); }}
               className="absolute top-6 right-6 p-2 hover:bg-black/5 rounded-full transition-colors"
             >
@@ -145,7 +142,7 @@ export default function UsersPage() {
                 <form onSubmit={handleInvite} className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Email Address</label>
-                    <input 
+                    <input
                       type="email"
                       required
                       value={inviteEmail}
@@ -157,7 +154,7 @@ export default function UsersPage() {
 
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Permissions Role</label>
-                    <select 
+                    <select
                       value={inviteRole}
                       onChange={(e: any) => setInviteRole(e.target.value)}
                       className="w-full h-12 px-5 rounded-xl bg-black/[0.02] border border-black/5 text-sm font-bold text-[#1d1d1f] focus:outline-none appearance-none cursor-pointer hover:bg-black/[0.04] transition-colors"
@@ -167,8 +164,8 @@ export default function UsersPage() {
                     </select>
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     isLoading={inviting}
                     className="w-full h-12 bg-[#093C15] text-white rounded-xl shadow-lg shadow-[#093C15]/10 active:scale-[0.98]"
                   >
@@ -183,10 +180,10 @@ export default function UsersPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-[#1d1d1f] font-bricolage mb-2">Invitation Ready</h2>
                 <p className="text-[#1d1d1f]/60 text-sm mb-8">Send this link to the new user. They will be automatically assigned the <b>{inviteRole}</b> role upon signup.</p>
-                
+
                 <div className="bg-black/[0.02] border border-black/5 rounded-2xl p-4 flex items-center justify-between gap-4 mb-6">
                   <code className="text-[13px] text-[#093C15] font-mono truncate">{inviteResult.inviteUrl}</code>
-                  <button 
+                  <button
                     onClick={() => copyToClipboard(inviteResult.inviteUrl)}
                     className="shrink-0 p-2.5 bg-white border border-black/5 rounded-xl hover:bg-[#41cc00]/5 transition-colors"
                   >
@@ -194,7 +191,7 @@ export default function UsersPage() {
                   </button>
                 </div>
 
-                <Button 
+                <Button
                   onClick={() => { setShowInviteModal(false); setInviteResult(null); }}
                   className="w-full h-12 bg-black/[0.05] text-[#1d1d1f] hover:bg-black/10 rounded-xl"
                 >
@@ -211,7 +208,7 @@ export default function UsersPage() {
           <div className="p-6 border-b border-black/5 flex items-center gap-4 bg-black/[0.01]">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1d1d1f]/30" />
-              <input 
+              <input
                 type="text"
                 placeholder="Search authors..."
                 value={searchQuery}
@@ -256,17 +253,16 @@ export default function UsersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
-                        user.role === 'admin' ? 'bg-[#41cc00]/10 text-[#093C15]' : 'bg-blue-500/10 text-blue-600'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${user.role === 'admin' ? 'bg-[#41cc00]/10 text-[#093C15]' : 'bg-blue-500/10 text-blue-600'
+                        }`}>
                         {user.role}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 text-[12px] font-bold ${user.is_active !== false ? 'text-[#41cc00]' : 'text-red-500'}`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${user.is_active !== false ? 'bg-[#41cc00]' : 'bg-red-500'}`} />
-                            {user.is_active !== false ? 'Active' : 'Deactivated'}
-                        </span>
+                      <span className={`inline-flex items-center gap-1.5 text-[12px] font-bold ${user.is_active !== false ? 'text-[#41cc00]' : 'text-red-500'}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${user.is_active !== false ? 'bg-[#41cc00]' : 'bg-red-500'}`} />
+                        {user.is_active !== false ? 'Active' : 'Deactivated'}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-[14px] font-bold text-[#1d1d1f] bg-black/5 w-fit px-2.5 py-0.5 rounded-lg border border-black/5">
@@ -276,19 +272,18 @@ export default function UsersPage() {
                     <td className="px-6 py-4 text-right">
                       {currentUser?.role === 'admin' && user.id !== currentUser.id && (
                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            disabled={processingId === user.id}
-                            onClick={() => handleRoleToggle(user.id, user.role)}
-                            className="p-2 hover:bg-[#41cc00]/10 rounded-lg transition-colors text-[#093C15] disabled:opacity-50" 
-                            title="Toggle Role (Admin/Author)"
+                          <Link
+                            href={`/admin/users/${user.id}`}
+                            className="p-2 hover:bg-[#41cc00]/10 rounded-lg transition-colors text-[#093C15]"
+                            title="View Profile Audit"
                           >
-                            {processingId === user.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldAlert className="w-4 h-4" />}
-                          </button>
-                          <button 
-                             disabled={processingId === user.id || user.is_active === false}
-                             onClick={() => handleDelete(user.id)}
-                             className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500 disabled:opacity-50" 
-                             title="Deactivate Author"
+                            <Shield className="w-4 h-4" />
+                          </Link>
+                          <button
+                            disabled={processingId === user.id || user.is_active === false}
+                            onClick={() => handleDelete(user.id)}
+                            className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500 disabled:opacity-50"
+                            title="Deactivate Author"
                           >
                             {processingId === user.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
                           </button>
@@ -305,18 +300,18 @@ export default function UsersPage() {
 
       {currentUser?.role === 'admin' && (
         <GsapReveal direction="up" delay={0.2} className="p-6 rounded-3xl bg-black/[0.02] border border-black/5">
-            <div className="flex items-start gap-4">
-                <div className="p-3 bg-white rounded-2xl shadow-sm border border-black/5">
-                    <Shield className="w-6 h-6 text-[#41cc00]" />
-                </div>
-                <div>
-                    <h3 className="text-[16px] font-bold text-[#1d1d1f]">Team Governance</h3>
-                    <p className="text-[13px] text-[#1d1d1f]/60 mt-1 max-w-xl">
-                        Only administrators can invite new authors or change permissions. 
-                        "Private" authors are hidden from the public Team page but can still publish articles.
-                    </p>
-                </div>
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-white rounded-2xl shadow-sm border border-black/5">
+              <Shield className="w-6 h-6 text-[#41cc00]" />
             </div>
+            <div>
+              <h3 className="text-[16px] font-bold text-[#1d1d1f]">Team Governance</h3>
+              <p className="text-[13px] text-[#1d1d1f]/60 mt-1 max-w-xl">
+                Only administrators can invite new authors or change permissions.
+                "Private" authors are hidden from the public Team page but can still publish articles.
+              </p>
+            </div>
+          </div>
         </GsapReveal>
       )}
     </div>

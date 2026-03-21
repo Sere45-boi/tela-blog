@@ -12,7 +12,6 @@ import Link from "next/link";
 
 type Step = "email" | "otp" | "password";
 
-const supabase = createClient();
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -24,6 +23,7 @@ export default function ForgotPasswordPage() {
   
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message?: string }>({ type: "idle" });
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
   const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();

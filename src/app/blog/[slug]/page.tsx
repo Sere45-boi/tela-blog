@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AdSpace } from "@/components/blog/AdSpace";
 import { createClient } from "@/utils/supabase/server";
+import { getAuthorAttribution } from "@/utils/author";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -57,7 +58,7 @@ export default async function ArticlePage({
   // Fetch article with author and category
   const query = supabase
     .from("articles")
-    .select("*, profiles(full_name, avatar_url, bio), categories(name)")
+    .select("*, profiles(full_name, avatar_url, bio, is_public), categories(name)")
     .eq("slug", slug);
 
   // If not preview mode, only show published articles
@@ -76,13 +77,15 @@ export default async function ArticlePage({
     supabase.rpc('increment_article_view', { article_slug: slug }).then();
   }
   
+  const author = getAuthorAttribution(article.profiles);
+  
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: article.title,
     description: article.meta_description || article.excerpt,
     image: article.featured_image || article.og_image_url,
-    author: { "@type": "Person", name: (article.profiles as any)?.full_name || "Tela Team" },
+    author: { "@type": "Person", name: author.name },
     publisher: { "@type": "Organization", name: "Tela", logo: { "@type": "ImageObject", url: "/images/logo.PNG" } },
     datePublished: article.published_at || article.created_at,
     mainEntityOfPage: { "@type": "WebPage", "@id": `https://tela.ng/blog/${slug}` },
@@ -126,12 +129,12 @@ export default async function ArticlePage({
                 
                 <div className="flex items-center gap-4 border-y border-black/5 py-6">
                   <img 
-                    src={(article.profiles as any)?.avatar_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"}
-                    alt="Author"
+                    src={author.avatar_url}
+                    alt={author.name}
                     className="w-12 h-12 rounded-full object-cover border border-black/5"
                   />
                   <div className="flex-1">
-                    <div className="text-[16px] font-bold text-[#1d1d1f]">{(article.profiles as any)?.full_name || "Tela Team"}</div>
+                    <div className="text-[16px] font-bold text-[#1d1d1f]">{author.name}</div>
                     <div className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins">
                       {article.read_time_minutes || 4} min read • {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
                     </div>
@@ -196,13 +199,13 @@ export default async function ArticlePage({
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#41cc00]/10 rounded-full -mr-16 -mt-16 blur-3xl" />
                 <div className="relative z-10">
                   <img 
-                    src={(article.profiles as any)?.avatar_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"}
-                    alt="Author"
+                    src={author.avatar_url}
+                    alt={author.name}
                     className="w-20 h-20 rounded-2xl object-cover border-2 border-white/10 mb-6"
                   />
-                  <h3 className="text-xl font-bold font-bricolage mb-2">{(article.profiles as any)?.full_name || "Tela Team"}</h3>
+                  <h3 className="text-xl font-bold font-bricolage mb-2">{author.name}</h3>
                   <p className="text-white/70 text-sm leading-relaxed mb-6 font-medium">
-                    {(article.profiles as any)?.bio || "Passionate about building the future of borderless business and global finance tools for African entrepreneurs."}
+                    {author.bio}
                   </p>
                   <Link href="/about" className="inline-flex items-center gap-2 text-[#41cc00] font-bold text-[13px] hover:text-white transition-colors">
                     View profile →

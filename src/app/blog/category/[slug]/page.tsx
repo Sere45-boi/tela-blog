@@ -4,6 +4,7 @@ import { getPublishedArticles } from "@/app/queries/content";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
+import { getAuthorAttribution } from "@/utils/author";
 import { notFound } from "next/navigation";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -61,12 +62,19 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                       {article.excerpt}
                     </p>
                     <div className="flex items-center gap-3 mt-auto text-[14px] font-semibold text-[#1d1d1f]/50">
-                      <img 
-                        src={article.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(article.profiles?.full_name || 'T')}&background=e8f5e8&color=093C15&size=96&bold=true`}
-                        alt={article.profiles?.full_name || 'Author'}
-                        className="w-8 h-8 rounded-full object-cover border border-black/5"
-                      />
-                      <span className="text-[#1d1d1f]">{article.profiles?.full_name || 'Tela'}</span>
+                      {(() => {
+                        const author = getAuthorAttribution(article.profiles);
+                        return (
+                          <>
+                            <img 
+                              src={author.avatar_url}
+                              alt={author.name}
+                              className="w-8 h-8 rounded-full object-cover border border-black/5"
+                            />
+                            <span className="text-[#1d1d1f]">{author.name}</span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </Link>

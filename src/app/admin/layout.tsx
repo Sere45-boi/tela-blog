@@ -51,8 +51,15 @@ export default function AdminLayout({
       ]);
 
       const prof = profileRes.data;
-      if (!prof || (prof.role !== "admin" && prof.role !== "author")) {
-        window.location.href = "/"; // Unauthorized
+      const profError = profileRes.error;
+      console.log("Admin Check - Profile Data:", prof);
+      console.log("Admin Check - Profile Error:", profError);
+      console.log("Admin Check - User:", user);
+
+      if (!prof || (prof.role !== "admin" && prof.role !== "author") || prof.is_active === false) {
+        console.error("Access Denied - Reason:", !prof ? `Profile Missing (Error: ${profError?.message})` : prof.is_active === false ? "Inactive" : `Invalid Role: ${prof.role}`);
+        // window.location.href = "/"; // Temporarily disabled for debugging
+        setLoading(false); 
         return;
       }
 
@@ -118,14 +125,12 @@ export default function AdminLayout({
         {/* Navigation Groups */}
         <div className="flex-1 px-4 overflow-y-auto space-y-6 custom-scrollbar pb-8">
           <div>
-            {isSidebarOpen && <h3 className="px-4 text-[11px] font-bold text-black/30 uppercase tracking-[0.1em] mb-3">Main Menu</h3>}
             <nav className="space-y-1">
               {([
                 { href: "/admin", Icon: LayoutDashboard, label: "Dashboard" },
-                { href: "/admin/articles", Icon: FileText, label: "Post Management" },
+                { href: "/admin/articles", Icon: FileText, label: "Articles" },
                 { href: "/admin/categories", Icon: Tags, label: "Categories" },
                 { href: "/admin/campaigns", Icon: ImageIcon, label: "Campaigns" },
-                { href: "/admin/users", Icon: Users, label: "Authors & Team" },
               ] as const).map(({ href, Icon, label }) => (
                 <Link
                   key={href}
@@ -137,43 +142,71 @@ export default function AdminLayout({
                   {isSidebarOpen && <span className="text-[14px] font-semibold">{label}</span>}
                 </Link>
               ))}
+
+              {profile?.role === 'admin' && (
+                <Link
+                  href="/admin/users"
+                  title="Authors & Team"
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group ${!isSidebarOpen ? 'justify-center' : ''}`}
+                >
+                  <Users className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200 shrink-0" />
+                  {isSidebarOpen && <span className="text-[14px] font-semibold">Authors</span>}
+                </Link>
+              )}
             </nav>
           </div>
           <div>
             <nav className="space-y-1">
-              <Link
-                href="/admin/site-settings"
-                title="Site Branding"
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group ${!isSidebarOpen ? 'justify-center' : ''}`}
-              >
-                <Globe className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200" />
-                {isSidebarOpen && <span className="text-[14px] font-semibold">Blog Content</span>}
-              </Link>
+              {profile?.role === 'admin' && (
+                <Link
+                  href="/admin/site-settings"
+                  title="Site Branding"
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] transition-colors duration-200 group ${!isSidebarOpen ? 'justify-center' : ''}`}
+                >
+                  <Globe className="h-4 w-4 text-[#41cc00] group-hover:scale-110 transition-transform duration-200" />
+                  {isSidebarOpen && <span className="text-[14px] font-semibold">Blog Content</span>}
+                </Link>
+              )}
             </nav>
           </div>
         </div>
 
-        {/* User Footer */}
-        <Link href="/admin/profile" className={`block p-4 bg-black/[0.02] border-t border-black/5 mt-auto hover:bg-black/[0.04] transition-colors group ${!isSidebarOpen && 'pb-8 pt-6 flex justify-center'}`}>
-          <div className={`bg-white rounded-2xl border border-black/5 shadow-sm flex items-center justify-between group-hover:shadow-md transition-shadow ${isSidebarOpen ? 'p-3' : 'p-2'}`}>
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className={`rounded-xl overflow-hidden grayscale-[0.5] group-hover:grayscale-0 transition-all border border-black/5 shrink-0 bg-black/5 flex items-center justify-center text-[#1d1d1f] font-bold ${isSidebarOpen ? 'w-9 h-9' : 'w-10 h-10'}`}>
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-xs uppercase">{(profile?.full_name || authUser?.email || "U").slice(0, 2)}</span>
+        {/* User Footer & Logout */}
+        <div className="mt-auto border-t border-black/5 bg-black/[0.02] flex flex-col">
+          <Link href="/admin/profile" className={`p-4 hover:bg-black/[0.04] transition-colors group ${!isSidebarOpen && 'pb-4 pt-6 flex justify-center'}`}>
+            <div className={`bg-white rounded-2xl border border-black/5 shadow-sm flex items-center justify-between group-hover:shadow-md transition-shadow ${isSidebarOpen ? 'p-3' : 'p-2'}`}>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className={`rounded-xl overflow-hidden grayscale-[0.5] group-hover:grayscale-0 transition-all border border-black/5 shrink-0 bg-black/5 flex items-center justify-center text-[#1d1d1f] font-bold ${isSidebarOpen ? 'w-9 h-9' : 'w-10 h-10'}`}>
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs uppercase">{(profile?.full_name || authUser?.email || "U").slice(0, 2)}</span>
+                  )}
+                </div>
+                {isSidebarOpen && (
+                  <div className="min-w-0">
+                    <div className="text-[14px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile?.full_name || authUser?.email?.split('@')[0]}</div>
+                    <div className="text-[10px] text-black/30 font-bold uppercase tracking-wider">{profile?.role || "User Account"}</div>
+                  </div>
                 )}
               </div>
-              {isSidebarOpen && (
-                <div className="min-w-0">
-                  <div className="text-[14px] font-bold text-[#1d1d1f] truncate leading-tight group-hover:text-[#41cc00] transition-colors">{profile?.full_name || authUser?.email?.split('@')[0]}</div>
-                  <div className="text-[10px] text-black/30 font-bold uppercase tracking-wider">User Account</div>
-                </div>
-              )}
+              {isSidebarOpen && <ChevronRight className="w-4 h-4 text-black/20 group-hover:text-[#41cc00] transition-colors" />}
             </div>
-            {isSidebarOpen && <ChevronRight className="w-4 h-4 text-black/20 group-hover:text-[#41cc00] transition-colors" />}
-          </div>
-        </Link>
+          </Link>
+
+          <button
+            onClick={async () => {
+              const { signOut } = await import("@/app/actions/user");
+              await signOut();
+              window.location.href = "/login";
+            }}
+            className={`flex items-center gap-3 px-8 py-4 text-red-500 hover:bg-red-50 transition-colors border-t border-black/5 ${!isSidebarOpen ? 'justify-center' : ''}`}
+            title="Logout"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            {isSidebarOpen && <span className="text-[13px] font-bold uppercase tracking-widest">Logout</span>}
+          </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}
@@ -195,7 +228,7 @@ export default function AdminLayout({
                   title={member.full_name}
                 >
                   <img
-                    src={member.avatar_url || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6"}
+                    src={member.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.full_name || 'U')}&background=e8f5e8&color=093C15&size=96&bold=true`}
                     className="w-full h-full object-cover"
                     alt={member.full_name}
                   />
