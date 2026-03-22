@@ -1,3 +1,4 @@
+export const revalidate = 3600; // Revalidate every hour
 import { Navbar } from "@/components/layout/Navbar";
 import { SocialShareButtons } from "@/components/blog/SocialShareButtons";
 import { AdCarousel } from "@/components/blog/AdCarousel";

@@ -15,13 +15,16 @@ export default async function AdminDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Fetch stats for the last 30 days to keep performance high
+  const last30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
   // Fetch all basic stats
   const [adsRes, analyticsRes, pageImpressionsRes, notificationsRes, allArticlesRes] = await Promise.all([
-    supabase.from("ads").select("impression_count, click_count"),
-    supabase.from("analytics").select("read_time_seconds, article_id, reader_id, created_at"),
-    supabase.from("page_impressions").select("type, created_at"),
+    supabase.from("ads").select("impression_count, click_count").eq("status", "active"),
+    supabase.from("analytics").select("read_time_seconds, article_id, reader_id, created_at").gt("created_at", last30Days),
+    supabase.from("page_impressions").select("type, created_at").gt("created_at", last30Days),
     supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(5),
-    // Fetch all articles to sum views
+    // Fetch articles sorted by views for the dashboard
     supabase.from("articles").select("id, title, slug, view_count, featured_image, status, author_id").order("view_count", { ascending: false })
   ]);
 

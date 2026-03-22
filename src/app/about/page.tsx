@@ -1,3 +1,4 @@
+export const revalidate = 3600; // Revalidate every hour
 import { Navbar } from "@/components/layout/Navbar";
 import { GsapReveal } from "@/components/GsapReveal";
 import { createClient } from "@/utils/supabase/server";
