@@ -89,6 +89,18 @@ export default async function ArticlePage({
     .limit(3);
 
   const topArticles = topArticlesData || [];
+
+  // Fetch related articles (same category, excluding current)
+  const { data: relatedArticlesData } = await supabase
+    .from("articles")
+    .select("slug, title, featured_image, created_at")
+    .eq("category_id", article.category_id)
+    .eq("status", "published")
+    .neq("slug", slug)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  const relatedArticles = relatedArticlesData || [];
   
   const formatViews = (views?: number) => {
     if (!views) return "0";
@@ -140,24 +152,26 @@ export default async function ArticlePage({
                     {(article.categories as any)?.name || "Insights"}
                   </span>
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-8 leading-[1.1]">
+                <h1 className="text-3xl md:text-4xl lg:text-[48px] font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-8 leading-[1.1]">
                   {article.title}
                 </h1>
                 
                 <div className="flex items-center gap-4 border-y border-black/5 py-6">
-                  <img 
-                    src={author.avatar_url}
-                    alt={author.name}
-                    className="w-12 h-12 rounded-full object-cover border border-black/5"
-                  />
-                  <div className="flex-1">
-                    <div className="text-[16px] font-bold text-[#1d1d1f]">{author.name}</div>
-                    <div className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins">
-                      {article.read_time_minutes || 4} min read • {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
+                  <Link href="/about" className="flex items-center gap-4 group">
+                    <img 
+                      src={author.avatar_url}
+                      alt={author.name}
+                      className="w-12 h-12 rounded-full object-cover border border-black/5 group-hover:ring-4 group-hover:ring-[#41cc00]/10 transition-all"
+                    />
+                    <div className="flex-1">
+                      <div className="text-[16px] font-bold text-[#1d1d1f] group-hover:text-[#41cc00] transition-colors">{author.name}</div>
+                      <div className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins">
+                        {article.read_time_minutes || 4} min read • {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                   {/* Social share inline on desktop */}
-                  <div className="hidden md:block">
+                  <div className="hidden md:block ml-auto">
                     <SocialShareButtons title={article.title} slug={slug} />
                   </div>
                 </div>
@@ -211,29 +225,41 @@ export default async function ArticlePage({
             {/* RIGHT SIDEBAR */}
             <aside className="hidden lg:block w-[340px] shrink-0 space-y-8 sticky top-32 self-start">
               
-              {/* Author Bio */}
-              <div className="bg-[#093C15] rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#41cc00]/10 rounded-full -mr-16 -mt-16 blur-3xl" />
-                <div className="relative z-10">
-                  <img 
-                    src={author.avatar_url}
-                    alt={author.name}
-                    className="w-20 h-20 rounded-2xl object-cover border-2 border-white/10 mb-6"
-                  />
-                  <h3 className="text-xl font-bold font-bricolage mb-2">{author.name}</h3>
-                  <p className="text-white/70 text-sm leading-relaxed mb-6 font-medium">
-                    {author.bio}
-                  </p>
-                  <Link href="/about" className="inline-flex items-center gap-2 text-[#41cc00] font-bold text-[13px] hover:text-white transition-colors">
-                    View profile →
-                  </Link>
-                </div>
-              </div>
-
               {/* Ad Space */}
               <AdSpace position="sidebar" />
+
+              {/* Related Articles */}
+              <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-5">
+                  <Sparkles className="w-4 h-4 text-[#41cc00]" />
+                  <h3 className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wider">Related Articles</h3>
+                </div>
+                <div className="space-y-6">
+                  {relatedArticles.length > 0 ? relatedArticles.map((post) => (
+                    <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex gap-4">
+                      <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-black/5 bg-black/[0.02]">
+                        <img 
+                          src={post.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"} 
+                          alt={post.title} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-[14px] font-bold text-[#1d1d1f] leading-snug group-hover:text-[#093C15] transition-colors line-clamp-2">
+                          {post.title}
+                        </h4>
+                        <span className="text-[11px] text-[#1d1d1f]/40 font-bold mt-1 block uppercase tracking-wider">
+                          {new Date(post.created_at).toLocaleDateString("en-US", { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                    </Link>
+                  )) : (
+                    <div className="text-[13px] text-black/40 font-medium">No related articles found.</div>
+                  )}
+                </div>
+              </div>
               
-              {/* Top Read Placeholder */}
+              {/* Top Read */}
               <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <TrendingUp className="w-4 h-4 text-[#41cc00]" />

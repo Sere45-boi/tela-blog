@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { GsapReveal } from "@/components/GsapReveal";
 import { Input } from "@/components/ui/Input";
-import { SearchIcon, ArrowRight } from "lucide-react";
+import { SearchIcon, ArrowRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
+import { getCleanExcerpt } from "@/utils/excerpt";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -44,8 +45,15 @@ export default function SearchPage() {
       <Navbar />
 
       <main className="container mx-auto px-4 md:px-8 py-16 md:py-24 pb-32">
+        <div className="max-w-3xl mx-auto mb-10">
+          <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] transition-colors">
+            <ChevronLeft className="w-4 h-4" />
+            Back to all stories
+          </Link>
+        </div>
+
         <GsapReveal direction="up" className="mb-16 max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-8 text-[#093C15]">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-8 text-[#093C15]">
             Search articles
           </h1>
           <div className="relative w-full max-w-2xl mx-auto">
@@ -85,11 +93,11 @@ export default function SearchPage() {
                          <span>•</span>
                          <span>{new Date(article.published_at!).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                        </div>
-                       <h4 className="text-xl font-bold mb-3 group-hover:text-[#41cc00] transition-colors text-[#093C15] line-clamp-2 leading-snug">
+                       <h4 className="text-[18px] font-bold mb-3 group-hover:text-[#41cc00] transition-colors text-[#093C15] line-clamp-2 leading-snug">
                          {article.title}
                        </h4>
-                       <p className="text-muted-foreground line-clamp-2 mb-4 flex-1">
-                         {article.excerpt}
+                       <p className="text-muted-foreground line-clamp-3 mb-4 flex-1">
+                         {getCleanExcerpt(article.content || article.excerpt, 180)}
                        </p>
                        <div className="flex items-center font-bold text-sm text-[#093C15] group-hover:text-[#41cc00] transition-colors mt-2">
                          Read article <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

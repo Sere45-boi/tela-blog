@@ -17,13 +17,13 @@ const bricolage = Bricolage_Grotesque({
 
 export const metadata: Metadata = {
   title: {
-    default: "Tela Blog | Insights on Global Payments & Business",
-    template: "%s | Tela Blog",
+    default: "Pulse by Tela | Insights on Global Payments & Business",
+    template: "%s | Pulse by Tela",
   },
   description: "Discover expert insights on borderless business, global payments, multi-currency finance, and tools for modern companies operating across Africa and the world.",
   keywords: ["global payments", "fintech Africa", "business blog", "cross-border payments", "virtual dollar card", "Nigeria fintech", "Tela", "USD account Nigeria"],
-  authors: [{ name: "Tela Team" }],
-  creator: "Tela Technologies",
+  authors: [{ name: "Tela" }],
+  creator: "Tela",
   publisher: "Tela",
   metadataBase: new URL("https://tela.ng"),
   alternates: {

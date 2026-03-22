@@ -7,6 +7,7 @@ import { createClient } from "@/utils/supabase/server";
 import { FloatingIconsHero } from "@/components/ui/floating-icons-hero-section";
 import { SearchBar } from "@/components/blog/SearchBar";
 import { getAuthorAttribution } from "@/utils/author";
+import { getCleanExcerpt } from "@/utils/excerpt";
 
 // --- Business & Fintech Icons (Vibrant Multi-color Palette) ---
 const HERO_ICONS = [
@@ -16,7 +17,7 @@ const HERO_ICONS = [
   { id: 5, icon: 'trending', className: 'bottom-[12%] right-[25%]', iconColor: 'text-[#41cc00]', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(65,204,0,0.15)]' },
   { id: 6, icon: 'chart', className: 'top-[12%] left-[15%]', iconColor: 'text-blue-600', bgColor: 'bg-blue-50/80 shadow-[0_8px_30px_rgb(37,99,235,0.15)]' },
   { id: 8, icon: 'globe', className: 'top-[62%] left-[12%]', iconColor: 'text-sky-600', bgColor: 'bg-sky-50/80 shadow-[0_8px_30px_rgb(2,132,199,0.15)]' },
-  { id: 9, icon: 'wallet', className: 'bottom-[15%] left-[32%]', iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(16,185,129,0.15)]' },
+  { id: 9, icon: 'wallet', className: 'bottom-[15%] left-[20%]', iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(16,185,129,0.15)]' },
   { id: 10, icon: 'shield', className: 'bottom-[30%] right-[10%]', iconColor: 'text-violet-600', bgColor: 'bg-violet-50/80 shadow-[0_8_30px_rgb(124,58,237,0.15)]' },
   { id: 11, icon: 'zap', className: 'top-[10%] right-[18%]', iconColor: 'text-yellow-600', bgColor: 'bg-yellow-50/80 shadow-[0_8px_30px_rgb(202,138,4,0.15)]' },
 ];
@@ -93,11 +94,11 @@ export default async function Home({
                   />
                 </div>
                 <div className="p-8 md:p-10 w-full bg-white">
-                  <h2 className="text-3xl md:text-4xl lg:text-[44px] font-bold leading-[1.15] mb-4 max-w-4xl tracking-tight text-[#1d1d1f] font-bricolage">
+                  <h2 className="text-2xl md:text-3xl lg:text-[30px] font-bold leading-[1.15] mb-4 tracking-tight text-[#1d1d1f] font-bricolage">
                     {featuredArticle.title}
                   </h2>
-                  <p className="text-[#1d1d1f]/60 text-[17px] md:text-[19px] leading-relaxed max-w-3xl font-medium line-clamp-2 mb-6 font-poppins">
-                    {featuredArticle.excerpt}
+                  <p className="text-[#1d1d1f]/60 text-[17px] md:text-[18px] leading-relaxed font-medium line-clamp-3 mb-6 font-poppins">
+                    {getCleanExcerpt(featuredArticle.content || featuredArticle.excerpt, 260)}
                   </p>
                   <div className="flex items-center gap-3">
                     {(() => {
@@ -162,11 +163,11 @@ export default async function Home({
                     <div className="flex items-center gap-2 text-[12px] font-bold text-[#41cc00] uppercase tracking-widest mb-4">
                       <span>{article.categories?.name || 'Insights'}</span>
                     </div>
-                    <h4 className="text-[24px] font-bold mb-3 text-[#1d1d1f] line-clamp-2 leading-[1.2] tracking-tight group-hover:text-[#093C15] transition-colors">
+                    <h4 className="text-[21px] font-bold mb-3 text-[#1d1d1f] line-clamp-2 leading-[1.2] tracking-tight group-hover:text-[#093C15] transition-colors">
                       {article.title}
                     </h4>
-                    <p className="text-[#1d1d1f]/60 line-clamp-2 mb-8 flex-1 text-[17px] leading-relaxed font-medium">
-                      {article.excerpt}
+                    <p className="text-[#1d1d1f]/60 line-clamp-3 mb-8 flex-1 text-[15px] leading-relaxed font-medium">
+                      {getCleanExcerpt(article.content || article.excerpt, 180)}
                     </p>
                     <div className="flex items-center gap-3 mt-auto text-[14px] font-semibold text-[#1d1d1f]/50">
                       {(() => {

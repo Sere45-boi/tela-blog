@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
+import { getCleanExcerpt } from "@/utils/excerpt";
 import { notFound } from "next/navigation";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -34,8 +35,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             Back to all stories
           </Link>
 
-          <GsapReveal direction="up" className="mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-6">
+          <GsapReveal direction="up" className="mb-16 text-center md:text-left">
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-6">
               {category.name}
             </h1>
             <p className="text-xl text-[#1d1d1f]/60 max-w-2xl font-medium">
@@ -55,11 +56,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     />
                   </div>
                   <div className="flex-1 flex flex-col p-8">
-                    <h4 className="text-[24px] font-bold mb-3 text-[#1d1d1f] line-clamp-2 leading-[1.2] tracking-tight group-hover:text-[#093C15] transition-colors">
+                    <h4 className="text-[21px] font-bold mb-3 text-[#1d1d1f] line-clamp-2 leading-[1.2] tracking-tight group-hover:text-[#093C15] transition-colors">
                       {article.title}
                     </h4>
-                    <p className="text-[#1d1d1f]/60 line-clamp-2 mb-8 text-[17px] leading-relaxed font-medium">
-                      {article.excerpt}
+                    <p className="text-[#1d1d1f]/60 line-clamp-3 mb-8 text-[17px] leading-relaxed font-medium">
+                      {getCleanExcerpt(article.content || article.excerpt, 180)}
                     </p>
                     <div className="flex items-center gap-3 mt-auto text-[14px] font-semibold text-[#1d1d1f]/50">
                       {(() => {
