@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Update the session state by refreshing the token
   const response = await updateSession(request)
   
@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-export default middleware;
+export default proxy;
 
 export const config = {
   matcher: [

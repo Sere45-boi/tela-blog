@@ -59,11 +59,11 @@ export function AdSpace({ position }: { position: string }) {
         >
           {/* Square image with padding for premium look */}
           <div className="w-full p-3">
-            <div className="w-full aspect-square overflow-hidden rounded-xl shadow-sm border border-black/5">
+            <div className="w-full aspect-video overflow-hidden rounded-xl shadow-sm border border-black/5 bg-white">
               <img
                 src={ad.image_url}
                 alt={ad.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
               />
             </div>
           </div>
@@ -86,48 +86,81 @@ export function AdSpace({ position }: { position: string }) {
             </div>
           </div>
 
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/noise.png')]" />
+          <div className="absolute inset-x-0 inset-y-0 opacity-[0.04] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
         </a>
       </div>
     );
   }
 
-  // ── DEFAULT: horizontal card — image left, text right ─────────────────────
+  // ── DEFAULT: horizontal card — Image Right, Text Left ─────────────────────
   return (
-    <div className="w-full my-12 group">
+    <div className="w-full my-16 group relative">
       <a
         href={ad.target_url}
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="block relative overflow-hidden rounded-[2rem] border border-[#41cc00]/20 bg-gradient-to-br from-[#f0fbf0] to-white shadow-sm hover:shadow-xl transition-all duration-500"
+        className="block relative overflow-hidden rounded-[2.5rem] border border-[#a294f9]/20 bg-[#f0e8ff]"
       >
-        <div className="flex flex-col md:flex-row items-center gap-8 p-8 md:p-10">
-          <div className={`w-full ${ad.shape === "square" ? "md:w-48 aspect-square" : "md:w-[300px] aspect-video"} rounded-2xl overflow-hidden shadow-lg border border-black/5 shrink-0`}>
-            <img
-              src={ad.image_url}
-              alt={ad.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+        {/* Wavy Text Background Layer - Exact S-Curve inspired by reference */}
+        <div className="absolute inset-0 z-0 opacity-[0.12] pointer-events-none overflow-hidden">
+          <svg viewBox="0 0 800 250" className="w-full h-full preserve-3d" preserveAspectRatio="none">
+            <path
+              id="adWavePathExact"
+              d="M-100,200 C100,300 300,-100 500,200 C700,500 900,0 1100,200"
+              fill="transparent"
+              stroke="transparent"
             />
-          </div>
+            <text className="text-[18px] font-bold uppercase tracking-[0.3em] fill-[#635BFF]">
+              <textPath href="#adWavePathExact" startOffset="0%">
+                {`${ad.title} • ${ad.title} • ${ad.title} • ${ad.title} • ${ad.title}`}
+                <animate
+                  attributeName="startOffset"
+                  from="0%"
+                  to="-25%"
+                  dur="25s"
+                  repeatCount="indefinite"
+                />
+              </textPath>
+            </text>
+          </svg>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-center gap-10 p-10 md:p-16 relative z-10">
+          {/* Left Side: Content */}
           <div className="flex-1 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#41cc00]/10 text-[#093C15] text-[10px] font-bold uppercase tracking-widest mb-4">
-              Sponsored Highlight
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#635BFF]/30 text-[#635BFF] text-[11px] font-bold uppercase tracking-widest mb-6">
+              Sponsored
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold font-bricolage text-[#1d1d1f] mb-4 leading-tight">
+            <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold font-bricolage text-[#1d1d1f] mb-6 leading-[1.05] tracking-tighter">
               {ad.title}
             </h3>
             {ad.description && (
-              <p className="text-[#1d1d1f]/60 text-[16px] font-medium mb-6 line-clamp-2 md:line-clamp-none">
+              <p className="text-[#1d1d1f]/70 text-[18px] md:text-[20px] font-medium mb-8 leading-relaxed max-w-xl font-poppins">
                 {ad.description}
               </p>
             )}
-            <div className="flex items-center justify-center md:justify-start gap-2 text-[#093C15] font-bold group-hover:gap-3 transition-all underline decoration-[#41cc00]/30 underline-offset-8">
-              Learn More <ExternalLink className="w-4 h-4" />
+            <div className="flex items-center justify-center md:justify-start gap-4">
+              <div className="px-8 py-4 bg-[#635BFF] text-white rounded-full font-bold text-[16px] hover:scale-105 transition-transform duration-300 shadow-xl shadow-[#635BFF]/20 flex items-center gap-2">
+                Learn More <ExternalLink className="w-5 h-5" />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side: Horizontal Image Frame */}
+          <div className="w-full md:w-[48%] shrink-0">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-[6px] border-white/50 aspect-video bg-white">
+              <img
+                src={ad.image_url}
+                alt={ad.title}
+                className="w-full h-full object-contain transform transition-transform duration-1000 group-hover:scale-105"
+              />
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/noise.png')]" />
+
+        {/* Subtle Noise for texture */}
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
       </a>
     </div>
   );

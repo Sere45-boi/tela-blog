@@ -24,6 +24,7 @@ const HERO_ICONS = [
 ];
 
 import { AdSpace } from "@/components/blog/AdSpace";
+import { NewsletterForm } from "@/components/blog/NewsletterForm";
 import { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -43,9 +44,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; page?: string }>;
 }) {
-  const { search } = await searchParams;
+  const { search, page: pageParam } = await searchParams;
+  const page = typeof pageParam === 'string' ? parseInt(pageParam) : 1;
   const supabase = await createClient();
   const [settingsResult, categoriesResult] = await Promise.all([
     supabase.from("site_settings").select("*").eq("id", 1).single(),
@@ -80,28 +82,8 @@ export default async function Home({
 
         {/* CENTRAL FEATURED & ARTICLE GRID */}
         <Suspense fallback={<BlogGridSkeleton />}>
-          <BlogContent search={search} siteSettings={siteSettings} />
+          <BlogContent search={search} page={page} siteSettings={siteSettings} categories={categories} />
         </Suspense>
-        {/* CATEGORY TABS SCROLLABLE */}
-        <section className="mb-12 pt-2">
-          <div className="container mx-auto px-6 md:px-8 max-w-7xl flex flex-wrap justify-center gap-3">
-            <Link
-              href="/"
-              className="whitespace-nowrap px-6 py-2.5 text-[15px] font-bold rounded-full transition-all duration-300 bg-[#093C15] text-white shadow-lg border border-[#093C15]"
-            >
-              All Stories
-            </Link>
-            {categories.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/blog/category/${cat.slug}`}
-                className="whitespace-nowrap px-6 py-2.5 text-[15px] font-bold rounded-full transition-all duration-300 text-[#1d1d1f]/60 bg-white hover:text-[#093C15] hover:bg-[#41cc00]/10 border border-black/5 hover:border-[#41cc00]/20"
-              >
-                {cat.name}
-              </Link>
-            ))}
-          </div>
-        </section>
 
         {/* Ad Space after Featured */}
         <div className="max-w-7xl mx-auto px-6 md:px-8">
@@ -131,29 +113,7 @@ export default async function Home({
 
               {/* Right Side: Inner Form Box */}
               <div className="w-full md:w-1/2">
-                <div className="bg-white/60 backdrop-blur-md p-6 md:p-8 rounded-[1.25rem] border border-white shadow-sm">
-                  <form className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5 border-none">
-                        <label className="text-[12px] font-bold text-[#093C15]/60 uppercase tracking-wider">First name</label>
-                        <input type="text" className="w-full h-[46px] bg-white border border-black/5 rounded-lg px-4 text-[#1d1d1f] text-[14px] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 outline-none transition-all placeholder:text-black/20 shadow-sm" placeholder="Dami" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[12px] font-bold text-[#093C15]/60 uppercase tracking-wider">Last name</label>
-                        <input type="text" className="w-full h-[46px] bg-white border border-black/5 rounded-lg px-4 text-[#1d1d1f] text-[14px] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 outline-none transition-all placeholder:text-black/20 shadow-sm" placeholder="Sere" />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5 pb-2">
-                      <label className="text-[12px] font-bold text-[#093C15]/60 uppercase tracking-wider">Email address</label>
-                      <input type="email" className="w-full h-[46px] bg-white border border-black/5 rounded-lg px-4 text-[#1d1d1f] text-[14px] focus:border-[#41cc00] focus:ring-2 focus:ring-[#41cc00]/20 outline-none transition-all placeholder:text-black/20 shadow-sm" placeholder="dami@example.com" />
-                    </div>
-
-                    <button type="button" className="w-full h-[52px] bg-[#093C15] text-white font-bold text-[15px] rounded-lg hover:bg-[#06290e] transition-colors shadow-md flex items-center justify-center">
-                      Subscribe
-                    </button>
-                  </form>
-                </div>
+                <NewsletterForm />
               </div>
 
             </div>
@@ -252,4 +212,3 @@ export default async function Home({
 
 // --- Sub-components for Streaming ---
 // Now imported from "@/components/blog/HomeStreaming"
-

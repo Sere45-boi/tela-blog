@@ -135,7 +135,7 @@ export default async function AnalyticsPage() {
         {/* Dark velocity card — same height/proportion as the others */}
         <GsapReveal direction="up" delay={0.24}>
           <div className="p-5 rounded-[1rem] flex flex-col gap-4 h-full bg-gradient-to-br from-[#093C15] to-[#041F0A] border border-white/5 shadow-sm relative overflow-hidden">
-            <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "url('/noise.png')" }} />
+            <div className="absolute inset-x-0 inset-y-0 opacity-[0.08] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
             <div className="relative z-10 flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-white/10 text-[#41cc00] shrink-0">
                 <TrendingUp className="w-4 h-4" />

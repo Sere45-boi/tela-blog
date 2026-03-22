@@ -15,14 +15,17 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       touchMultiplier: 2,
     });
 
+    let requestRef: number;
+
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      requestRef = requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    requestRef = requestAnimationFrame(raf);
 
     return () => {
+      if (requestRef) cancelAnimationFrame(requestRef);
       lenis.destroy();
     };
   }, []);

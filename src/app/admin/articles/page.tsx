@@ -9,12 +9,30 @@ export const metadata = {
   title: "Post Management | Tela CMS",
 };
 
-export default async function AdminArticlesList() {
+export default async function AdminArticlesList({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
   const supabase = await createClient();
-  const { data: articles } = await supabase
+
+  let query = supabase
     .from("articles")
-    .select("id, title, slug, status, published_at, view_count, is_featured, categories(name), profiles(full_name)")
+    .select("id, title, slug, status, published_at, view_count, is_featured, category_id, categories(name), profiles(full_name)")
     .order("created_at", { ascending: false });
+
+  if (category) {
+    query = query.eq("category_id", category);
+  }
+
+  const [articlesResult, categoriesResult] = await Promise.all([
+    query,
+    supabase.from("categories").select("id, name, slug").order("name")
+  ]);
+
+  const articles = articlesResult.data;
+  const categories = categoriesResult.data || [];
 
   return (
     <div className="max-w-6xl">
@@ -28,6 +46,32 @@ export default async function AdminArticlesList() {
             <Plus className="h-4 w-4" /> New Post
           </Button>
         </Link>
+      </GsapReveal>
+
+      <GsapReveal direction="up" delay={0.1} className="mb-10 flex flex-wrap gap-2">
+        <Link 
+          href="/admin/articles"
+          className={`px-4 py-2 text-[13px] font-bold rounded-xl border transition-all ${
+            !category 
+              ? "border-[#093C15] bg-[#093C15] text-white shadow-sm" 
+              : "border-black/5 bg-white/80 text-[#1d1d1f]/60 hover:text-[#093C15] hover:border-[#41cc00]/20"
+          }`}
+        >
+          All Posts
+        </Link>
+        {categories.map((cat) => (
+          <Link
+            key={cat.id}
+            href={`/admin/articles?category=${cat.id}`}
+            className={`px-4 py-2 text-[13px] font-bold rounded-xl border transition-all ${
+              category === cat.id 
+                ? "border-[#093C15] bg-[#093C15] text-white shadow-sm" 
+                : "border-black/5 bg-white/80 text-[#1d1d1f]/60 hover:text-[#093C15] hover:border-[#41cc00]/20"
+            }`}
+          >
+            {cat.name}
+          </Link>
+        ))}
       </GsapReveal>
 
       <GsapReveal direction="up" delay={0.1}>

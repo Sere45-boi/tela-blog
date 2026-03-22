@@ -120,7 +120,7 @@ export function ImageUpload({
       >
         {value ? (
           <>
-            <img src={value} alt="Preview" className="w-full h-full object-cover" />
+            <img src={value} alt="Preview" className="w-full h-full object-contain bg-white" />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
               <button
                 type="button"

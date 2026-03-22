@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { broadcastNewArticle } from "@/app/actions/newsletter";
 
 // PostgreSQL does not support null bytes (\u0000) in text fields.
 // Pasting from Word can sometimes introduce these hidden characters.
@@ -85,12 +86,21 @@ export async function upsertArticle(articleData: {
 
   // If we have tags, attach them
   if (tags && tags.length > 0) {
-    // We need to resolve tag IDs first, or assume tags are already created if we just pass IDs
-    // For now, let's look for tags by name or ID
     const { data: tagRecords } = await supabase.from("tags").select("id, name").in("name", tags);
     if (tagRecords) {
       await attachTagsToArticle(data.id, tagRecords.map(t => t.id));
     }
+  }
+
+  // Trigger newsletter broadcast if newly published
+  if (articleData.status === "published") {
+    broadcastNewArticle({
+      id: data.id,
+      title: data.title,
+      slug: data.slug,
+      excerpt: data.excerpt,
+      featured_image: data.featured_image
+    }).catch(err => console.error("Newsletter broadcast failed:", err));
   }
   
   revalidatePath("/admin/articles");
