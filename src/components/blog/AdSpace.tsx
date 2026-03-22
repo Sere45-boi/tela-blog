@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { ExternalLink } from "lucide-react";
+import { createNotification } from "@/app/actions/notifications";
 
 interface Ad {
   id: string;
@@ -40,6 +41,13 @@ export function AdSpace({ position }: { position: string }) {
     if (!ad) return;
     await supabase.rpc("increment_ad_click", { ad_uuid: ad.id });
     await supabase.from("ad_events").insert({ ad_id: ad.id, event_type: "click" });
+    
+    // Trigger admin notification
+    await createNotification({
+      type: "click",
+      message: `Ad clicked: ${ad.title}`,
+      link: ad.target_url
+    });
   };
 
   if (!ad) return null;

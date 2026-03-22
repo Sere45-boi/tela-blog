@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import { AdSpace } from "@/components/blog/AdSpace";
 import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
+import { EventLogger } from "@/components/blog/EventLogger";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -128,6 +129,11 @@ export default async function ArticlePage({
 
       <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]" suppressHydrationWarning>
         <Navbar />
+        <EventLogger 
+          type="read" 
+          targetName={article.title} 
+          link={`/blog/${slug}`} 
+        />
         
         {preview === "true" && (
           <div className="fixed top-20 left-0 right-0 z-[60] bg-[#093C15] text-[#41cc00] py-2 px-4 text-center font-bold text-sm flex items-center justify-center gap-2">

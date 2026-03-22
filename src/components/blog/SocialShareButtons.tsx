@@ -2,6 +2,7 @@
 
 import { Twitter, Linkedin, Facebook, Link as LinkIcon, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
+import { createNotification } from "@/app/actions/notifications";
 
 export function SocialShareButtons({ title, slug }: { title: string; slug: string }) {
   const [copied, setCopied] = useState(false);
@@ -22,9 +23,24 @@ export function SocialShareButtons({ title, slug }: { title: string; slug: strin
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      
+      // Trigger notification
+      await createNotification({
+        type: "share",
+        message: `Article link copied: ${title}`,
+        link: url
+      });
     } catch {
       // fallback
     }
+  };
+
+  const notifyShare = async (platform: string) => {
+    await createNotification({
+      type: "share",
+      message: `Article shared on ${platform}: ${title}`,
+      link: url
+    });
   };
 
   return (
@@ -34,6 +50,7 @@ export function SocialShareButtons({ title, slug }: { title: string; slug: strin
         href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => notifyShare('Twitter')}
         className="w-10 h-10 rounded-full bg-black/5 hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2] flex items-center justify-center transition-all text-[#1d1d1f]/60"
         title="Share on Twitter"
       >
@@ -43,6 +60,7 @@ export function SocialShareButtons({ title, slug }: { title: string; slug: strin
         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => notifyShare('LinkedIn')}
         className="w-10 h-10 rounded-full bg-black/5 hover:bg-[#0077B5]/10 hover:text-[#0077B5] flex items-center justify-center transition-all text-[#1d1d1f]/60"
         title="Share on LinkedIn"
       >
@@ -52,6 +70,7 @@ export function SocialShareButtons({ title, slug }: { title: string; slug: strin
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => notifyShare('Facebook')}
         className="w-10 h-10 rounded-full bg-black/5 hover:bg-[#1877F2]/10 hover:text-[#1877F2] flex items-center justify-center transition-all text-[#1d1d1f]/60"
         title="Share on Facebook"
       >
@@ -61,6 +80,7 @@ export function SocialShareButtons({ title, slug }: { title: string; slug: strin
         href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => notifyShare('WhatsApp')}
         className="w-10 h-10 rounded-full bg-black/5 hover:bg-[#25D366]/10 hover:text-[#25D366] flex items-center justify-center transition-all text-[#1d1d1f]/60"
         title="Share on WhatsApp"
       >

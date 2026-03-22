@@ -25,6 +25,8 @@ const HERO_ICONS = [
 
 import { AdSpace } from "@/components/blog/AdSpace";
 import { NewsletterForm } from "@/components/blog/NewsletterForm";
+import { MobileAppShowcase } from "@/components/blog/MobileAppShowcase";
+import { EventLogger } from "@/components/blog/EventLogger";
 import { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -67,6 +69,7 @@ export default async function Home({
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
       <Navbar />
+      <EventLogger type="visit" />
 
       <main className="pt-12 md:pt-16">
         {/* INTERACTIVE FLOATING HERO */}
@@ -89,6 +92,9 @@ export default async function Home({
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <AdSpace position="home_middle" />
         </div>
+
+        {/* MOBILE APP / AI SHOWCASE SECTION */}
+        <MobileAppShowcase />
 
 
 
