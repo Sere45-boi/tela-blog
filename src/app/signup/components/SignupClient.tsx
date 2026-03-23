@@ -92,7 +92,7 @@ export function SignupClient() {
       }
 
       setSuccess(true);
-      
+
       // 3. Check if email confirmation is required (session will be null)
       if (!authData.session) {
         setNeedsEmailConfirmation(true);
@@ -149,7 +149,7 @@ export function SignupClient() {
             {needsEmailConfirmation ? "Check Your Email" : "Welcome to the Team!"}
           </h1>
           <p className="text-[#1d1d1f]/60 mb-8 font-medium">
-            {needsEmailConfirmation 
+            {needsEmailConfirmation
               ? "We've sent a confirmation link to your email address. Please click the link to verify your account before logging in."
               : `Your account has been created and your permissions have been assigned. Redirecting you to the dashboard...`}
           </p>
@@ -182,10 +182,10 @@ export function SignupClient() {
               Invitation Confirmed
             </div>
             <h1 className="mb-2 text-3xl tracking-tight text-[#1d1d1f] font-bricolage">
-              Join <span className="font-bold text-[#41cc00]">Tela Pulse</span>
+              Join <span className="font-bold text-[#41cc00]">Pulse Team</span>
             </h1>
             <p className="text-[15px] text-[#1d1d1f]/60 font-medium font-poppins">
-              Create your account to start contributing to the platform.
+              Create your account to start contributing.
             </p>
           </div>
 

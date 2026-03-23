@@ -17,19 +17,27 @@ export function NotificationCenter() {
 
     // Subscribe to real-time changes
     const channel = supabase
-      .channel("realtime-notifications")
+      .channel("notifications-live")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "notifications" },
         (payload: { new: any }) => {
-          setNotifications((prev) => [payload.new, ...prev]);
+          // Check if already in list to avoid duplicates
+          setNotifications((prev) => {
+            if (prev.some(n => n.id === payload.new.id)) return prev;
+            return [payload.new, ...prev].slice(0, 10);
+          });
           setUnreadCount((prev) => prev + 1);
         }
       )
       .subscribe();
 
+    // Fallback Polling (Every 60 seconds)
+    const interval = setInterval(fetchNotifications, 60000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, []);
 

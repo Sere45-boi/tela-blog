@@ -32,7 +32,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
             <ChevronLeft className="w-4 h-4" />
-            Back to all stories
+            Back
           </Link>
 
           <GsapReveal direction="up" className="mb-16 text-center md:text-left">
@@ -49,10 +49,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <GsapReveal key={article.id} direction="up" delay={0.05 * i}>
                 <Link href={`/blog/${article.slug}`} className="group flex flex-col h-full bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-shadow duration-500 border-none">
                   <div className="aspect-[4/3] w-full bg-[#f5f5f7] overflow-hidden relative">
-                    <img 
-                      src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"} 
-                      alt={article.title} 
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                    <img
+                      src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
+                      alt={article.title}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                   </div>
                   <div className="flex-1 flex flex-col p-8">
@@ -67,7 +67,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                         const author = getAuthorAttribution(article.profiles);
                         return (
                           <>
-                            <img 
+                            <img
                               src={author.avatar_url}
                               alt={author.name}
                               className="w-8 h-8 rounded-full object-cover border border-black/5"
@@ -84,7 +84,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
             {(!articles || articles.length === 0) && (
               <div className="col-span-full py-20 text-center">
-                 <p className="text-[#1d1d1f]/40 font-bold text-xl">No articles found in this category yet.</p>
+                <p className="text-[#1d1d1f]/40 font-bold text-xl">No articles found in this category yet.</p>
               </div>
             )}
           </div>
@@ -93,7 +93,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
       <footer className="py-10 border-t border-black/5 mt-20">
         <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
-          © {new Date().getFullYear()} Tela Technologies. All rights reserved.
+          © {new Date().getFullYear()} Tela . All rights reserved.
         </div>
       </footer>
     </div>

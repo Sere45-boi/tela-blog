@@ -17,11 +17,11 @@ const bricolage = Bricolage_Grotesque({
 
 export const metadata: Metadata = {
   title: {
-    default: "Pulse by Tela | Insights on Global Payments & Business",
+    default: "Pulse by Tela | Insights and stories from Tela",
     template: "%s | Pulse by Tela",
   },
-  description: "Discover expert insights on borderless business, global payments, multi-currency finance, and tools for modern companies operating across Africa and the world.",
-  keywords: ["global payments", "fintech Africa", "business blog", "cross-border payments", "virtual dollar card", "Nigeria fintech", "Tela", "USD account Nigeria"],
+  description: "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management",
+  keywords: "Tela blog, Tela, Pulse, Pulse by tela, AI-powered solutions, financial management, African SMEs, invoicing, international payments, TELA",
   authors: [{ name: "Tela" }],
   creator: "Tela",
   publisher: "Tela",
@@ -30,18 +30,18 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Tela Blog | Insights on Global Payments & Business",
-    description: "Discover expert insights on borderless business, global payments, and financial tools for modern companies.",
-    siteName: "Tela Blog",
+    title: "Pulse by Tela | Insights and stories from Tela",
+    description: "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management",
+    siteName: "Pulse by Tela",
     type: "website",
     locale: "en_US",
     url: "https://tela.ng",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tela Blog | Insights on Global Payments & Business",
-    description: "Discover expert insights on borderless business, global payments, and financial tools for modern companies.",
-    creator: "@taborahq",
+    title: "Pulse by Tela | Insights and stories from Tela",
+    description: "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management",
+    creator: "@mytelaapp",
   },
   robots: {
     index: true,
@@ -74,9 +74,10 @@ export default function RootLayout({
     url: "https://tela.ng",
     logo: "https://tela.ng/images/logo.PNG",
     sameAs: [
-      "https://twitter.com/taborahq",
-      "https://linkedin.com/company/tela",
-      "https://instagram.com/tela",
+      "https://x.com/mytelaapp",
+      "https://www.linkedin.com/company/telang",
+      "https://www.instagram.com/mytelaapp/",
+      "https://www.tiktok.com/@mytelaapp",
     ],
   };
 

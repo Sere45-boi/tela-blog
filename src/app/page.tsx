@@ -37,9 +37,49 @@ export async function generateMetadata(): Promise<Metadata> {
     .eq("id", 1)
     .single();
 
+  const title = settings?.site_title || "Pulse by Tela";
+  const description =
+    settings?.site_description ||
+    "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management";
+
   return {
-    title: settings?.site_title || "Tela Blog",
-    description: settings?.site_description || "Insights on borderless business and global payments.",
+    title,
+    description,
+
+    keywords: [
+      "Tela blog",
+      "Pulse by Tela",
+      "AI-powered solutions",
+      "financial management",
+      "African SMEs",
+      "invoicing",
+      "international payments",
+    ],
+
+    authors: [{ name: "Pulse by TELA" }],
+
+    openGraph: {
+      title: "AI-Powered Solutions for SMEs | Pulse by TELA",
+      description,
+      url: "https://tela.ng",
+      siteName: "Pulse by Tela",
+      images: [
+        {
+          url: "https://tela.ng/images/poster.jpg",
+          width: 1200,
+          height: 630,
+        },
+      ],
+      type: "website",
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://tela.ng/images/poster.jpg"],
+    },
+
   };
 }
 
@@ -58,12 +98,12 @@ export default async function Home({
 
   const categories = categoriesResult?.data || [];
   const siteSettings = settingsResult?.data || {
-    hero_title: "The Tela Blog.",
-    hero_subtitle: "Ideas that grow.",
-    hero_description: "Insights on borderless business, global payments, and financial tools for modern companies.",
+    hero_title: "Pulse by Tela",
+    hero_subtitle: "Insights and stories from Tela",
+    hero_description: "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management",
     newsletter_title: "Insights that drive growth.",
-    newsletter_description: "Join thousands of founders getting weekly updates on finance, startups, and product building.",
-    footer_description: "Tela is the borderless financial OS for ambitious businesses in emerging markets. Built for global scale.",
+    newsletter_description: "Join thousands of business owners getting weekly updates on finance, startups, and product building.",
+    footer_description: "Pulse by Tela is the borderless business OS for ambitious businesses in emerging markets. Built for global scale.",
   };
 
   return (
@@ -74,9 +114,9 @@ export default async function Home({
       <main className="pt-12 md:pt-16">
         {/* INTERACTIVE FLOATING HERO */}
         <FloatingIconsHero
-          title={siteSettings.hero_title || "The Tela Blog"}
-          subtitle={siteSettings.hero_accent_text || "FINANCIAL OS FOR MODERN BUSINESS"}
-          description={siteSettings.hero_description || "Insights on borderless business, global payments, and financial tools for modern companies."}
+          title={siteSettings.hero_title || "Pulse by Tela"}
+          subtitle={siteSettings.hero_accent_text || "Insights and stories from Tela"}
+          description={siteSettings.hero_description || "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management"}
           ctaHref="#articles"
           icons={HERO_ICONS}
         >
@@ -134,80 +174,54 @@ export default async function Home({
             <div className="lg:col-span-2">
               <div className="flex flex-col items-start gap-6">
                 <div className="mb-2">
-                  <img src="/images/logo.PNG" className="h-[28px] w-auto mix-blend-multiply opacity-90" alt="Tela Footer Logo" />
+                  <img src="/images/IMG_2366.png" className="h-[40px] w-auto mix-blend-multiply opacity-90" alt="Tela Footer Logo" />
                 </div>
                 <p className="text-[15px] text-[#1d1d1f]/60 max-w-[300px] leading-relaxed font-medium">
-                  {siteSettings.footer_description || "Tela is the borderless financial OS for ambitious businesses in emerging markets."}
+                  {siteSettings.footer_description || "TELA a sub of Difi Financial Services LTD. TELA offers its financial services in partnership with licensed financial institutions in their respective jurisdictions."}
                 </p>
               </div>
             </div>
 
+
             <div>
               <h4 className="text-[#1d1d1f] font-bold text-[13px] uppercase tracking-wider mb-6">Products</h4>
               <ul className="space-y-4 text-[15px] font-medium text-[#1d1d1f]/60">
-                {(siteSettings.footer_products || []).length > 0 ? (
-                  (siteSettings.footer_products as any[]).map((link, i) => (
-                    <li key={i}><Link href={link.url} className="hover:text-[#1d1d1f] transition-colors">{link.label}</Link></li>
-                  ))
-                ) : (
-                  <>
-                    <li><Link href="/" className="hover:text-[#1d1d1f] transition-colors">Payments</Link></li>
-                    <li><Link href="/" className="hover:text-[#1d1d1f] transition-colors">Invoices</Link></li>
-                  </>
-                )}
+                <li><Link href="https://tela.ng/ai" className="hover:text-[#1d1d1f] transition-colors">AI</Link></li>
+                <li><Link href="https://quiz.tela.ng" className="hover:text-[#1d1d1f] transition-colors">Quiz</Link></li>
+                <li><Link href="https://tela.ng/Payment" className="hover:text-[#1d1d1f] transition-colors">Payments</Link></li>
+                <li><Link href="https://tela.ng/Business" className="hover:text-[#1d1d1f] transition-colors">Business</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-[#1d1d1f] font-bold text-[13px] uppercase tracking-wider mb-6">Company</h4>
+              <h4 className="text-[#1d1d1f] font-bold text-[13px] uppercase tracking-wider mb-6">Resources</h4>
               <ul className="space-y-4 text-[15px] font-medium text-[#1d1d1f]/60">
-                {(siteSettings.footer_company || []).length > 0 ? (
-                  (siteSettings.footer_company as any[]).map((link, i) => (
-                    <li key={i}><Link href={link.url} className="hover:text-[#1d1d1f] transition-colors">{link.label}</Link></li>
-                  ))
-                ) : (
-                  <>
-                    <li><Link href="/" className="hover:text-[#1d1d1f] transition-colors">About</Link></li>
-                    <li><Link href="/blog" className="hover:text-[#1d1d1f] transition-colors text-[#093C15]">Blog</Link></li>
-                  </>
-                )}
+                <li><Link href="https://intercom.help/tela-ng/en" className="hover:text-[#1d1d1f] transition-colors">Help center</Link></li>
+                <li><Link href="https://tela.ng/contact-us" className="hover:text-[#1d1d1f] transition-colors"> Contact</Link></li>
+                <li><Link href="https://tela.ng/careers" className="hover:text-[#1d1d1f] transition-colors">Careers</Link></li>
               </ul>
             </div>
 
             <div className="col-span-2 md:col-span-4 lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-10">
               <div>
-                <h4 className="text-[#1d1d1f] font-bold text-[13px] uppercase tracking-wider mb-6">Resources</h4>
+                <h4 className="text-[#1d1d1f] font-bold text-[13px] uppercase tracking-wider mb-6">Legals</h4>
                 <ul className="space-y-4 text-[15px] font-medium text-[#1d1d1f]/60">
-                  {(siteSettings.footer_resources || []).length > 0 ? (
-                    (siteSettings.footer_resources as any[]).map((link, i) => (
-                      <li key={i}><Link href={link.url} className="hover:text-[#1d1d1f] transition-colors">{link.label}</Link></li>
-                    ))
-                  ) : (
-                    <li><Link href="/" className="hover:text-[#1d1d1f] transition-colors">Help center</Link></li>
-                  )}
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-[#1d1d1f] font-bold text-[13px] uppercase tracking-wider mb-6">Legal</h4>
-                <ul className="space-y-4 text-[15px] font-medium text-[#1d1d1f]/60">
-                  {(siteSettings.footer_legal || []).length > 0 ? (
-                    (siteSettings.footer_legal as any[]).map((link, i) => (
-                      <li key={i}><Link href={link.url} className="hover:text-[#1d1d1f] transition-colors">{link.label}</Link></li>
-                    ))
-                  ) : (
-                    <li><Link href="/" className="hover:text-[#1d1d1f] transition-colors">Privacy Policy</Link></li>
-                  )}
+                  <li><Link href="https://tela.ng/cookies" className="hover:text-[#1d1d1f] transition-colors">Cookie Policy</Link></li>
+                  <li><Link href="https://tela.ng/privacy" className="hover:text-[#1d1d1f] transition-colors">Privacy Policy</Link></li>
+                  <li><Link href="https://tela.ng/Terms&conditions" className="hover:text-[#1d1d1f] transition-colors">Terms &amp; Conditions</Link></li>
+                  <li><Link href="https://tela.ng/merchant" className="hover:text-[#1d1d1f] transition-colors">Merchant Agreement</Link></li>
                 </ul>
               </div>
             </div>
           </div>
 
           <div className="pt-8 border-t border-[#1d1d1f]/10 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-[#1d1d1f]/50 font-medium">
-            <p>© {new Date().getFullYear()} {siteSettings.site_title || 'Tela'}. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} {siteSettings.footer_copyright_text || 'Tela'}</p>
             <div className="flex items-center gap-6">
-              <Link href={siteSettings.twitter_handle ? `https://twitter.com/${siteSettings.twitter_handle.replace('@', '')}` : "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">Twitter</Link>
+              <Link href={siteSettings.twitter_handle || "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">X</Link>
               <Link href={siteSettings.linkedin_url || "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">LinkedIn</Link>
               <Link href={siteSettings.instagram_url || "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">Instagram</Link>
+              <Link href={siteSettings.facebook_url || "#"} className="hover:text-[#1d1d1f] transition-colors" target="_blank">TikTok</Link>
             </div>
           </div>
         </div>

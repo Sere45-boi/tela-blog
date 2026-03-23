@@ -23,7 +23,7 @@ const LinkListEditor = ({ label, links, onChange }: { label: string; links: any[
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
         <label className="text-[12px] font-bold text-[#093C15] uppercase tracking-wider">{label}</label>
-        <button 
+        <button
           onClick={addLink}
           className="p-1.5 rounded-lg bg-[#41cc00]/10 text-[#093C15] hover:bg-[#41cc00]/20 transition-colors flex items-center gap-2 text-[10px] font-bold"
         >
@@ -34,20 +34,20 @@ const LinkListEditor = ({ label, links, onChange }: { label: string; links: any[
         {links.map((link, idx) => (
           <div key={idx} className="flex gap-3 items-start animate-in fade-in slide-in-from-left-2 duration-300">
             <div className="flex-1 space-y-2">
-              <Input 
-                placeholder="Label (e.g. Payments)" 
-                value={link.label} 
+              <Input
+                placeholder="Label (e.g. Payments)"
+                value={link.label}
                 onChange={(e) => updateLink(idx, "label", e.target.value)}
                 className="h-10 text-[13px] bg-white/50 border-black/5"
               />
-              <Input 
-                placeholder="URL (e.g. /payments)" 
-                value={link.url} 
+              <Input
+                placeholder="URL (e.g. /payments)"
+                value={link.url}
                 onChange={(e) => updateLink(idx, "url", e.target.value)}
                 className="h-10 text-[13px] bg-white/50 border-black/5 font-mono"
               />
             </div>
-            <button 
+            <button
               onClick={() => removeLink(idx)}
               className="p-2.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors mt-1"
             >
@@ -124,7 +124,7 @@ export default function SiteSettingsPage() {
         .select("*")
         .eq("id", 1)
         .single();
-      
+
       if (data && !error) {
         setSettings(data);
       }
@@ -156,10 +156,10 @@ export default function SiteSettingsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-2">Site Environment</h1>
           <p className="text-[#1d1d1f]/40 font-medium tracking-tight">Configure global branding, content systems, and SEO architecture.</p>
         </GsapReveal>
-        
+
         <GsapReveal direction="up" delay={0.1}>
-          <Button 
-            onClick={handleSave} 
+          <Button
+            onClick={handleSave}
             isLoading={saving}
             className="h-12 px-8 bg-[#093C15] text-white group shadow-lg shadow-[#093C15]/10 hover:bg-[#0a5a1f] transition-all"
             disabled={loading}
@@ -179,31 +179,31 @@ export default function SiteSettingsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Left Column */}
             <div className="space-y-8">
-              <Section 
-                title="Identity & SEO" 
+              <Section
+                title="Identity & SEO"
                 icon={Globe}
                 description="Manage the absolute core markers of your platform identity."
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Site Title</label>
-                    <Input 
-                      value={settings.site_title} 
+                    <Input
+                      value={settings.site_title}
                       onChange={(e) => updateField("site_title", e.target.value)}
                       className="h-12 bg-white/50 border-black/5 rounded-xl"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Universal Tagline</label>
-                    <Input 
-                      value={settings.site_tagline} 
+                    <Input
+                      value={settings.site_tagline}
                       onChange={(e) => updateField("site_tagline", e.target.value)}
                       className="h-12 bg-white/50 border-black/5 rounded-xl"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Global SEO Description</label>
-                    <textarea 
+                    <textarea
                       className="w-full h-32 rounded-2xl border border-black/5 bg-white/50 p-4 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none shadow-sm"
                       value={settings.site_description || ""}
                       onChange={(e) => updateField("site_description", e.target.value)}
@@ -216,8 +216,8 @@ export default function SiteSettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Meta Keywords</label>
-                    <Input 
-                      value={settings.meta_keywords || ""} 
+                    <Input
+                      value={settings.meta_keywords || ""}
                       onChange={(e) => updateField("meta_keywords", e.target.value)}
                       className="h-12 bg-white/50 border-black/5 rounded-xl"
                     />
@@ -225,90 +225,62 @@ export default function SiteSettingsPage() {
                 </div>
               </Section>
 
-              <Section 
-                title="Engagement & Social" 
+              <Section
+                title="Engagement & Social"
                 icon={Share2}
                 description="Connect community distribution channels."
               >
                 <div className="space-y-4">
                   {[
-                    { label: "X (Twitter)", key: "twitter_handle", placeholder: "@handle" },
+                    { label: "X (Twitter)", key: "twitter_handle", placeholder: "URL" },
                     { label: "LinkedIn", key: "linkedin_url", placeholder: "URL" },
                     { label: "Instagram", key: "instagram_url", placeholder: "URL" },
-                    { label: "Facebook", key: "facebook_url", placeholder: "URL" }
+                    { label: "TikTok", key: "facebook_url", placeholder: "URL" }
                   ].map(social => (
                     <div key={social.key} className="space-y-1.5">
                       <label className="text-[11px] font-bold text-black/30 uppercase tracking-wider ml-1">{social.label}</label>
-                      <Input 
-                        value={(settings as any)[social.key] || ""} 
-                        onChange={(e) => updateField(social.key, e.target.value)} 
+                      <Input
+                        value={(settings as any)[social.key] || ""}
+                        onChange={(e) => updateField(social.key, e.target.value)}
                         placeholder={social.placeholder}
                         className="h-11 bg-white/50 border-black/5 rounded-xl"
                       />
                     </div>
                   ))}
                 </div>
-                
-                <div className="mt-8 border-t border-black/5 pt-6 space-y-6">
-                  <h3 className="text-[12px] font-bold flex items-center gap-2 text-[#093C15] uppercase tracking-wider">
-                    <FileText className="w-4 h-4" /> Newsletter Strategy
-                  </h3>
-                  <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Campaign Heading</label>
-                    <Input 
-                      value={settings.newsletter_title || ""} 
-                      onChange={(e) => updateField("newsletter_title", e.target.value)}
-                      className="h-12 bg-white/50 border-black/5 rounded-xl"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Value Proposition Description</label>
-                    <textarea 
-                      className="w-full h-24 rounded-2xl border border-black/5 bg-white/50 p-6 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none shadow-sm"
-                      value={settings.newsletter_description || ""}
-                      onChange={(e) => updateField("newsletter_description", e.target.value)}
-                    />
-                  </div>
-                </div>
+
+
               </Section>
             </div>
 
             {/* Right Column */}
             <div className="space-y-8">
-              <Section 
-                title="Narrative Content" 
+              <Section
+                title="Narrative Content"
                 icon={Type}
                 description="Configure the high-impact storytelling elements for the home interface."
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Primary Heading</label>
-                    <Input 
-                      value={settings.hero_title || ""} 
+                    <Input
+                      value={settings.hero_title || ""}
                       onChange={(e) => updateField("hero_title", e.target.value)}
                       className="h-12 bg-white/50 border-black/5 rounded-xl"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Gradient Accent Text</label>
-                    <Input 
-                      value={settings.hero_accent_text || ""} 
+                    <Input
+                      value={settings.hero_accent_text || ""}
                       onChange={(e) => updateField("hero_accent_text", e.target.value)}
                       placeholder="e.g. FINANCIAL OS FOR MODERN BUSINESS"
                       className="h-12 bg-white/50 border-black/5 rounded-xl"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Subtitle</label>
-                    <Input 
-                      value={settings.hero_subtitle || ""} 
-                      onChange={(e) => updateField("hero_subtitle", e.target.value)}
-                      className="h-12 bg-white/50 border-black/5 rounded-xl"
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Hero Narrative</label>
-                    <textarea 
+                    <textarea
                       className="w-full h-24 rounded-2xl border border-black/5 bg-white/50 p-6 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none shadow-sm"
                       value={settings.hero_description || ""}
                       onChange={(e) => updateField("hero_description", e.target.value)}
@@ -318,76 +290,51 @@ export default function SiteSettingsPage() {
 
                 <div className="mt-8 border-t border-black/5 pt-6 space-y-6">
                   <h3 className="text-[12px] font-bold flex items-center gap-2 text-[#093C15] uppercase tracking-wider">
-                    <FileText className="w-4 h-4" /> STRUCTURAL GOVERNANCE
+                    <FileText className="w-4 h-4" /> Footer
                   </h3>
                   <div className="space-y-6">
+
                     <div className="space-y-2">
-                      <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Header Governance Title</label>
-                      <Input 
-                        value={settings.header_governance_text || ""} 
-                        onChange={(e) => updateField("header_governance_text", e.target.value)}
-                        placeholder="Governance"
-                        className="h-12 bg-white/50 border-black/5 rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Footer Narrative Copy</label>
-                      <textarea 
+                      <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Footer Text</label>
+                      <textarea
                         className="w-full h-24 rounded-2xl border border-black/5 bg-white/50 p-6 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none shadow-sm"
                         value={settings.footer_description || ""}
                         onChange={(e) => updateField("footer_description", e.target.value)}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Footer Copyright Marker</label>
-                      <Input 
-                        value={settings.footer_copyright_text || ""} 
+                      <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Footer Copyright </label>
+                      <Input
+                        value={settings.footer_copyright_text || ""}
                         onChange={(e) => updateField("footer_copyright_text", e.target.value)}
                         className="h-12 bg-white/50 border-black/5 rounded-xl"
                       />
                     </div>
-                    
-                    <div className="space-y-8 pt-4">
-                      <LinkListEditor 
-                        label="Product Links" 
-                        links={settings.footer_products || []} 
-                        onChange={(val) => updateField("footer_products", val)} 
-                      />
-                      <LinkListEditor 
-                        label="Company Links" 
-                        links={settings.footer_company || []} 
-                        onChange={(val) => updateField("footer_company", val)} 
-                      />
-                      <LinkListEditor 
-                        label="Resource Links" 
-                        links={settings.footer_resources || []} 
-                        onChange={(val) => updateField("footer_resources", val)} 
-                      />
-                      <LinkListEditor 
-                        label="Legal Links" 
-                        links={settings.footer_legal || []} 
-                        onChange={(val) => updateField("footer_legal", val)} 
-                      />
+                    <div className="mt-8 border-t border-black/5 pt-6 space-y-6">
+                      <h3 className="text-[12px] font-bold flex items-center gap-2 text-[#093C15] uppercase tracking-wider">
+                        <FileText className="w-4 h-4" /> Newsletter Strategy
+                      </h3>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Campaign Heading</label>
+                        <Input
+                          value={settings.newsletter_title || ""}
+                          onChange={(e) => updateField("newsletter_title", e.target.value)}
+                          className="h-12 bg-white/50 border-black/5 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-[#1d1d1f]/60 ml-1">Description</label>
+                        <textarea
+                          className="w-full h-24 rounded-2xl border border-black/5 bg-white/50 p-6 text-[#1d1d1f] text-[14px] font-medium focus:border-[#41cc00]/40 outline-none transition-all resize-none shadow-sm"
+                          value={settings.newsletter_description || ""}
+                          onChange={(e) => updateField("newsletter_description", e.target.value)}
+                        />
+                      </div>
                     </div>
+
                   </div>
                 </div>
               </Section>
-
-              <GsapReveal direction="up" delay={0.4}>
-                <div className="p-8 bg-[#093C15] overflow-hidden relative shadow-2xl rounded-[2.5rem]">
-                   <div className="absolute top-0 right-0 w-64 h-64 bg-[#41cc00]/10 rounded-full blur-[80px] -mr-32 -mt-32" />
-                   <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-4">
-                         <span className="px-2 py-0.5 rounded bg-[#41cc00] text-[#093C15] text-[10px] font-bold uppercase tracking-widest">Enterprise Protocol</span>
-                      </div>
-                      <h3 className="text-[18px] font-bold font-bricolage text-white mb-4 tracking-tight">Configuration Integrity</h3>
-                      <p className="text-white/70 text-[13px] font-medium leading-relaxed mb-8">
-                        Updates to site settings propagate immediately. Ensure descriptors maintain SEO length requirements.
-                      </p>
-                      <Button variant="ghost" className="w-full h-11 border-white/20 text-white hover:bg-white hover:text-[#093C15] rounded-xl font-bold px-8 bg-white/5 transition-all text-[12px]">Refresh Global Cache</Button>
-                   </div>
-                </div>
-              </GsapReveal>
             </div>
           </div>
 

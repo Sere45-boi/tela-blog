@@ -14,19 +14,19 @@ import { EventLogger } from "@/components/blog/EventLogger";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
-  
+
   const { data: article } = await supabase
     .from("articles")
     .select("title, meta_title, meta_description, featured_image, og_image_url")
     .eq("slug", slug)
     .single();
 
-  if (!article) return { title: "Article Not Found | Tela Blog" };
+  if (!article) return { title: "Article Not Found | Pulse by Tela" };
 
   const title = article.meta_title || article.title;
   const description = article.meta_description || `Read "${article.title}" on the Tela Blog.`;
   const image = article.og_image_url || article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71";
-  
+
   return {
     title: `${title} | Tela Blog`,
     description,
@@ -46,10 +46,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function ArticlePage({ 
+export default async function ArticlePage({
   params,
-  searchParams 
-}: { 
+  searchParams
+}: {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ preview?: string }>;
 }) {
@@ -78,9 +78,9 @@ export default async function ArticlePage({
   if (preview !== "true") {
     supabase.rpc('increment_article_view', { article_slug: slug }).then();
   }
-  
+
   const author = getAuthorAttribution(article.profiles);
-  
+
   // Fetch top read articles (excluding current)
   const { data: topArticlesData } = await supabase
     .from("articles")
@@ -103,13 +103,13 @@ export default async function ArticlePage({
     .limit(3);
 
   const relatedArticles = relatedArticlesData || [];
-  
+
   const formatViews = (views?: number) => {
     if (!views) return "0";
     if (views >= 1000) return (views / 1000).toFixed(1) + "k";
     return views.toString();
   };
-  
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -129,12 +129,12 @@ export default async function ArticlePage({
 
       <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]" suppressHydrationWarning>
         <Navbar />
-        <EventLogger 
-          type="read" 
-          targetName={article.title} 
-          link={`/blog/${slug}`} 
+        <EventLogger
+          type="read"
+          targetName={article.title}
+          link={`/blog/${slug}`}
         />
-        
+
         {preview === "true" && (
           <div className="fixed top-20 left-0 right-0 z-[60] bg-[#093C15] text-[#41cc00] py-2 px-4 text-center font-bold text-sm flex items-center justify-center gap-2">
             <AlertCircle className="w-4 h-4" />
@@ -144,10 +144,10 @@ export default async function ArticlePage({
 
         <main className="pt-32 pb-24 md:pt-40">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-24 flex flex-col lg:flex-row gap-12 lg:gap-20">
-            
+
             {/* MAIN ARTICLE COLUMN */}
             <article className="flex-1 min-w-0 max-w-[800px]">
-              
+
               <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
                 <ChevronLeft className="w-4 h-4" />
                 Back to all articles
@@ -162,10 +162,10 @@ export default async function ArticlePage({
                 <h1 className="text-3xl md:text-4xl lg:text-[48px] font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-8 leading-[1.1]">
                   {article.title}
                 </h1>
-                
+
                 <div className="flex items-center gap-4 border-y border-black/5 py-6">
                   <Link href="/about" className="flex items-center gap-4 group">
-                    <img 
+                    <img
                       src={author.avatar_url}
                       alt={author.name}
                       className="w-12 h-12 rounded-full object-cover border border-black/5 group-hover:ring-4 group-hover:ring-[#41cc00]/10 transition-all"
@@ -183,14 +183,14 @@ export default async function ArticlePage({
                   </div>
                 </div>
               </header>
-              
+
               {/* Cover image */}
               {article.featured_image && (
                 <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-white rounded-[2rem] overflow-hidden mb-12 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-black/5">
-                  <img 
-                    src={article.featured_image} 
-                    alt={article.title} 
-                    className="w-full h-full object-cover" 
+                  <img
+                    src={article.featured_image}
+                    alt={article.title}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               )}
@@ -201,7 +201,7 @@ export default async function ArticlePage({
               </div>
 
               {/* Article Content */}
-              <div 
+              <div
                 className="max-w-none font-poppins leading-relaxed prose prose-lg prose-headings:font-bricolage prose-a:text-[#093C15] prose-img:rounded-2xl"
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
@@ -231,7 +231,7 @@ export default async function ArticlePage({
 
             {/* RIGHT SIDEBAR */}
             <aside className="hidden lg:block w-[340px] shrink-0 space-y-8 sticky top-32 self-start">
-              
+
               {/* Ad Space */}
               <AdSpace position="sidebar" />
 
@@ -245,10 +245,10 @@ export default async function ArticlePage({
                   {relatedArticles.length > 0 ? relatedArticles.map((post) => (
                     <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex gap-4">
                       <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-black/5 bg-black/[0.02]">
-                        <img 
-                          src={post.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"} 
-                          alt={post.title} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        <img
+                          src={post.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -265,7 +265,7 @@ export default async function ArticlePage({
                   )}
                 </div>
               </div>
-              
+
               {/* Top Read */}
               <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-5">
@@ -293,9 +293,9 @@ export default async function ArticlePage({
         </main>
 
         <footer className="py-10 border-t border-black/5">
-           <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
-             © {new Date().getFullYear()} Tela Technologies. All rights reserved.
-           </div>
+          <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
+            © {new Date().getFullYear()} Tela Technologies. All rights reserved.
+          </div>
         </footer>
       </div>
     </>

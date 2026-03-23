@@ -7,7 +7,7 @@ import { GlassCard } from "@/components/ui/Card";
 import { CampaignActions } from "./CampaignActions";
 
 export const metadata = {
-  title: "Campaign Intelligence | Tela CMS",
+  title: "Campaigns | Pulse by Tela",
 };
 
 export default async function AdminAdsPage() {

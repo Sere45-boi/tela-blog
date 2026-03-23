@@ -14,7 +14,7 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message?: string }>({ type: "idle" });
   const [loading, setLoading] = useState(false);
-  
+
   const router = useRouter();
   const supabase = createClient();
 
@@ -23,9 +23,9 @@ export default function ResetPasswordPage() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setStatus({ 
-          type: "error", 
-          message: "Invalid or expired recovery link. Please try resetting your password again." 
+        setStatus({
+          type: "error",
+          message: "Invalid or expired token. Please try resetting your password again."
         });
       }
     };
@@ -56,12 +56,12 @@ export default function ResetPasswordPage() {
       setStatus({ type: "error", message: error.message });
       setLoading(false);
     } else {
-      setStatus({ 
-        type: "success", 
-        message: "Your password has been successfully updated." 
+      setStatus({
+        type: "success",
+        message: "Your password has been successfully updated."
       });
       setLoading(false);
-      
+
       // Redirect to admin dashboard after short delay
       setTimeout(() => {
         router.push("/admin");
@@ -75,7 +75,7 @@ export default function ResetPasswordPage() {
       <GsapReveal direction="up" className="w-full max-w-md">
         <GlassCard className="relative overflow-hidden">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent to-muted-foreground opacity-50"></div>
-          
+
           <div className="mb-8 mt-2 text-center">
             <h1 className="mb-2 text-2xl font-medium tracking-tight text-foreground">
               Create New Password
@@ -129,16 +129,16 @@ export default function ResetPasswordPage() {
                 {status.message}
               </div>
             )}
-            
+
             {status.type === "success" && (
               <div className="rounded-lg bg-green-500/10 p-3 text-sm text-green-600 border border-green-500/20">
                 {status.message} Redirecting to dashboard...
               </div>
             )}
 
-            <Button 
-              type="submit" 
-              className="mt-6 w-full" 
+            <Button
+              type="submit"
+              className="mt-6 w-full"
               isLoading={loading}
               disabled={status.type === "success" || status.message?.includes("expired")}
             >

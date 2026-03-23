@@ -6,7 +6,7 @@ import { GsapReveal } from "@/components/GsapReveal";
 import { deleteArticle } from "@/app/actions/content";
 
 export const metadata = {
-  title: "Post Management | Tela CMS",
+  title: "Post Management | Pulse by Tela",
 };
 
 export default async function AdminArticlesList({
@@ -49,13 +49,12 @@ export default async function AdminArticlesList({
       </GsapReveal>
 
       <GsapReveal direction="up" delay={0.1} className="mb-10 flex flex-wrap gap-2">
-        <Link 
+        <Link
           href="/admin/articles"
-          className={`px-4 py-2 text-[13px] font-bold rounded-xl border transition-all ${
-            !category 
-              ? "border-[#093C15] bg-[#093C15] text-white shadow-sm" 
+          className={`px-4 py-2 text-[13px] font-bold rounded-xl border transition-all ${!category
+              ? "border-[#093C15] bg-[#093C15] text-white shadow-sm"
               : "border-black/5 bg-white/80 text-[#1d1d1f]/60 hover:text-[#093C15] hover:border-[#41cc00]/20"
-          }`}
+            }`}
         >
           All Posts
         </Link>
@@ -63,11 +62,10 @@ export default async function AdminArticlesList({
           <Link
             key={cat.id}
             href={`/admin/articles?category=${cat.id}`}
-            className={`px-4 py-2 text-[13px] font-bold rounded-xl border transition-all ${
-              category === cat.id 
-                ? "border-[#093C15] bg-[#093C15] text-white shadow-sm" 
+            className={`px-4 py-2 text-[13px] font-bold rounded-xl border transition-all ${category === cat.id
+                ? "border-[#093C15] bg-[#093C15] text-white shadow-sm"
                 : "border-black/5 bg-white/80 text-[#1d1d1f]/60 hover:text-[#093C15] hover:border-[#41cc00]/20"
-            }`}
+              }`}
           >
             {cat.name}
           </Link>
@@ -96,9 +94,8 @@ export default async function AdminArticlesList({
                       {article.is_featured && <span className="ml-2 text-[9px] bg-[#41cc00]/10 font-bold text-[#093C15] px-2 py-0.5 rounded-full uppercase tracking-widest">Featured</span>}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`capitalize inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase ${
-                        article.status === 'published' ? 'bg-[#41cc00]/10 text-[#093C15]' : 'bg-yellow-500/10 text-yellow-600'
-                      }`}>
+                      <span className={`capitalize inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase ${article.status === 'published' ? 'bg-[#41cc00]/10 text-[#093C15]' : 'bg-yellow-500/10 text-yellow-600'
+                        }`}>
                         {article.status}
                       </span>
                     </td>
@@ -112,16 +109,16 @@ export default async function AdminArticlesList({
                       {article.view_count.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
-                       <Link 
-                        href={`/blog/${article.slug}?preview=true`} 
+                      <Link
+                        href={`/blog/${article.slug}?preview=true`}
                         target="_blank"
                         className="p-2 inline-block text-[#1d1d1f]/40 hover:text-[#41cc00] transition-colors"
                         title="Preview"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
-                      <Link 
-                        href={`/admin/articles/editor?id=${article.id}`} 
+                      <Link
+                        href={`/admin/articles/editor?id=${article.id}`}
                         className="p-2 inline-block text-[#1d1d1f]/40 hover:text-[#093C15] transition-colors"
                         title="Edit"
                       >
@@ -135,7 +132,7 @@ export default async function AdminArticlesList({
                     </td>
                   </tr>
                 ))}
-                
+
                 {(!articles || articles.length === 0) && (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-[#1d1d1f]/40 font-medium">

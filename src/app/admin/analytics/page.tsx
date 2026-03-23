@@ -5,7 +5,7 @@ import { BarChart3, TrendingUp, Users, Clock, ArrowUpRight, Activity, BookOpen }
 import Link from "next/link";
 
 export const metadata = {
-  title: "Analytics Intelligence | Tela CMS",
+  title: "Analytics | Pulse by Tela",
 };
 
 export default async function AnalyticsPage() {
@@ -24,7 +24,7 @@ export default async function AnalyticsPage() {
   const totalArticleViews = allArticles.reduce((acc, a) => acc + (a.view_count || 0), 0);
   const totalSessions = analyticsData.length > 0 ? analyticsData.length : totalArticleViews;
   const uniqueReaders = new Set(analyticsData.map((a) => a.reader_id)).size || Math.round(totalArticleViews * 0.85);
-  
+
   const totalReadSeconds = analyticsData.reduce((acc, r) => acc + (r.read_time_seconds || 0), 0);
   const avgReadSeconds = analyticsData.length > 0 ? Math.round(totalReadSeconds / analyticsData.length) : (totalArticleViews > 0 ? 180 : 0);
   const avgReadTime = avgReadSeconds > 0 ? `${Math.floor(avgReadSeconds / 60)}m ${avgReadSeconds % 60}s` : "—";
