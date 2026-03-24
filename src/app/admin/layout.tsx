@@ -136,7 +136,7 @@ export default function AdminLayout({
             </Link>
           ) : (
             <Link href="/admin" className="flex items-center justify-center w-10 h-10 rounded-xl hover:opacity-80">
-              <img src="/images/logo.png" alt="Logo" className="w-8 h-8" />
+              <img src="/images/logo.PNG" alt="Logo" className="w-8 h-8" />
             </Link>
           )}
           <button
