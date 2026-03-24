@@ -193,7 +193,7 @@ export default function AdminLayout({
 
       {isMobileMenuOpen && <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
 
-      <main className={`flex-1 min-h-screen flex flex-col transition-all duration-300 ${isSidebarOpen ? 'lg:ml-[280px]' : 'lg:ml-[80px]'} ml-0`}>
+      <main className={`flex-1 min-w-0 min-h-screen flex flex-col transition-all duration-300 ${isSidebarOpen ? 'lg:ml-[280px]' : 'lg:ml-[80px]'} ml-0`}>
         <header className="h-16 px-6 md:px-12 flex items-center justify-between sticky top-0 bg-white/60 backdrop-blur-xl z-40 border-b border-[#41cc00]/5">
           <div className="flex items-center gap-4">
             <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 rounded-xl bg-black/5 text-[#093C15]"><Menu size={20} /></button>

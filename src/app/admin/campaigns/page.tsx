@@ -94,7 +94,7 @@ export default async function AdminAdsPage() {
 
       <GsapReveal direction="up" delay={0.5}>
         <GlassCard className="overflow-hidden shadow-sm lg:p-0">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto pb-32">
             <table className="w-full min-w-[900px] text-left border-collapse">
               <thead className="text-[11px] font-bold text-[#1d1d1f]/30 uppercase tracking-[0.15em] bg-black/[0.01] border-b border-black/5">
                 <tr>

@@ -39,7 +39,7 @@ export default async function AdminDashboard() {
   const analyticsRows = analyticsRes.data || [];
   const totalReadSeconds = analyticsRows.reduce((acc, r) => acc + (r.read_time_seconds || 0), 0);
   const cumulativeReadTime = formatDuration(totalReadSeconds);
-  const uniqueReaders = new Set(analyticsRows.map((r) => r.reader_id)).size || Math.round(totalArticleViews * 0.85); // fallback estimate
+  const uniqueReaders = new Set(analyticsRows.map((r) => r.reader_id)).size;
 
   // ---- Logic to find the Top Performer ----
   let topPost = null;
@@ -66,15 +66,15 @@ export default async function AdminDashboard() {
   
   // Intelligent Fallbacks: If raw telemetry lacks 'reads', use the views count to establish a baseline.
   const hasRealTraffic = homeVisits > 0 || articleReads > 0;
-  const organicPct = hasRealTraffic ? Math.round((homeVisits / totalEvents) * 100) : (totalArticleViews > 0 ? 45 : 0);
-  const readPct = hasRealTraffic ? Math.round((articleReads / totalEvents) * 100) : (totalArticleViews > 0 ? 55 : 0);
-  const otherPct = hasRealTraffic ? Math.round((otherEvents / totalEvents) * 100) : (totalEvents > 0 ? 100 : 0);
+  const organicPct = totalEvents > 0 ? Math.round((homeVisits / totalEvents) * 100) : 0;
+  const readPct = totalEvents > 0 ? Math.round((articleReads / totalEvents) * 100) : 0;
+  const otherPct = totalEvents > 0 ? Math.round((otherEvents / totalEvents) * 100) : 0;
 
   // ---- Platform Growth ----
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const thisWeekCount = rawTraffic.filter((t) => t.created_at >= sevenDaysAgo).length;
   const prevWeekCount = Math.max(totalEvents - thisWeekCount, 1);
-  const growthRate = Math.round(((thisWeekCount - prevWeekCount) / prevWeekCount) * 100);
+  const growthRate = totalEvents > 0 ? Math.round(((thisWeekCount - prevWeekCount) / prevWeekCount) * 100) : 0;
 
   // ---- Deep Insights ----
   const recentNotifications = notificationsRes.data || [];
@@ -92,14 +92,14 @@ export default async function AdminDashboard() {
 
   const topCards = [
     { label: "Content Engagement", value: totalArticleViews.toLocaleString(), icon: TrendingUp, color: "bg-[#41cc00]", detail: `${totalPosts} total posts (${publishedCount} live)` },
-    { label: "Unique Readers", value: uniqueReaders.toLocaleString(), icon: Eye, color: "bg-[#093C15]", detail: `~85% unique view rate` },
+    { label: "Unique Readers", value: uniqueReaders.toLocaleString(), icon: Eye, color: "bg-[#093C15]", detail: `Tracked unique visitors` },
     { label: "Cumulative Read Time", value: cumulativeReadTime, icon: Clock, color: "bg-orange-500", detail: "Total reader engagement" },
   ];
 
   const growthCards = [
     { label: "Platform Growth", value: `${growthRate > 0 ? "+" : ""}${growthRate}%`, desc: "This week vs last" },
     { label: "Engagement Velocity", value: `${analyticsRows.length > 0 ? analyticsRows.length : totalArticleViews} sessions`, desc: "Total read sessions" },
-    { label: "Audience Retention", value: `${readPct > 0 ? readPct : (totalArticleViews > 0 ? 85 : 0)}%`, desc: "Article read rate" },
+    { label: "Audience Retention", value: `${readPct}%`, desc: "Article read rate" },
   ];
 
   return (

@@ -38,7 +38,7 @@ export function AdEditorClient({ ad }: AdFormProps) {
   const [imageUrl, setImageUrl] = useState(ad?.image_url || "");
   const [shape, setShape] = useState<"square">(ad?.shape || "square");
 
-  const selectedShape = SHAPE_OPTIONS.find((s) => s.value === shape)!;
+  const selectedShape = SHAPE_OPTIONS.find((s) => s.value === shape) || SHAPE_OPTIONS[0];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

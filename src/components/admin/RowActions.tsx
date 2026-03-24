@@ -23,6 +23,33 @@ interface RowActionsProps {
 export function RowActions({ actions }: RowActionsProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
+
+  // Compute fixed position when opening
+  useEffect(() => {
+    if (open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const menuHeight = 200; // approximate max height
+
+      if (spaceBelow < menuHeight) {
+        // Open upward
+        setMenuStyle({
+          position: "fixed",
+          right: window.innerWidth - rect.right,
+          bottom: window.innerHeight - rect.top + 4,
+        });
+      } else {
+        // Open downward
+        setMenuStyle({
+          position: "fixed",
+          right: window.innerWidth - rect.right,
+          top: rect.bottom + 4,
+        });
+      }
+    }
+  }, [open]);
 
   // Close on outside click
   useEffect(() => {
@@ -35,18 +62,24 @@ export function RowActions({ actions }: RowActionsProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Close on Escape
+  // Close on Escape and scroll
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
+    const escHandler = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
+    const scrollHandler = () => setOpen(false);
+    document.addEventListener("keydown", escHandler);
+    if (open) window.addEventListener("scroll", scrollHandler, true);
+    return () => {
+      document.removeEventListener("keydown", escHandler);
+      window.removeEventListener("scroll", scrollHandler, true);
+    };
+  }, [open]);
 
   return (
     <div ref={containerRef} className="relative inline-block">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`p-2.5 rounded-xl transition-all ${
@@ -60,7 +93,10 @@ export function RowActions({ actions }: RowActionsProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 w-36 bg-white rounded-xl border border-black/5 shadow-2xl z-50 p-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div
+          style={menuStyle}
+          className="w-36 bg-white rounded-xl border border-black/5 shadow-2xl z-[9999] p-1.5 animate-in fade-in slide-in-from-top-1 duration-150"
+        >
           {actions.map((action, i) => {
             const base =
               "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-bold transition-colors text-left";

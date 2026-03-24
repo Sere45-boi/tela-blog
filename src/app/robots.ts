@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/login/', '/_next/'],
     },
-    sitemap: 'https://tela.ng/sitemap.xml',
+    sitemap: 'https://blog.tela.ng/sitemap.xml',
   }
 }
