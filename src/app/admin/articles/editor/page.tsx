@@ -396,7 +396,7 @@ export default function ArticleEditor() {
                   <div className="p-10 rounded-[2.5rem] bg-white border border-[#dadce0] font-sans shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-full flex flex-col justify-between">
                     <div className="text-[#202124] text-sm mb-3 flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-white border border-black/5 overflow-hidden flex items-center justify-center">
-                        <img src="/images/logo.png" className="w-5 h-5 object-contain" alt="Tela" />
+                        <img src="/images/logo.PNG" className="w-5 h-5 object-contain" alt="Tela" />
                       </div>
                       <div>
                         <span className="block font-bold text-sm">Tela Insights</span>
