@@ -60,6 +60,7 @@ import { Toaster } from "sonner";
 import { PageTracker } from "@/components/layout/PageTracker";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { Suspense } from "react";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -87,6 +88,26 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </head>
       <body suppressHydrationWarning className={`${poppins.variable} ${bricolage.variable} font-sans bg-noise antialiased selection:bg-accent selection:text-accent-foreground`}>
+        {/* Google Analytics Tag */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX"}`}
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX"}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+
         <Suspense fallback={null}>
           <PageTracker />
         </Suspense>
