@@ -199,7 +199,7 @@ export default async function AdminDashboard() {
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-2 opacity-20">
-                        <img src="/images/logo.png" className="w-12 h-12 object-contain" alt="Tela" />
+                        <img src="/images/logo.PNG" className="w-12 h-12 object-contain" alt="Tela" />
                       </div>
                     )}
                   </div>

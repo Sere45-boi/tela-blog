@@ -567,7 +567,7 @@ export default function ArticleEditor() {
                         {authors.find(a => a.id === formData.author_id)?.full_name?.slice(0, 2).toUpperCase()}
                       </span>
                     ) : (
-                      <img src="/images/logo.png" className="w-6 h-6 object-contain grayscale opacity-50" alt="Author" />
+                      <img src="/images/logo.PNG" className="w-6 h-6 object-contain grayscale opacity-50" alt="Author" />
                     )}
                   </div>
                   <div className="text-left">
