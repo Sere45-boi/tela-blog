@@ -10,6 +10,8 @@ import { AdSpace } from "@/components/blog/AdSpace";
 import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
 import { EventLogger } from "@/components/blog/EventLogger";
+import { JSDOM } from "jsdom";
+import DOMPurify from "dompurify";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -133,6 +135,7 @@ export default async function ArticlePage({
           type="read"
           targetName={article.title}
           link={`/blog/${slug}`}
+          articleId={article.id}
         />
 
         {preview === "true" && (
@@ -150,7 +153,7 @@ export default async function ArticlePage({
 
               <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
                 <ChevronLeft className="w-4 h-4" />
-                Back to all articles
+                Back
               </Link>
 
               <header className="mb-12">
@@ -159,7 +162,7 @@ export default async function ArticlePage({
                     {(article.categories as any)?.name || "Insights"}
                   </span>
                 </div>
-                <h1 className="text-3xl md:text-4xl lg:text-[48px] font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-8 leading-[1.1]">
+                <h1 className="text-3xl md:text-[40px] lg:text-[48px] font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-8 leading-[1.1]">
                   {article.title}
                 </h1>
 
@@ -203,7 +206,7 @@ export default async function ArticlePage({
               {/* Article Content */}
               <div
                 className="max-w-none font-poppins leading-relaxed prose prose-lg prose-headings:font-bricolage prose-a:text-[#093C15] prose-img:rounded-2xl"
-                dangerouslySetInnerHTML={{ __html: article.content }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify(new JSDOM("").window as any).sanitize(article.content) }}
               />
 
               {/* Dynamic Ads from Backend */}
@@ -222,9 +225,11 @@ export default async function ArticlePage({
 
               {/* Bottom share bar */}
               <div className="mt-16 pt-8 border-t border-black/5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-4">
                   <p className="text-[15px] text-[#1d1d1f]/60 font-medium">Enjoyed this article? Share it with your network.</p>
-                  <SocialShareButtons title={article.title} slug={slug} />
+                  <div className="w-full sm:w-auto">
+                    <SocialShareButtons title={article.title} slug={slug} />
+                  </div>
                 </div>
               </div>
             </article>
@@ -294,7 +299,7 @@ export default async function ArticlePage({
 
         <footer className="py-10 border-t border-black/5">
           <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
-            © {new Date().getFullYear()} Tela Technologies. All rights reserved.
+            © {new Date().getFullYear()} Tela. All rights reserved.
           </div>
         </footer>
       </div>

@@ -16,22 +16,13 @@ interface AdFormProps {
 
 const SHAPE_OPTIONS = [
   {
-    value: "rectangle",
-    label: "Rectangle",
-    icon: LayoutTemplate,
-    aspectRatio: "video" as const,
-    desc: "Wide horizontal banner",
-    dims: "1200 × 628 px",
-    hint: "Best for article bottom ads and homepage ads. Recommended 16:9 ratio.",
-  },
-  {
     value: "square",
     label: "Square",
     icon: Square,
     aspectRatio: "square" as const,
     desc: "Equal-side ad unit",
     dims: "600 × 600 px",
-    hint: "Best for sidebar and social-style ads. Recommended 1:1 ratio.",
+    hint: "Optimized for all placements. Horizontal banners will now use square images with a refined layout.",
   },
 ];
 
@@ -45,7 +36,7 @@ export function AdEditorClient({ ad }: AdFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(ad?.image_url || "");
-  const [shape, setShape] = useState<"rectangle" | "square">(ad?.shape || "rectangle");
+  const [shape, setShape] = useState<"square">(ad?.shape || "square");
 
   const selectedShape = SHAPE_OPTIONS.find((s) => s.value === shape)!;
 
@@ -121,70 +112,7 @@ export function AdEditorClient({ ad }: AdFormProps) {
               </div>
             </div>
 
-            {/* Shape Selector */}
-            <div>
-              <label className="block text-[12px] font-bold text-[#1d1d1f]/40 uppercase tracking-widest mb-4">
-                Select Image Size
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {SHAPE_OPTIONS.map((opt) => {
-                  const Icon = opt.icon;
-                  const active = shape === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setShape(opt.value as "rectangle" | "square")}
-                      className={`relative flex flex-col items-start gap-3 p-5 rounded-2xl border-2 text-left transition-all group ${active
-                        ? "border-[#41cc00] bg-[#f3fbf3] shadow-sm"
-                        : "border-black/5 bg-black/[0.01] hover:border-black/10 hover:bg-white"
-                        }`}
-                    >
-                      {/* Shape Visual Preview */}
-                      <div className="w-full flex items-center justify-center py-4 rounded-xl bg-black/[0.03]">
-                        {opt.value === "rectangle" ? (
-                          <div className="w-28 h-16 rounded-lg border-2 border-dashed border-[#41cc00]/40 bg-[#41cc00]/5 flex items-center justify-center">
-                            <Maximize2 className="w-5 h-5 text-[#41cc00]/60" />
-                          </div>
-                        ) : (
-                          <div className="w-16 h-16 rounded-lg border-2 border-dashed border-[#093C15]/40 bg-[#093C15]/5 flex items-center justify-center">
-                            <Square className="w-5 h-5 text-[#093C15]/60" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between w-full">
-                        <div>
-                          <p className="font-bold text-[15px] text-[#1d1d1f]">{opt.label}</p>
-                          <p className="text-[12px] text-black/40 font-medium">{opt.desc}</p>
-                        </div>
-                        {active && (
-                          <div className="w-5 h-5 rounded-full bg-[#41cc00] flex items-center justify-center shrink-0">
-                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Dimension Badge */}
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/[0.04] border border-black/5">
-                        <Info className="w-3 h-3 text-black/30 shrink-0" />
-                        <span className="text-[11px] font-bold text-black/40 tracking-wide">{opt.dims}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Hint for selected shape */}
-              <div className="mt-4 flex items-start gap-2 p-4 rounded-xl bg-[#f3fbf3] border border-[#41cc00]/10">
-                <Info className="w-4 h-4 text-[#41cc00] mt-0.5 shrink-0" />
-                <p className="text-[12px] font-medium text-[#093C15]/70 leading-relaxed">
-                  {selectedShape.hint}
-                </p>
-              </div>
-            </div>
+            {/* Shape Info (Simplified since only Square is supported) */}
 
             {/* Image Upload + Fields — side by side, compact */}
             <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -259,25 +187,6 @@ export function AdEditorClient({ ad }: AdFormProps) {
               </div>
             </div>
 
-            {/* Article Image Dimension Guide */}
-            <div className="p-6 rounded-2xl bg-[#093C15]/[0.03] border border-[#093C15]/10">
-              <h4 className="text-[13px] font-bold text-[#093C15] mb-4 uppercase tracking-widest">
-                Image Dimension Guide
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  { label: "Rectangle Ad", dims: "1200 × 628 px", ratio: "16:9", note: "Article bottom / Homepage" },
-                  { label: "Square Ad", dims: "600 × 600 px", ratio: "1:1", note: "Sidebar / Social feed" },
-                  { label: "Article Cover", dims: "1200 × 630 px", ratio: "1.91:1", note: "Blog post featured image" },
-                ].map((item) => (
-                  <div key={item.label} className="flex flex-col gap-1 p-4 rounded-xl bg-white border border-black/5 shadow-sm">
-                    <span className="text-[11px] font-bold text-black/30 uppercase tracking-widest">{item.label}</span>
-                    <span className="text-[15px] font-bold text-[#1d1d1f] tabular-nums">{item.dims}</span>
-                    <span className="text-[11px] font-medium text-[#093C15]/60">{item.ratio} — {item.note}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* Actions */}
             <div className="pt-6 border-t border-black/5 flex justify-end gap-4">

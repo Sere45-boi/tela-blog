@@ -164,7 +164,7 @@ export function TrafficChart({ rawData, organicPct, readPct, otherPct }: Props) 
 
       {/* Chart */}
       <div className="h-[280px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={100}>
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -30, bottom: 0 }}>
             <defs>
               <linearGradient id="gradVisits" x1="0" y1="0" x2="0" y2="1">

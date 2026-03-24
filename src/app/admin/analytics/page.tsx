@@ -3,6 +3,7 @@ import { GsapReveal } from "@/components/GsapReveal";
 import { GlassCard } from "@/components/ui/Card";
 import { BarChart3, TrendingUp, Users, Clock, ArrowUpRight, Activity, BookOpen } from "lucide-react";
 import Link from "next/link";
+import { formatDuration } from "@/lib/utils";
 
 export const metadata = {
   title: "Analytics | Pulse by Tela",
@@ -26,8 +27,7 @@ export default async function AnalyticsPage() {
   const uniqueReaders = new Set(analyticsData.map((a) => a.reader_id)).size || Math.round(totalArticleViews * 0.85);
 
   const totalReadSeconds = analyticsData.reduce((acc, r) => acc + (r.read_time_seconds || 0), 0);
-  const avgReadSeconds = analyticsData.length > 0 ? Math.round(totalReadSeconds / analyticsData.length) : (totalArticleViews > 0 ? 180 : 0);
-  const avgReadTime = avgReadSeconds > 0 ? `${Math.floor(avgReadSeconds / 60)}m ${avgReadSeconds % 60}s` : "—";
+  const cumulativeReadTime = formatDuration(totalReadSeconds);
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
@@ -92,9 +92,9 @@ export default async function AnalyticsPage() {
       accent: "bg-blue-500/10 text-blue-600",
     },
     {
-      label: "Avg Read Time",
+      label: "Cumulative Read Time",
       sub: "Engagement",
-      value: avgReadTime,
+      value: cumulativeReadTime,
       icon: Clock,
       accent: "bg-orange-500/10 text-orange-600",
     },

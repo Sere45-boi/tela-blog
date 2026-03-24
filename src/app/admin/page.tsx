@@ -8,6 +8,7 @@ import { GsapReveal } from "@/components/GsapReveal";
 import { GlassCard } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { TrafficChart } from "@/components/admin/TrafficChart";
+import { formatDuration } from "@/lib/utils";
 
 export const metadata = { title: "Dashboard | Pulse by Tela" };
 
@@ -37,10 +38,7 @@ export default async function AdminDashboard() {
   // ---- Reader Attention ----
   const analyticsRows = analyticsRes.data || [];
   const totalReadSeconds = analyticsRows.reduce((acc, r) => acc + (r.read_time_seconds || 0), 0);
-  const avgReadTimeSeconds = analyticsRows.length > 0 ? Math.round(totalReadSeconds / analyticsRows.length) : (totalArticleViews > 0 ? 180 : 0); // 3m fallback
-  const avgReadTime = avgReadTimeSeconds > 0
-    ? `${Math.floor(avgReadTimeSeconds / 60)}m ${avgReadTimeSeconds % 60}s`
-    : "No data";
+  const cumulativeReadTime = formatDuration(totalReadSeconds);
   const uniqueReaders = new Set(analyticsRows.map((r) => r.reader_id)).size || Math.round(totalArticleViews * 0.85); // fallback estimate
 
   // ---- Logic to find the Top Performer ----
@@ -95,7 +93,7 @@ export default async function AdminDashboard() {
   const topCards = [
     { label: "Content Engagement", value: totalArticleViews.toLocaleString(), icon: TrendingUp, color: "bg-[#41cc00]", detail: `${totalPosts} total posts (${publishedCount} live)` },
     { label: "Unique Readers", value: uniqueReaders.toLocaleString(), icon: Eye, color: "bg-[#093C15]", detail: `~85% unique view rate` },
-    { label: "Reader Attention", value: avgReadTime, icon: Clock, color: "bg-orange-500", detail: "Avg engagement time" },
+    { label: "Cumulative Read Time", value: cumulativeReadTime, icon: Clock, color: "bg-orange-500", detail: "Total reader engagement" },
   ];
 
   const growthCards = [
@@ -148,7 +146,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Growth Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
         {growthCards.map((stat, i) => (
           <GsapReveal key={stat.label} direction="up" delay={0.25 + i * 0.08}>
             <div className="bg-white/40 backdrop-blur-md border border-black/5 rounded-xl p-4 flex items-center justify-between hover:bg-white transition-all shadow-sm group">

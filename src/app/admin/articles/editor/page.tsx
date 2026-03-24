@@ -16,6 +16,7 @@ import { GsapReveal } from "@/components/GsapReveal";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import DOMPurify from "dompurify";
 
 export default function ArticleEditor() {
   const router = useRouter();
@@ -599,7 +600,7 @@ export default function ArticleEditor() {
                   prose-blockquote:border-l-[#41cc00] prose-blockquote:bg-[#41cc00]/5 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:text-[#093C15]/80 prose-blockquote:font-medium prose-blockquote:italic
                   prose-img:rounded-3xl prose-img:shadow-2xl prose-img:border prose-img:border-black/5
                   marker:text-[#41cc00]"
-                dangerouslySetInnerHTML={{ __html: formData.content || "<p className='text-black/20 italic text-2xl text-center py-20 font-light'>Your story will unfold here...</p>" }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(formData.content || "<p className='text-black/20 italic text-2xl text-center py-20 font-light'>Your story will unfold here...</p>") }}
               />
 
               {/* Tags */}

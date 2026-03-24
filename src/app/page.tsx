@@ -6,6 +6,7 @@ import { FloatingIconsHero } from "@/components/ui/floating-icons-hero-section";
 import { SearchBar } from "@/components/blog/SearchBar";
 import { Suspense } from "react";
 import { BlogContent, BlogGridSkeleton } from "@/components/blog/HomeStreaming";
+import { IntercomClient } from "@/components/blog/IntercomClient";
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -13,13 +14,13 @@ export const revalidate = 3600; // Revalidate every hour
 // --- Business & Fintech Icons (Vibrant Multi-color Palette) ---
 const HERO_ICONS = [
   { id: 1, icon: 'stripe', className: 'top-[20%] left-[8%]', iconColor: 'text-[#635BFF]', bgColor: 'bg-indigo-50/80 shadow-[0_8px_30px_rgb(99,91,255,0.15)]' },
-  { id: 2, icon: 'vercel', className: 'top-[32%] right-[12%]', iconColor: 'text-slate-900', bgColor: 'bg-slate-50/80 shadow-[0_8px_30px_rgb(0,0,0,0.1)]' },
-  { id: 4, icon: 'briefcase', className: 'top-[48%] right-[6%]', iconColor: 'text-[#093C15]', bgColor: 'bg-green-50/80 shadow-[0_8px_30px_rgb(9,60,21,0.1)]' },
+  { id: 2, icon: 'vercel', className: 'hidden md:flex top-[32%] right-[12%]', iconColor: 'text-slate-900', bgColor: 'bg-slate-50/80 shadow-[0_8px_30px_rgb(0,0,0,0.1)]' },
+  { id: 4, icon: 'briefcase', className: 'hidden md:flex top-[48%] right-[6%]', iconColor: 'text-[#093C15]', bgColor: 'bg-green-50/80 shadow-[0_8px_30px_rgb(9,60,21,0.1)]' },
   { id: 5, icon: 'trending', className: 'bottom-[12%] right-[25%]', iconColor: 'text-[#41cc00]', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(65,204,0,0.15)]' },
   { id: 6, icon: 'chart', className: 'top-[12%] left-[15%]', iconColor: 'text-blue-600', bgColor: 'bg-blue-50/80 shadow-[0_8px_30px_rgb(37,99,235,0.15)]' },
   { id: 8, icon: 'globe', className: 'top-[62%] left-[12%]', iconColor: 'text-sky-600', bgColor: 'bg-sky-50/80 shadow-[0_8px_30px_rgb(2,132,199,0.15)]' },
   { id: 9, icon: 'wallet', className: 'bottom-[15%] left-[20%]', iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50/80 shadow-[0_8px_30px_rgb(16,185,129,0.15)]' },
-  { id: 10, icon: 'shield', className: 'bottom-[30%] right-[10%]', iconColor: 'text-violet-600', bgColor: 'bg-violet-50/80 shadow-[0_8_30px_rgb(124,58,237,0.15)]' },
+  { id: 10, icon: 'shield', className: 'hidden md:flex bottom-[30%] right-[10%]', iconColor: 'text-violet-600', bgColor: 'bg-violet-50/80 shadow-[0_8_30px_rgb(124,58,237,0.15)]' },
   { id: 11, icon: 'zap', className: 'top-[10%] right-[18%]', iconColor: 'text-yellow-600', bgColor: 'bg-yellow-50/80 shadow-[0_8px_30px_rgb(202,138,4,0.15)]' },
 ];
 
@@ -108,6 +109,7 @@ export default async function Home({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
+      <IntercomClient />
       <Navbar />
       <EventLogger type="visit" />
 
@@ -129,30 +131,32 @@ export default async function Home({
         </Suspense>
 
         {/* Ad Space after Featured */}
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <AdSpace position="home_middle" />
         </div>
 
         {/* MOBILE APP / AI SHOWCASE SECTION */}
-        <MobileAppShowcase />
+        <div className="overflow-hidden">
+          <MobileAppShowcase />
+        </div>
 
 
 
         {/* LIGHT NEWSLETTER SIGNUP SECTION */}
-        <section className="px-6 md:px-8 max-w-7xl mx-auto mb-32 relative">
+        <section className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto mb-20 md:mb-32 relative">
           <GsapReveal direction="up" className="relative group">
             {/* The subtle glow under the card */}
             <div className="absolute inset-x-12 -bottom-2 h-16 bg-[#41cc00] rounded-full blur-[40px] opacity-10 transform translate-y-2"></div>
 
             {/* The main light gradient card */}
-            <div className="bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] rounded-[2rem] p-8 md:p-14 relative z-10 border border-[#41cc00]/20 shadow-[0_10px_40px_rgba(0,0,0,0.04)] flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+            <div className="bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] rounded-[2rem] p-6 sm:p-8 md:p-14 relative z-10 border border-[#41cc00]/20 shadow-[0_10px_40px_rgba(0,0,0,0.04)] flex flex-col md:flex-row items-center gap-8 md:gap-12 lg:gap-20">
 
               {/* Left Side: Text Details */}
-              <div className="w-full md:w-1/2">
-                <h2 className="text-[40px] md:text-[48px] lg:text-[46px] font-bold leading-[1.1] mb-5 tracking-tight text-[#093C15] font-bricolage">
+              <div className="w-full md:w-1/2 text-center md:text-left">
+                <h2 className="text-[32px] sm:text-[40px] md:text-[48px] lg:text-[46px] font-bold leading-[1.1] mb-5 tracking-tight text-[#093C15] font-bricolage">
                   {siteSettings.newsletter_title}
                 </h2>
-                <p className="text-[#093C15]/70 text-[18px] leading-relaxed max-w-[360px] font-medium font-poppins">
+                <p className="text-[#093C15]/70 text-[16px] sm:text-[18px] leading-relaxed max-w-[360px] mx-auto md:mx-0 font-medium font-poppins">
                   {siteSettings.newsletter_description}
                 </p>
               </div>

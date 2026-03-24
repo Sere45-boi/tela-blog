@@ -13,9 +13,14 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
   ]);
 
   const featuredArticle = featuredArticleResult || null;
-  const articles = articlesResult?.data || [];
+  let articles = articlesResult?.data || [];
   const totalArticles = articlesResult?.count || 0;
   const totalPages = Math.ceil(totalArticles / limit);
+
+  // Filter out featured article from the grid to prevent duplication
+  if (featuredArticle && articles.length > 0) {
+    articles = articles.filter(a => a.id !== featuredArticle.id);
+  }
 
   return (
     <>

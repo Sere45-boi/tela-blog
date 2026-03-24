@@ -63,11 +63,11 @@ export function AdSpace({ position }: { position: string }) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleClick}
-          className="block relative overflow-hidden rounded-2xl border border-[#41cc00]/20 bg-gradient-to-b from-[#f0fbf0] to-white shadow-sm hover:shadow-lg transition-all duration-500"
+          className="block relative overflow-hidden rounded-2xl border border-[#41cc00]/20 bg-gradient-to-b from-[#f0fbf0] to-white transition-all duration-500"
         >
           {/* Square image with padding for premium look */}
           <div className="w-full p-3">
-            <div className="w-full aspect-video overflow-hidden rounded-xl shadow-sm border border-black/5 bg-white">
+            <div className="w-full aspect-square overflow-hidden rounded-xl border border-black/5 bg-white">
               <img
                 src={ad.image_url}
                 alt={ad.title}
@@ -100,7 +100,7 @@ export function AdSpace({ position }: { position: string }) {
     );
   }
 
-  // ── DEFAULT: horizontal card — Image Right, Text Left ─────────────────────
+  // ── DEFAULT: horizontal premium banner — Text Left, Square Image Right ────────
   return (
     <div className="w-full my-16 group relative">
       <a
@@ -108,67 +108,59 @@ export function AdSpace({ position }: { position: string }) {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="block relative overflow-hidden rounded-[2.5rem] border border-[#a294f9]/20 bg-[#f0e8ff]"
+        className="block relative overflow-hidden rounded-[2.5rem] bg-[#E6E0F8] border border-black/5"
       >
-        {/* Wavy Text Background Layer - Exact S-Curve inspired by reference */}
-        <div className="absolute inset-0 z-0 opacity-[0.12] pointer-events-none overflow-hidden">
-          <svg viewBox="0 0 800 250" className="w-full h-full preserve-3d" preserveAspectRatio="none">
+        {/* Curved Text Graphic (Inspired by reference) */}
+        <div className="absolute top-[-20%] right-[-5%] w-[60%] h-[140%] opacity-[0.4] pointer-events-none z-0">
+          <svg viewBox="0 0 400 400" className="w-full h-full rotate-[-15deg]">
             <path
-              id="adWavePathExact"
-              d="M-100,200 C100,300 300,-100 500,200 C700,500 900,0 1100,200"
+              id="curvePath"
+              d="M 100,200 A 100,100 0 0,1 300,200"
               fill="transparent"
-              stroke="transparent"
             />
-            <text className="text-[18px] font-bold uppercase tracking-[0.3em] fill-[#635BFF]">
-              <textPath href="#adWavePathExact" startOffset="0%">
-                {`${ad.title} • ${ad.title} • ${ad.title} • ${ad.title} • ${ad.title}`}
-                <animate
-                  attributeName="startOffset"
-                  from="0%"
-                  to="-25%"
-                  dur="25s"
-                  repeatCount="indefinite"
-                />
+            <text className="text-[14px] font-bold uppercase tracking-[0.2em] fill-[#635BFF]">
+              <textPath href="#curvePath" startOffset="0%">
+                {`${ad.title} • Premium Exclusive • ${ad.title} •`}
               </textPath>
             </text>
           </svg>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center gap-10 p-10 md:p-16 relative z-10">
+        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 p-8 md:p-14 relative z-10">
           {/* Left Side: Content */}
-          <div className="flex-1 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#635BFF]/30 text-[#635BFF] text-[11px] font-bold uppercase tracking-widest mb-6">
-              Sponsored
+          <div className="flex-1 text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1d1d1f]/10 bg-white/40 text-[#1d1d1f] text-[11px] font-bold uppercase tracking-widest mb-6 backdrop-blur-sm">
+              Sponsored Content
             </div>
-            <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold font-bricolage text-[#1d1d1f] mb-6 leading-[1.05] tracking-tighter">
+            <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold font-bricolage text-[#1d1d1f] mb-6 leading-[1.1] tracking-tighter">
               {ad.title}
             </h3>
             {ad.description && (
-              <p className="text-[#1d1d1f]/70 text-[18px] md:text-[20px] font-medium mb-8 leading-relaxed max-w-xl font-poppins">
+              <p className="text-[#1d1d1f]/60 text-[16px] md:text-[18px] font-medium mb-10 leading-relaxed max-w-xl">
                 {ad.description}
               </p>
             )}
-            <div className="flex items-center justify-center md:justify-start gap-4">
-              <div className="px-8 py-4 bg-[#635BFF] text-white rounded-full font-bold text-[16px] hover:scale-105 transition-transform duration-300 shadow-xl shadow-[#635BFF]/20 flex items-center gap-2">
-                Learn More <ExternalLink className="w-5 h-5" />
+            <div className="flex items-center gap-4">
+              <div className="px-8 py-3.5 bg-[#1d1d1f] text-white rounded-full font-bold text-[15px] hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                Learn More <ExternalLink className="w-4 h-4" />
               </div>
             </div>
           </div>
 
-          {/* Right Side: Horizontal Image Frame */}
-          <div className="w-full md:w-[48%] shrink-0">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-[6px] border-white/50 aspect-video bg-white">
+          {/* Right Side: Square Image Container */}
+          <div className="w-full md:w-[40%] shrink-0">
+            <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-white/50 backdrop-blur-md border border-white/20">
               <img
                 src={ad.image_url}
                 alt={ad.title}
-                className="w-full h-full object-contain transform transition-transform duration-1000 group-hover:scale-105"
+                className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-105"
               />
             </div>
           </div>
         </div>
 
-        {/* Subtle Noise for texture */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+        {/* Subtle texture/noise */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
       </a>
     </div>
   );

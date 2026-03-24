@@ -59,10 +59,10 @@ export function LoginClient() {
       <GsapReveal direction="up" className="w-full max-w-md relative z-10">
         <GlassCard className="relative overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.1)] border border-black/5 bg-white/90 backdrop-blur-3xl rounded-3xl p-8 md:p-10">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#41cc00] to-[#093C15] opacity-80"></div>
-          
+
           <div className="mb-10 text-center">
             <h1 className="mb-2 text-3xl tracking-tight text-[#1d1d1f] font-bricolage">
-              Tela <span className="font-bold text-[#093C15]">Insights</span>
+              Pulse by<span className="font-bold text-[#093C15]"> Tela</span>
             </h1>
             <p className="text-[15px] text-[#1d1d1f]/60 font-medium font-poppins">
               Sign in to access your administration dashboard.

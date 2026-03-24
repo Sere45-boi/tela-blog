@@ -22,8 +22,13 @@ export function PageTracker() {
       lastTrackedPath.current = currentPath;
 
       try {
+        let type = "other";
+        if (pathname === "/") type = "visit";
+        else if (pathname.startsWith("/blog/")) type = "read";
+
         await supabase.from("page_impressions").insert({
           path: pathname,
+          type,
           // Extract source from UTM if available, else direct
           source: searchParams.get("utm_source") || "direct",
           referrer: typeof document !== 'undefined' ? document.referrer : null,

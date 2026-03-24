@@ -28,7 +28,25 @@ export async function updateSession(request: NextRequest) {
   )
 
   // This will refresh the session if expired
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/admin')
+
+  // Protect admin routes: redirect unauthenticated users to login
+  if (isProtectedRoute && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+  
+  // Redirect authenticated users away from the login page
+  if (request.nextUrl.pathname.startsWith('/login') && user) {
+     const url = request.nextUrl.clone()
+     url.pathname = '/admin'
+     return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 }
