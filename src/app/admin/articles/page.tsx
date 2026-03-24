@@ -75,7 +75,7 @@ export default async function AdminArticlesList({
       <GsapReveal direction="up" delay={0.1}>
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-black/5 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
+            <table className="w-full min-w-[800px] text-sm text-left">
               <thead className="text-[11px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider bg-black/[0.02] border-b border-black/5">
                 <tr>
                   <th className="px-6 py-4">Post Title</th>

@@ -131,7 +131,7 @@ export default function ArticleEditor() {
     <div className="pb-0">
       <form onSubmit={(e) => handleSubmit(e, false)} className="max-w-6xl mx-auto px-6">
         {/* Superior Header - Following second user sketch */}
-        <GsapReveal direction="up" className="flex items-center justify-between h-24 mb-4">
+        <GsapReveal direction="up" className="flex flex-col sm:flex-row sm:items-center justify-between sm:h-24 mb-8 pt-8 sm:pt-0 gap-6">
           <div className="flex items-center gap-4">
             <button
               type="button"
@@ -145,7 +145,7 @@ export default function ArticleEditor() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Button
               type="button"
               variant="ghost"

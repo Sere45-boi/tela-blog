@@ -192,21 +192,23 @@ export default function CategoryManagementPage() {
         <div className="lg:col-span-8 h-full">
           <GsapReveal direction="up" delay={0.3} className="h-full">
             <GlassCard className="h-full overflow-hidden shadow-sm flex flex-col">
-              <div className="grid grid-cols-12 gap-4 p-5 md:px-8 border-b border-black/5 bg-black/[0.01] text-[11px] font-bold text-[#1d1d1f]/30 uppercase tracking-[0.15em]">
-                <div className="col-span-6 md:col-span-5">Category Name</div>
-                <div className="hidden md:block col-span-4">Slug</div>
-                <div className="col-span-2 text-center">Articles</div>
-                <div className="col-span-4 md:col-span-1 text-right">Actions</div>
-              </div>
-
-              <div className="divide-y divide-black/5">
-                {loading && categories.length === 0 ? (
-                  <div className="p-20 flex justify-center">
-                    <Loader2 className="h-10 w-10 animate-spin text-[#41cc00]" />
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px]">
+                  <div className="grid grid-cols-12 gap-4 p-5 md:px-8 border-b border-black/5 bg-black/[0.01] text-[11px] font-bold text-[#1d1d1f]/30 uppercase tracking-[0.15em]">
+                    <div className="col-span-6 md:col-span-5">Category Name</div>
+                    <div className="hidden md:block col-span-4">Slug</div>
+                    <div className="col-span-3 text-center">Articles</div>
+                    <div className="col-span-3 md:col-span-2 text-right">Actions</div>
                   </div>
-                ) : categories.map((category) => (
-                  <div key={category.id} className="grid grid-cols-12 gap-4 p-5 md:px-8 items-center hover:bg-[#f3fbf3]/50 transition-colors group">
-                    <div className="col-span-6 md:col-span-5">
+
+                  <div className="divide-y divide-black/5">
+                    {loading && categories.length === 0 ? (
+                      <div className="p-20 flex justify-center">
+                        <Loader2 className="h-10 w-10 animate-spin text-[#41cc00]" />
+                      </div>
+                    ) : categories.map((category) => (
+                      <div key={category.id} className="grid grid-cols-12 gap-4 p-5 md:px-8 items-center hover:bg-black/[0.04] transition-colors group">
+                        <div className="col-span-6 md:col-span-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-2xl bg-white border border-black/5 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
                           <Tag className="w-4 h-4 text-[#41cc00]" />
@@ -218,18 +220,18 @@ export default function CategoryManagementPage() {
                       </div>
                     </div>
 
-                    <div className="hidden md:block col-span-4">
-                      <span className="text-[12px] font-mono text-black/20 bg-black/[0.02] px-2 py-1 rounded-lg">/{category.slug}</span>
-                    </div>
+                        <div className="hidden md:block col-span-4">
+                          <span className="text-[12px] font-mono text-black/20 bg-black/[0.02] px-2 py-1 rounded-lg">/{category.slug}</span>
+                        </div>
 
-                    <div className="col-span-2 text-center">
-                      <div className="flex flex-col items-center">
-                        <span className="text-[16px] font-bold text-[#1d1d1f] leading-none">{category.article_count}</span>
-                        <span className="text-[10px] font-bold text-black/20 uppercase mt-1">Posts</span>
-                      </div>
-                    </div>
+                        <div className="col-span-3 text-center">
+                          <div className="flex flex-col items-center">
+                            <span className="text-[16px] font-bold text-[#1d1d1f] leading-none">{category.article_count}</span>
+                            <span className="text-[10px] font-bold text-black/20 uppercase mt-1">Posts</span>
+                          </div>
+                        </div>
 
-                    <div className="col-span-4 md:col-span-1 flex items-center justify-end gap-1">
+                        <div className="col-span-3 md:col-span-2 flex items-center justify-end gap-1">
                       <RowActions
                         actions={[
                           {
@@ -256,10 +258,12 @@ export default function CategoryManagementPage() {
                   </div>
                 )}
               </div>
-            </GlassCard>
-          </GsapReveal>
-        </div>
-      </div>
+            </div>
+          </div>
+        </GlassCard>
+      </GsapReveal>
     </div>
+  </div>
+</div>
   );
 }

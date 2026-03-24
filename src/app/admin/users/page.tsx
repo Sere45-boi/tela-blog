@@ -219,7 +219,7 @@ export default function UsersPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[800px] text-left border-collapse">
               <thead>
                 <tr className="bg-black/[0.02]">
                   <th className="px-6 py-4 text-[12px] font-bold text-[#1d1d1f]/40 uppercase tracking-wider">Author</th>

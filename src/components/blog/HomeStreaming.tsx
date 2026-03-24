@@ -110,10 +110,10 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
                         <div className="flex items-center gap-2 text-[11px] md:text-[12px] font-bold text-white/90 uppercase tracking-widest">
                           <Calendar className="w-3.5 h-3.5" />
                           <span suppressHydrationWarning>
-                            {new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric', 
-                              year: 'numeric' 
+                            {new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
                             })}
                           </span>
                         </div>
@@ -144,7 +144,7 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
           </div>
         ) : (
           <div className="py-20 text-center">
-            <h3 className="text-2xl font-bold text-[#1d1d1f]/30">No stories found matching your search.</h3>
+            <h3 className="text-2xl font-bold text-[#1d1d1f]/30">No article found</h3>
           </div>
         )}
 
@@ -152,7 +152,7 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
         {totalPages > 1 && (
           <div className="mt-24 flex items-center justify-center gap-4">
             {page > 1 && (
-              <Link 
+              <Link
                 href={`/?page=${page - 1}${search ? `&q=${search}` : ''}`}
                 className="w-10 h-10 rounded-lg flex items-center justify-center text-[#1d1d1f] hover:bg-black/5 transition-all"
               >
@@ -164,18 +164,17 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
               <Link
                 key={pageNum}
                 href={`/?page=${pageNum}${search ? `&q=${search}` : ''}`}
-                className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[15px] transition-all ${
-                  pageNum === page 
-                    ? "bg-[#41cc00] text-white shadow-lg shadow-[#41cc00]/20" 
+                className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[15px] transition-all ${pageNum === page
+                    ? "bg-[#41cc00] text-white shadow-lg shadow-[#41cc00]/20"
                     : "text-[#1d1d1f] hover:bg-black/5"
-                }`}
+                  }`}
               >
                 {pageNum}
               </Link>
             ))}
 
             {page < totalPages && (
-              <Link 
+              <Link
                 href={`/?page=${page + 1}${search ? `&q=${search}` : ''}`}
                 className="w-10 h-10 rounded-lg flex items-center justify-center text-[#1d1d1f] hover:bg-black/5 transition-all"
               >
@@ -201,9 +200,9 @@ export function BlogGridSkeleton() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-12">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div key={i} className="aspect-square relative flex flex-col rounded-[2.5rem] bg-black/5 animate-pulse overflow-hidden">
-               <div className="mt-auto p-4 flex flex-col items-center w-full">
-                 <div className="w-full max-w-[95%] h-32 bg-white/20 rounded-[2rem]" />
-               </div>
+              <div className="mt-auto p-4 flex flex-col items-center w-full">
+                <div className="w-full max-w-[95%] h-32 bg-white/20 rounded-[2rem]" />
+              </div>
             </div>
           ))}
         </div>
