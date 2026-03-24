@@ -1,16 +1,11 @@
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
-export async function proxy(request: NextRequest) {
-  // Update the session state by refreshing the token
-  const response = await updateSession(request)
-  
-  // Later we can add route protection logic here
-  // e.g., redirecting from /admin if user is not authorized
-  return response
+export async function middleware(request: NextRequest) {
+  return await updateSession(request);
 }
 
-export default proxy;
+export default middleware;
 
 export const config = {
   matcher: [
