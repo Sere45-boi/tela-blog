@@ -161,7 +161,18 @@ export default function NotificationsPage() {
                                  </div>
 
                                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button className="p-3 text-black/20 hover:text-red-500 rounded-xl hover:bg-red-500/5 transition-all">
+                                    <button
+                                       onClick={async () => {
+                                          const { error } = await supabase
+                                             .from("notifications")
+                                             .delete()
+                                             .eq("id", n.id);
+                                          if (!error) {
+                                             setNotifications(prev => prev.filter(item => item.id !== n.id));
+                                          }
+                                       }}
+                                       className="p-3 text-black/20 hover:text-red-500 rounded-xl hover:bg-red-500/5 transition-all"
+                                    >
                                        <Trash2 className="w-4 h-4" />
                                     </button>
                                  </div>
