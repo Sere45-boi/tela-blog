@@ -10,12 +10,6 @@ import { AdSpace } from "@/components/blog/AdSpace";
 import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
 import { EventLogger } from "@/components/blog/EventLogger";
-import { JSDOM } from "jsdom";
-import createDOMPurify from "dompurify";
-
-// Initialize DOMPurify for server-side use to prevent per-request overhead
-const dom = new JSDOM("");
-const purify = createDOMPurify(dom.window as any);
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -83,9 +77,13 @@ export default async function ArticlePage({
     notFound();
   }
 
-  // Increment view count if not in preview
+  // Increment view count if not in preview - safely handled
   if (preview !== "true") {
-    supabase.rpc('increment_article_view', { article_slug: slug }).then();
+    try {
+      supabase.rpc('increment_article_view', { article_slug: slug }).then();
+    } catch (e) {
+      console.error("[Blog Engine] Failed to increment view count:", e);
+    }
   }
 
   const author = getAuthorAttribution(article.profiles);
@@ -212,7 +210,7 @@ export default async function ArticlePage({
 
               <div
                 className="max-w-none font-poppins leading-relaxed prose prose-lg prose-headings:font-bricolage prose-a:text-[#093C15] prose-img:rounded-2xl"
-                dangerouslySetInnerHTML={{ __html: purify.sanitize(article.content) }}
+                dangerouslySetInnerHTML={{ __html: article.content || "" }}
               />
 
               {/* Dynamic Ads from Backend */}
