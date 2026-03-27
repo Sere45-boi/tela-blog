@@ -11,7 +11,11 @@ import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
 import { EventLogger } from "@/components/blog/EventLogger";
 import { JSDOM } from "jsdom";
-import DOMPurify from "dompurify";
+import createDOMPurify from "dompurify";
+
+// Initialize DOMPurify for server-side use to prevent per-request overhead
+const dom = new JSDOM("");
+const purify = createDOMPurify(dom.window as any);
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -73,6 +77,9 @@ export default async function ArticlePage({
   const { data: article, error } = await query.single();
 
   if (error || !article) {
+    if (error) {
+      console.error(`[Blog Engine] Error fetching article "${slug}":`, error.message, error.details);
+    }
     notFound();
   }
 
@@ -203,10 +210,9 @@ export default async function ArticlePage({
                 <SocialShareButtons title={article.title} slug={slug} />
               </div>
 
-              {/* Article Content */}
               <div
                 className="max-w-none font-poppins leading-relaxed prose prose-lg prose-headings:font-bricolage prose-a:text-[#093C15] prose-img:rounded-2xl"
-                dangerouslySetInnerHTML={{ __html: DOMPurify(new JSDOM("").window as any).sanitize(article.content) }}
+                dangerouslySetInnerHTML={{ __html: purify.sanitize(article.content) }}
               />
 
               {/* Dynamic Ads from Backend */}

@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
-  
+
   // Fetch published articles
   const { data: articles } = await supabase
     .from('articles')
@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from('categories')
     .select('slug')
 
-  const baseUrl = 'https://tela.ng'
+  const baseUrl = 'https://blog.tela.ng'
 
   const articleUrls = (articles || []).map((article) => ({
     url: `${baseUrl}/blog/${article.slug}`,
