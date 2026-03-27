@@ -9,7 +9,8 @@ export async function getPublishedArticles(page = 1, limit = 9, categorySlug?: s
       profiles (full_name, avatar_url, is_public),
       categories!inner(id, name, slug)
     `, { count: "exact" })
-    .eq("status", "published")
+    .or("status.eq.published,status.eq.scheduled")
+    .lte("published_at", new Date().toISOString())
     .order("published_at", { ascending: false });
 
   if (categorySlug) {
@@ -42,7 +43,8 @@ export async function getFeaturedArticle() {
       profiles (full_name, avatar_url, is_public),
       categories(name, slug)
     `)
-    .eq("status", "published")
+    .or("status.eq.published,status.eq.scheduled")
+    .lte("published_at", new Date().toISOString())
     .eq("is_featured", true)
     .order("published_at", { ascending: false })
     .limit(1)
@@ -77,7 +79,8 @@ export async function getArticleBySlug(slug: string) {
       profiles (full_name, avatar_url, bio, is_public),
       categories(name, slug)
     `)
-    .eq("status", "published")
+    .or("status.eq.published,status.eq.scheduled")
+    .lte("published_at", new Date().toISOString())
     .eq("slug", slug)
     .single();
 

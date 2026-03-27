@@ -45,6 +45,7 @@ export default function ArticleEditor() {
     meta_description: "",
     tags: [] as string[],
     read_time_minutes: 5,
+    published_at: new Date().toISOString(),
   });
 
   useEffect(() => {
@@ -73,6 +74,7 @@ export default function ArticleEditor() {
             meta_description: article.meta_description || "",
             tags: article.tags || [],
             read_time_minutes: article.read_time_minutes || 5,
+            published_at: article.published_at || new Date().toISOString(),
           });
         }
       } else {
@@ -237,6 +239,20 @@ export default function ArticleEditor() {
                       <option value="scheduled">Scheduled</option>
                     </select>
                   </div>
+
+                  {(formData.status === "scheduled" || formData.status === "published") && (
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-black/30 uppercase ml-1">
+                        {formData.status === "scheduled" ? "Schedule For" : "Public Date"}
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="w-full h-12 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-bold text-[#1d1d1f] focus:outline-none"
+                        value={new Date(formData.published_at).toISOString().slice(0, 16)}
+                        onChange={e => setFormData({ ...formData, published_at: new Date(e.target.value).toISOString() })}
+                      />
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <label className="text-[11px] font-bold text-black/30 uppercase ml-1">Author</label>

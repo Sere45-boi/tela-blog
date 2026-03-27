@@ -19,7 +19,7 @@ export default async function AdminArticlesList({
 
   let query = supabase
     .from("articles")
-    .select("id, title, slug, status, published_at, view_count, is_featured, category_id, categories(name), profiles(full_name)")
+    .select("id, title, slug, status, published_at, created_at, view_count, is_featured, category_id, categories(name), profiles(full_name)")
     .order("created_at", { ascending: false });
 
   if (category) {
@@ -94,10 +94,21 @@ export default async function AdminArticlesList({
                       {article.is_featured && <span className="ml-2 text-[9px] bg-[#41cc00]/10 font-bold text-[#093C15] px-2 py-0.5 rounded-full uppercase tracking-widest">Featured</span>}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`capitalize inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase ${article.status === 'published' ? 'bg-[#41cc00]/10 text-[#093C15]' : 'bg-yellow-500/10 text-yellow-600'
-                        }`}>
-                        {article.status}
-                      </span>
+                      {article.status === 'published' && new Date(article.published_at) > new Date() ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-blue-500/10 text-blue-600">
+                          Scheduled
+                        </span>
+                      ) : (
+                        <span className={`capitalize inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase ${article.status === 'published' ? 'bg-[#41cc00]/10 text-[#093C15]' :
+                          article.status === 'scheduled' ? 'bg-blue-500/10 text-blue-600' :
+                            'bg-yellow-500/10 text-yellow-600'
+                          }`}>
+                          {article.status}
+                        </span>
+                      )}
+                      <div className="text-[10px] text-[#1d1d1f]/40 font-bold mt-1 uppercase">
+                        {new Date(article.published_at || article.created_at).toLocaleDateString()}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-[#1d1d1f]/60 font-medium">
                       {(article.profiles as any)?.full_name || "—"}

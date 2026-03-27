@@ -53,6 +53,7 @@ export async function upsertArticle(articleData: {
   tags?: string[];
   read_time_minutes?: number;
   author_id?: string;
+  published_at?: string | null;
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -73,7 +74,7 @@ export async function upsertArticle(articleData: {
     meta_title: sanitizeString(coreArticleData.meta_title),
     meta_description: sanitizeString(coreArticleData.meta_description),
     author_id: finalAuthorId,
-    ...(articleData.status === "published" && !articleData.id ? { published_at: new Date().toISOString() } : {})
+    published_at: articleData.published_at || (articleData.status !== 'draft' ? new Date().toISOString() : null)
   };
 
   const { data, error } = await supabase

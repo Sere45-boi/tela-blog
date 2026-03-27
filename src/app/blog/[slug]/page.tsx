@@ -58,14 +58,16 @@ export default async function ArticlePage({
   const supabase = await createClient();
 
   // Fetch article with author and category
-  const query = supabase
+  let query = supabase
     .from("articles")
     .select("*, profiles(full_name, avatar_url, bio, is_public), categories(name)")
     .eq("slug", slug);
 
-  // If not preview mode, only show published articles
+  // If not preview mode, only show articles that are live (published/scheduled and past date)
   if (preview !== "true") {
-    query.eq("status", "published");
+    query = query
+      .or("status.eq.published,status.eq.scheduled")
+      .lte("published_at", new Date().toISOString());
   }
 
   const { data: article, error } = await query.single();

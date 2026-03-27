@@ -4,11 +4,12 @@ import { createClient } from '@/utils/supabase/server'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
 
-  // Fetch published articles
+  // Fetch live articles (published or scheduled and past publication date)
   const { data: articles } = await supabase
     .from('articles')
     .select('slug, updated_at')
-    .eq('status', 'published')
+    .or('status.eq.published,status.eq.scheduled')
+    .lte('published_at', new Date().toISOString())
 
   const { data: categories } = await supabase
     .from('categories')
