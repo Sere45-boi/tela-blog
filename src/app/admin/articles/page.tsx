@@ -7,7 +7,7 @@ import { deleteArticle } from "@/app/actions/content";
 import { DeleteArticleButton } from "@/components/admin/DeleteArticleButton";
 
 export const metadata = {
-  title: "Post Management | Pulse by Tela",
+  title: "Post Management",
 };
 
 export default async function AdminArticlesList({

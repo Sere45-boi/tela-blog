@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { TrafficChart } from "@/components/admin/TrafficChart";
 import { formatDuration } from "@/lib/utils";
 
-export const metadata = { title: "Dashboard | Pulse by Tela" };
+export const metadata = { title: "Dashboard" };
 
 export default async function AdminDashboard() {
   const supabase = await createClient();
