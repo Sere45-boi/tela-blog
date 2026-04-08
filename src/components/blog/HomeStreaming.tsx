@@ -27,36 +27,63 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
       {featuredArticle && (
         <section className="px-6 md:px-8 max-w-7xl mx-auto mb-16 relative">
           <GsapReveal direction="up">
-            <Link href={`/blog/${featuredArticle.slug}`} className="group block relative rounded-[2.5rem] overflow-hidden bg-white shadow-[0_10px_40px_rgb(0,0,0,0.06)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.12)] transition-shadow duration-500 border border-black/5">
-              <div className="w-full aspect-[16/9] md:aspect-[2.2/1] shrink-0 relative bg-[#1a1a1a] overflow-hidden">
+            <Link href={`/blog/${featuredArticle.slug}`} className="group flex flex-col md:flex-row gap-8 lg:gap-16 rounded-[3.5rem] overflow-hidden bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:shadow-[0_45px_100px_rgba(0,0,0,0.15)] transition-all duration-700 border border-black/5 p-6 md:p-10 lg:p-12 items-center">
+              {/* Image Section */}
+              <div className="w-full md:w-[45%] lg:w-[42%] aspect-[4/3] md:aspect-square shrink-0 relative bg-[#f5f5f7] rounded-[2.5rem] overflow-hidden shadow-sm">
                 <img
                   src={featuredArticle.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
                   alt={featuredArticle.title}
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                   loading="eager"
                 />
+                <div className="absolute top-6 left-6">
+                  <span className="px-5 py-2 rounded-full bg-white/90 backdrop-blur-md text-[#093C15] text-[13px] font-bold uppercase tracking-wider shadow-sm border border-white/20">
+                    Featured Story
+                  </span>
+                </div>
               </div>
-              <div className="p-8 md:p-10 w-full bg-white">
-                <h2 className="text-2xl md:text-3xl lg:text-[30px] font-bold leading-[1.15] mb-4 tracking-tight text-[#1d1d1f] font-bricolage">
-                  {featuredArticle.title}
-                </h2>
-                <p className="text-[#1d1d1f]/60 text-[17px] md:text-[18px] leading-relaxed font-medium line-clamp-3 mb-6 font-poppins">
-                  {getCleanExcerpt(featuredArticle.content || featuredArticle.excerpt, 260)}
-                </p>
-                <div className="flex items-center gap-3">
-                  {(() => {
-                    const author = getAuthorAttribution(featuredArticle.profiles);
-                    return (
-                      <>
-                        <img
-                          src={author.avatar_url}
-                          alt={author.name}
-                          className="w-10 h-10 rounded-full object-cover border border-black/5"
-                        />
-                        <span className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wide">{author.name}</span>
-                      </>
-                    );
-                  })()}
+
+              {/* Content Section */}
+              <div className="flex flex-col flex-1 py-4 md:py-8 h-full">
+                <div className="flex-1">
+                  <h2 className="text-[28px] md:text-[36px] lg:text-[46px] font-bold leading-[1.05] mb-6 tracking-tight text-[#1d1d1f] font-bricolage group-hover:text-[#093C15] transition-colors duration-500">
+                    {featuredArticle.title}
+                  </h2>
+                  <p className="text-[#1d1d1f]/60 text-[17px] md:text-[19px] lg:text-[21px] leading-relaxed font-medium line-clamp-3 mb-10 font-poppins">
+                    {getCleanExcerpt(featuredArticle.content || featuredArticle.excerpt, 220)}
+                  </p>
+                </div>
+                
+                <div className="flex flex-wrap items-center justify-between gap-6 pt-8 border-t border-black/5 mt-auto">
+                  <div className="flex items-center gap-4">
+                    {(() => {
+                      const author = getAuthorAttribution(featuredArticle.profiles);
+                      return (
+                        <>
+                          <img
+                            src={author.avatar_url}
+                            alt={author.name}
+                            className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-white shadow-md"
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-[16px] md:text-[17px] font-bold text-[#1d1d1f] tracking-tight">{author.name}</span>
+                            <span className="text-[12px] text-[#1d1d1f]/40 font-bold uppercase tracking-widest mt-0.5">Storyteller</span>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                  
+                  <div className="flex items-center gap-2.5 text-[14px] font-bold text-[#1d1d1f]/30 uppercase tracking-[0.12em] font-poppins bg-black/5 px-4 py-2 rounded-full">
+                    <Calendar className="w-4 h-4 opacity-70" />
+                    <span suppressHydrationWarning>
+                      {new Date(featuredArticle.published_at || featuredArticle.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </div>
                 </div>
               </div>
             </Link>
@@ -192,8 +219,22 @@ export function BlogGridSkeleton() {
   return (
     <div className="space-y-16">
       {/* Featured Skeleton */}
-      <section className="px-6 md:px-8 max-w-7xl mx-auto">
-        <div className="w-full h-[400px] bg-black/5 animate-pulse rounded-[2.5rem]" />
+      <section className="px-6 md:px-8 max-w-7xl mx-auto mb-16">
+        <div className="w-full h-[600px] md:h-[500px] lg:h-[600px] bg-black/5 animate-pulse rounded-[3.5rem] flex flex-col md:flex-row p-6 md:p-12 gap-8 lg:gap-16 items-center">
+          <div className="w-full md:w-[45%] aspect-square bg-black/5 rounded-[2.5rem]" />
+          <div className="flex-1 space-y-6">
+            <div className="h-10 w-2/3 bg-black/5 rounded-xl" />
+            <div className="h-6 w-full bg-black/5 rounded-lg" />
+            <div className="h-6 w-full bg-black/5 rounded-lg" />
+            <div className="h-20 w-full pt-8 border-t border-black/5 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-black/5" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-24 bg-black/5 rounded" />
+                <div className="h-3 w-16 bg-black/5 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       {/* Grid Skeleton */}
       <section className="container mx-auto px-6 md:px-8 max-w-7xl mb-16">
