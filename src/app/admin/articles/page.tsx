@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Plus, Edit2, Trash2, Eye } from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
 import { deleteArticle } from "@/app/actions/content";
+import { DeleteArticleButton } from "@/components/admin/DeleteArticleButton";
 
 export const metadata = {
   title: "Post Management | Pulse by Tela",
@@ -119,7 +120,7 @@ export default async function AdminArticlesList({
                     <td className="px-6 py-4 text-right tabular-nums text-[#1d1d1f]/60 font-medium">
                       {article.view_count.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
+                    <td className="px-6 py-4 text-right space-x-2 flex items-center justify-end">
                       <Link
                         href={`/blog/${article.slug}?preview=true`}
                         target="_blank"
@@ -135,11 +136,7 @@ export default async function AdminArticlesList({
                       >
                         <Edit2 className="h-4 w-4" />
                       </Link>
-                      <form action={deleteArticle.bind(null, article.id)} className="inline-block">
-                        <button className="p-2 text-[#1d1d1f]/40 hover:text-red-500 transition-colors" title="Delete">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </form>
+                      <DeleteArticleButton id={article.id} title={article.title} />
                     </td>
                   </tr>
                 ))}
