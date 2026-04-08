@@ -24,7 +24,8 @@ export default function ArticleEditor() {
   const id = searchParams.get("id");
   const supabase = createClient();
 
-  const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [authors, setAuthors] = useState<any[]>([]);
   const [tagInput, setTagInput] = useState("");
@@ -125,7 +126,8 @@ export default function ArticleEditor() {
       return;
     }
 
-    setLoading(true);
+    if (isPublishing) setIsPublishing(true);
+    else setIsSaving(true);
 
     const read_time = calculateReadTime(formData.content);
 
@@ -158,7 +160,8 @@ export default function ArticleEditor() {
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Error saving article");
-      setLoading(false);
+      setIsSaving(false);
+      setIsPublishing(false);
     }
   };
 
@@ -192,7 +195,8 @@ export default function ArticleEditor() {
             <Button
               type="submit"
               variant="secondary"
-              isLoading={loading}
+              isLoading={isSaving}
+              disabled={isPublishing}
               className="h-10 px-5 rounded-xl text-[13px] font-bold border-black/5 bg-white shadow-sm flex items-center gap-2"
             >
               <Save className="w-4 h-4" /> Save Draft
@@ -201,7 +205,8 @@ export default function ArticleEditor() {
               type="button"
               onClick={(e) => handleSubmit(e, true)}
               variant="primary"
-              isLoading={loading}
+              isLoading={isPublishing}
+              disabled={isSaving}
               className="h-10 px-6 rounded-xl text-[13px] font-bold bg-[#093C15] text-white flex items-center gap-2 shadow-lg"
             >
               <Send className="w-4 h-4" /> Publish
