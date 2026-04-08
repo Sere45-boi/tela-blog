@@ -25,18 +25,15 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   const docInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Initialize editor only once to avoid re-rendering issues and cursor resets
-  React.useEffect(() => {
-    if (editorRef.current && !editorRef.current.innerHTML && value) {
-      editorRef.current.innerHTML = value;
-    }
-  }, []);
-
-  // Sync internal content with external changes only if necessary (e.g. from state loads)
+  // Initialize editor and sync changes from outside (e.g. database load)
   React.useEffect(() => {
     if (editorRef.current && value !== editorRef.current.innerHTML) {
-      // Small optimization: only update if the change came from outside (not from user typing)
-      // This happens normally when an article is loaded initially or reset.
+      // Only set innerHTML if the editor is not currently focused 
+      // OR if this is the initial hydration of content.
+      // This prevents the cursor from jumping to the start while the user is typing.
+      if (document.activeElement !== editorRef.current || !editorRef.current.innerHTML) {
+        editorRef.current.innerHTML = value || "";
+      }
     }
   }, [value]);
 
