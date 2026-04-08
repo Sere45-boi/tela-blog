@@ -286,8 +286,11 @@ export default function ArticleEditor() {
                       <input
                         type="datetime-local"
                         className="w-full h-12 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-bold text-[#1d1d1f] focus:outline-none"
-                        value={formData.published_at ? new Date(formData.published_at).toISOString().slice(0, 16) : ""}
-                        onChange={e => setFormData({ ...formData, published_at: new Date(e.target.value).toISOString() })}
+                        value={formData.published_at ? new Date(new Date(formData.published_at).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                        onChange={e => {
+                          const date = new Date(e.target.value);
+                          setFormData({ ...formData, published_at: date.toISOString() });
+                        }}
                       />
                     </div>
                   )}
