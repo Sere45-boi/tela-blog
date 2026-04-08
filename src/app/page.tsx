@@ -60,9 +60,9 @@ export async function generateMetadata(): Promise<Metadata> {
     authors: [{ name: "Pulse by TELA" }],
 
     openGraph: {
-      title: "AI-Powered Solutions for SMEs | Pulse by TELA",
+      title: "Insights for SMEs | Pulse by TELA",
       description,
-      url: "https://tela.ng",
+      url: "https://blog.tela.ng",
       siteName: "Pulse by Tela",
       images: [
         {

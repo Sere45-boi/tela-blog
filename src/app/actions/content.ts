@@ -61,12 +61,12 @@ export async function upsertArticle(articleData: {
   if (!user) throw new Error("Unauthorized");
 
   // Determine actual author (defaults to current user if not provided)
-  const finalAuthorId = articleData.author_id || user.id;
+  const finalAuthorId = (articleData.author_id && articleData.author_id !== "") ? articleData.author_id : user.id;
 
   // Omit tags and other fields that shouldn't go directly into the articles table
-  const { tags, ...coreArticleData } = articleData;
+  const { tags, id, ...coreArticleData } = articleData;
 
-  const payload = {
+  const payload: any = {
     ...coreArticleData,
     title: sanitizeString(coreArticleData.title) as string,
     content: sanitizeString(coreArticleData.content) as string,
@@ -74,8 +74,16 @@ export async function upsertArticle(articleData: {
     meta_title: sanitizeString(coreArticleData.meta_title),
     meta_description: sanitizeString(coreArticleData.meta_description),
     author_id: finalAuthorId,
-    published_at: articleData.published_at || (articleData.status !== 'draft' ? new Date().toISOString() : null)
+    category_id: (articleData.category_id && articleData.category_id !== "") ? articleData.category_id : null,
+    status: articleData.status,
+    published_at: articleData.status === 'published' 
+      ? (articleData.published_at || new Date().toISOString())
+      : (articleData.status === 'scheduled' ? articleData.published_at : null)
   };
+
+  if (id) {
+    payload.id = id;
+  }
 
   const { data, error } = await supabase
     .from("articles")

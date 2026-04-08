@@ -45,7 +45,7 @@ export default function ArticleEditor() {
     meta_description: "",
     tags: [] as string[],
     read_time_minutes: 5,
-    published_at: new Date().toISOString(),
+    published_at: "",
   });
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function ArticleEditor() {
             meta_description: article.meta_description || "",
             tags: article.tags || [],
             read_time_minutes: article.read_time_minutes || 5,
-            published_at: article.published_at || new Date().toISOString(),
+            published_at: article.published_at || "",
           });
         }
       } else {
@@ -86,6 +86,13 @@ export default function ArticleEditor() {
     }
     load();
   }, [id, supabase]);
+
+  // Sync published_at when status changes to published, but don't overwrite if it already has a value (e.g. editing)
+  useEffect(() => {
+    if (formData.status === "published" && !formData.published_at) {
+      setFormData(prev => ({ ...prev, published_at: new Date().toISOString() }));
+    }
+  }, [formData.status, formData.published_at]);
 
   const calculateReadTime = (content: string) => {
     const wordsPerMinute = 200;
@@ -107,24 +114,50 @@ export default function ArticleEditor() {
 
   const handleSubmit = async (e: React.FormEvent, isPublishing = false) => {
     if (e) e.preventDefault();
+
+    // Basic Validation
+    if (!formData.title.trim()) {
+      toast.error("Please enter a title");
+      return;
+    }
+    if (!formData.content.trim()) {
+      toast.error("Please enter some content");
+      return;
+    }
+
     setLoading(true);
 
     const read_time = calculateReadTime(formData.content);
 
     try {
-      const statusToSave = isPublishing ? "published" : formData.status;
+      // Logic: 
+      // If clicking "Publish" button: 
+      //   - if status is already "scheduled", keep it "scheduled" (it will use the set date)
+      //   - else, force to "published"
+      // If clicking "Save Draft" button:
+      //   - use current formData.status
+      let statusToSave = formData.status;
+      if (isPublishing) {
+        statusToSave = formData.status === "scheduled" ? "scheduled" : "published";
+      }
+
       await upsertArticle({
         ...(id ? { id } : {}),
         ...formData,
         read_time_minutes: read_time,
         status: statusToSave,
       });
-      toast.success(isPublishing ? "Article published!" : "Draft saved!");
+
+      let successMsg = "Draft saved!";
+      if (statusToSave === "published") successMsg = "Article published!";
+      if (statusToSave === "scheduled") successMsg = "Article scheduled!";
+
+      toast.success(successMsg);
       router.push("/admin/articles");
       router.refresh();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Error saving article");
+      toast.error(err.message || "Error saving article");
       setLoading(false);
     }
   };
@@ -191,7 +224,7 @@ export default function ArticleEditor() {
                     title: e.target.value,
                     slug: id ? formData.slug : e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
                   })}
-                  placeholder="Enter your compelling title..."
+                  placeholder="Enter title..."
                   className="w-full text-3xl font-bold font-bricolage text-[#1d1d1f] placeholder-black/10 focus:outline-none resize-none leading-tight overflow-hidden bg-black/[0.02] px-6 py-4 rounded-2xl border border-black/5"
                   rows={1}
                   onInput={(e) => {
@@ -240,17 +273,28 @@ export default function ArticleEditor() {
                     </select>
                   </div>
 
-                  {(formData.status === "scheduled" || formData.status === "published") && (
+                  {formData.status === "scheduled" && (
                     <div className="space-y-2">
                       <label className="text-[11px] font-bold text-black/30 uppercase ml-1">
-                        {formData.status === "scheduled" ? "Schedule For" : "Public Date"}
+                        Schedule For
                       </label>
                       <input
                         type="datetime-local"
                         className="w-full h-12 rounded-xl border border-black/5 bg-black/[0.02] px-4 text-sm font-bold text-[#1d1d1f] focus:outline-none"
-                        value={new Date(formData.published_at).toISOString().slice(0, 16)}
+                        value={formData.published_at ? new Date(formData.published_at).toISOString().slice(0, 16) : ""}
                         onChange={e => setFormData({ ...formData, published_at: new Date(e.target.value).toISOString() })}
                       />
+                    </div>
+                  )}
+
+                  {formData.status === "published" && (
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-black/30 uppercase ml-1">
+                        Made Public On
+                      </label>
+                      <div className="w-full h-12 rounded-xl border border-black/5 bg-black/[0.02] px-4 flex items-center text-sm font-bold text-[#41cc00]">
+                        <CheckCircle2 className="w-4 h-4 mr-2" /> Published Now
+                      </div>
                     </div>
                   )}
 
@@ -493,7 +537,7 @@ export default function ArticleEditor() {
       {/* Premium Cinematic Preview Overlay */}
       {isPreviewing && (
         <div data-lenis-prevent className="fixed inset-0 z-[100] bg-[#f8fcf8] overflow-y-auto overflow-x-hidden overscroll-contain animate-in fade-in zoom-in-95 duration-500 font-poppins selection:bg-[#41cc00]/30 selection:text-[#093C15]">
-          
+
           {/* Subtle Background Elements */}
           <div className="fixed inset-0 pointer-events-none overflow-hidden">
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#41cc00]/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2" />
@@ -512,14 +556,14 @@ export default function ArticleEditor() {
                   <div className="text-[14px] font-bold text-[#1d1d1f] leading-none max-w-[200px] truncate">{formData.title || "Untitled Draft"}</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-black/[0.03] border border-black/5 mr-2">
                   <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                   <span className="text-[11px] font-bold text-black/50 uppercase tracking-widest">{formData.status}</span>
                 </div>
-                <Button 
-                  onClick={() => setIsPreviewing(false)} 
+                <Button
+                  onClick={() => setIsPreviewing(false)}
                   variant="secondary"
                   className="h-10 rounded-full px-6 bg-black/[0.03] border-none hover:bg-black/10 text-[#1d1d1f] font-bold shadow-none transition-all group"
                 >
@@ -532,14 +576,14 @@ export default function ArticleEditor() {
 
           {/* Main Editorial Content */}
           <div className="relative z-10 w-full max-w-[900px] mx-auto pt-40 pb-32 px-6 sm:px-12">
-            
+
             {/* Hero Image */}
             {formData.featured_image ? (
               <GsapReveal direction="up" delay={0.1} className="w-full aspect-[21/9] rounded-[2.5rem] overflow-hidden mb-16 shadow-[0_30px_100px_rgba(0,0,0,0.12)] relative ring-1 ring-black/5 bg-black/5 group">
-                <img 
-                  src={formData.featured_image} 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
-                  alt="Featured Hero" 
+                <img
+                  src={formData.featured_image}
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  alt="Featured Hero"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </GsapReveal>
@@ -564,7 +608,7 @@ export default function ArticleEditor() {
                   </span>
                 )}
               </div>
-              
+
               <h1 className="text-5xl sm:text-7xl font-bold text-[#1d1d1f] font-bricolage mb-8 leading-[1.1] tracking-tighter text-balance">
                 {formData.title || "Your New Masterpiece Begins Here"}
               </h1>
@@ -595,9 +639,9 @@ export default function ArticleEditor() {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-black/10" />
-                
+
                 <div className="flex items-center gap-3 text-black/40 text-[12px] font-bold uppercase tracking-widest bg-black/[0.02] px-5 py-2.5 rounded-2xl border border-black/5">
                   <Timer className="w-4 h-4 text-[#41cc00]" />
                   <span>{calculateReadTime(formData.content)} Minute Read</span>
