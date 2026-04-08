@@ -53,7 +53,7 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
                     {getCleanExcerpt(featuredArticle.content || featuredArticle.excerpt, 220)}
                   </p>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center justify-between gap-6 pt-8 border-t border-black/5 mt-auto">
                   <div className="flex items-center gap-4">
                     {(() => {
@@ -73,7 +73,7 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
                       );
                     })()}
                   </div>
-                  
+
                   <div className="flex items-center gap-2.5 text-[14px] font-bold text-[#1d1d1f]/30 uppercase tracking-[0.12em] font-poppins bg-black/5 px-4 py-2 rounded-full">
                     <Calendar className="w-4 h-4 opacity-70" />
                     <span suppressHydrationWarning>
@@ -192,8 +192,8 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
                 key={pageNum}
                 href={`/?page=${pageNum}${search ? `&q=${search}` : ''}`}
                 className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[15px] transition-all ${pageNum === page
-                    ? "bg-[#41cc00] text-white shadow-lg shadow-[#41cc00]/20"
-                    : "text-[#1d1d1f] hover:bg-black/5"
+                  ? "bg-[#41cc00] text-white shadow-lg shadow-[#41cc00]/20"
+                  : "text-[#1d1d1f] hover:bg-black/5"
                   }`}
               >
                 {pageNum}
