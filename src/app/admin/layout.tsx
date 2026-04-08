@@ -73,7 +73,7 @@ export default function AdminLayout({
       const prof = profileRes.data;
       if (!prof || (prof.role !== "admin" && prof.role !== "author") || prof.is_active === false) {
         setProfile({ unauthorized: true, reason: !prof ? "Missing Profile" : prof.is_active === false ? "Account Deactivated" : "Insufficient Permissions" });
-        setLoading(false); 
+        setLoading(false);
         return;
       }
 
@@ -101,7 +101,7 @@ export default function AdminLayout({
               ? "Your account has been deactivated by an administrator."
               : "You do not have the required permissions to view the dashboard."}
           </p>
-          <button 
+          <button
             onClick={async () => {
               await signOut();
               window.location.href = '/login';
@@ -125,7 +125,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-poppins selection:bg-[#41cc00]/30 selection:text-[#093C15]">
       {/* Sidebar Navigation */}
-      <aside 
+      <aside
         className={`fixed inset-y-0 left-0 bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 flex flex-col z-50 overflow-hidden shadow-sm transition-all duration-300 
         ${isSidebarOpen || isMobileMenuOpen ? 'w-[280px]' : 'w-[80px]'} 
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
@@ -178,12 +178,12 @@ export default function AdminLayout({
 
         <div className="mt-auto border-t border-black/5 bg-black/[0.02]">
           <Link href="/admin/profile" className={`p-4 block hover:bg-black/[0.04] ${(!isSidebarOpen && !isMobileMenuOpen) && 'flex justify-center'}`}>
-             <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl overflow-hidden border border-black/5 bg-black/5 flex items-center justify-center shrink-0">
-                  {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-xs">U</span>}
-                </div>
-                {(isSidebarOpen || isMobileMenuOpen) && <span className="text-[14px] font-bold truncate">{profile?.full_name || 'Admin'}</span>}
-             </div>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl overflow-hidden border border-black/5 bg-black/5 flex items-center justify-center shrink-0">
+                {profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <span className="text-xs">U</span>}
+              </div>
+              {(isSidebarOpen || isMobileMenuOpen) && <span className="text-[14px] font-bold truncate">{profile?.full_name || 'Admin'}</span>}
+            </div>
           </Link>
           <button onClick={async () => { await signOut(); window.location.href = "/login"; }} className="w-full flex items-center gap-3 px-8 py-4 text-red-500 hover:bg-red-50 border-t border-black/5">
             <LogOut className="w-4 h-4" />
@@ -199,20 +199,20 @@ export default function AdminLayout({
           <div className="flex items-center gap-4">
             <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 rounded-xl bg-black/5 text-[#093C15]"><Menu size={20} /></button>
             <h2 className="text-[20px] md:text-[25px] font-bold text-[#1d1d1f] font-bricolage transition-all duration-300">
-              {navItems.find(item => item.href === pathname)?.label || 
-               (pathname.includes('/editor') ? "Editor" : 
-                pathname.includes('/profile') ? "My Profile" : 
-                pathname.split('/').filter(Boolean).pop()?.charAt(0).toUpperCase() + pathname.split('/').filter(Boolean).pop()?.slice(1) || "Pulse")}
+              {navItems.find(item => item.href === pathname)?.label ||
+                (pathname.includes('/editor') ? "Editor" :
+                  pathname.includes('/profile') ? "My Profile" :
+                    (pathname.split('/').filter(Boolean).pop()?.charAt(0).toUpperCase() || "Pulse") + (pathname.split('/').filter(Boolean).pop()?.slice(1) || ""))}
               <span className="hidden sm:inline text-[#41cc00]/40 font-medium ml-2">| Pulse by Tela</span>
             </h2>
           </div>
           <div className="flex items-center gap-4 md:gap-8">
             <div className="hidden sm:flex -space-x-3">
-               {team.slice(0, 3).map((member: any, i: number) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-sm">
-                    <img src={member.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.full_name || 'U')}`} className="w-full h-full object-cover" />
-                  </div>
-               ))}
+              {team.slice(0, 3).map((member: any, i: number) => (
+                <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-sm">
+                  <img src={member.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.full_name || 'U')}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
             </div>
             <NotificationCenter />
           </div>
