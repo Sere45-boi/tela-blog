@@ -17,8 +17,8 @@ const bricolage = Bricolage_Grotesque({
 
 export const metadata: Metadata = {
   title: {
-    default: "Pulse by Tela | Insights and stories from Tela",
-    template: "%s | Pulse by Tela",
+    default: "Pulse by Tela",
+    template: "%s",
   },
   description: "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management",
   keywords: "Tela blog, Tela, Pulse, Pulse by tela, AI-powered solutions, financial management, African SMEs, invoicing, international payments, TELA",

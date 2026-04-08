@@ -130,7 +130,7 @@ export function CategoryManagementClient() {
                   <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">
                     {editingId ? "Update Metadata" : "Create category"}
                   </h3>
-                  <p className="text-[13px] text-black/30 font-medium">Define category parameters.</p>
+                  <p className="text-[13px] text-black/30 font-medium">Category Details.</p>
                 </div>
               </div>
 
@@ -175,7 +175,7 @@ export function CategoryManagementClient() {
 
                 <div className="pt-4 flex flex-col gap-3">
                   <Button type="submit" className="w-full h-12 bg-[#093C15] hover:bg-[#0a5a1f] text-white font-bold rounded-xl shadow-lg shadow-[#093C15]/10 transition-all" disabled={loading}>
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : (editingId ? "Commit Changes" : "Deploy Category")}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : (editingId ? "Commit Changes" : "Add Category")}
                   </Button>
                   {editingId && (
                     <Button type="button" variant="ghost" onClick={closeForm} className="text-black/30 hover:text-black/60">Cancel Update</Button>
