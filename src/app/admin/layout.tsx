@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -34,6 +34,7 @@ export default function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
   const supabase = createClient();
   const [profile, setProfile] = useState<any>(null);
   const [team, setTeam] = useState<any[]>([]);
@@ -197,7 +198,13 @@ export default function AdminLayout({
         <header className="h-16 px-6 md:px-12 flex items-center justify-between sticky top-0 bg-white/60 backdrop-blur-xl z-40 border-b border-[#41cc00]/5">
           <div className="flex items-center gap-4">
             <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 rounded-xl bg-black/5 text-[#093C15]"><Menu size={20} /></button>
-            <h2 className="text-[20px] md:text-[25px] font-bold text-[#1d1d1f] font-bricolage">Pulse <span className="hidden sm:inline text-[#41cc00]/40 font-medium">by Tela</span></h2>
+            <h2 className="text-[20px] md:text-[25px] font-bold text-[#1d1d1f] font-bricolage transition-all duration-300">
+              {navItems.find(item => item.href === pathname)?.label || 
+               (pathname.includes('/editor') ? "Editor" : 
+                pathname.includes('/profile') ? "My Profile" : 
+                pathname.split('/').filter(Boolean).pop()?.charAt(0).toUpperCase() + pathname.split('/').filter(Boolean).pop()?.slice(1) || "Pulse")}
+              <span className="hidden sm:inline text-[#41cc00]/40 font-medium ml-2">| Pulse by Tela</span>
+            </h2>
           </div>
           <div className="flex items-center gap-4 md:gap-8">
             <div className="hidden sm:flex -space-x-3">
