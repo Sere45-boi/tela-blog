@@ -98,7 +98,7 @@ export function InactivityTracker() {
 
             <div className="grid grid-cols-2 gap-4">
               <Button 
-                variant="outline" 
+                variant="secondary" 
                 className="rounded-xl h-12 border-black/5 hover:bg-black/5 text-[#1d1d1f]/60"
                 onClick={handleLogout}
               >
