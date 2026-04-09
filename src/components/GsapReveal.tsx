@@ -12,7 +12,7 @@ export const GsapReveal = ({
   direction = "up",
   delay = 0,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   direction?: "up" | "down" | "left" | "right" | "none";
   delay?: number;
