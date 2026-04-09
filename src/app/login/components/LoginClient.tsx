@@ -19,7 +19,7 @@ export function LoginClient() {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  
+
   const router = useRouter();
   const supabase = createClient();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,7 +62,7 @@ export function LoginClient() {
         duration: 0.3,
         onComplete: () => {
           setStep("verification");
-          gsap.fromTo(".login-content", 
+          gsap.fromTo(".login-content",
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
           );
@@ -166,8 +166,8 @@ export function LoginClient() {
                 {step === "identification" ? "Welcome back" : "Security Check"}
               </h1>
               <p className="text-[16px] text-[#1d1d1f]/50 font-medium font-poppins px-4">
-                {step === "identification" 
-                  ? "Enter your email address to receive a secure login code." 
+                {step === "identification"
+                  ? "Enter your email address to receive a secure login code."
                   : `Enter the 8-digit code sent to ${email}`}
               </p>
             </div>
@@ -192,10 +192,10 @@ export function LoginClient() {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  variant="primary" 
-                  className="w-full group h-14 text-[16px] font-bold rounded-2xl shadow-[0_10px_30px_-5px_rgba(65,204,0,0.3)] hover:shadow-[0_15px_40px_-5px_rgba(65,204,0,0.4)] transition-all duration-300 border-none bg-gradient-to-r from-[#41cc00] to-[#1a5d28]" 
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="w-full group h-14 text-[16px] font-bold rounded-2xl shadow-[0_10px_30px_-5px_rgba(65,204,0,0.3)] hover:shadow-[0_15px_40px_-5px_rgba(65,204,0,0.4)] transition-all duration-300 border-none bg-gradient-to-r from-[#41cc00] to-[#1a5d28]"
                   isLoading={loading}
                 >
                   Send Login Code
@@ -204,7 +204,7 @@ export function LoginClient() {
 
                 <div className="pt-4 text-center">
                   <p className="text-[14px] text-[#1d1d1f]/40 font-medium">
-                    New to Tela? <Link href="/signup" className="text-[#093C15] font-bold hover:underline underline-offset-4 decoration-2">Contact Admin</Link>
+                    New to Pulse by Tela? <Link href="/signup" className="text-[#093C15] font-bold hover:underline underline-offset-4 decoration-2">Contact Admin</Link>
                   </p>
                 </div>
               </form>
@@ -216,86 +216,6 @@ export function LoginClient() {
                       <input
                         key={index}
                         ref={(el) => { otpInputs.current[index] = el; }}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(index, e)}
-                        className="w-full aspect-square text-center text-2xl font-bold bg-black/[0.03] border-2 border-transparent focus:border-[#41cc00]/30 focus:bg-white focus:ring-4 focus:ring-[#41cc00]/5 transition-all outline-none rounded-xl md:rounded-2xl text-[#093C15]"
-                        autoFocus={index === 0}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <Button 
-                    type="submit" 
-                    variant="primary" 
-                    className="w-full group h-14 text-[16px] font-bold rounded-2xl shadow-[0_10px_30px_-5px_rgba(65,204,0,0.3)] hover:shadow-[0_15px_40px_-5px_rgba(65,204,0,0.4)] transition-all duration-300 border-none bg-gradient-to-r from-[#41cc00] to-[#1a5d28]" 
-                    isLoading={loading}
-                  >
-                    Login
-                  </Button>
-                  
-                  <div className="flex flex-col items-center gap-4">
-                    <button 
-                      type="button" 
-                      onClick={handleResendOtp}
-                      disabled={countdown > 0 || resending}
-                      className="text-[14px] font-bold text-[#093C15] disabled:text-[#1d1d1f]/30 transition-colors flex items-center gap-2"
-                    >
-                      {resending ? (
-                        <RefreshCcw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <RefreshCcw className="w-4 h-4" />
-                      )}
-                      {countdown > 0 ? `Resend in ${countdown}s` : "Resend Code"}
-                    </button>
-                    
-                    <button 
-                      type="button" 
-                      onClick={() => {
-                        gsap.to(".login-content", {
-                          opacity: 0,
-                          y: 20,
-                          duration: 0.3,
-                          onComplete: () => {
-                            setStep("identification");
-                            gsap.fromTo(".login-content", 
-                              { opacity: 0, y: -20 },
-                              { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
-                            );
-                          }
-                        });
-                      }}
-                      className="text-[14px] font-bold text-[#1d1d1f]/30 hover:text-[#1d1d1f]/50 transition-colors flex items-center gap-1.5"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      Change Email
-                    </button>
-                  </div>
-                </div>
-              </form>
-            )}
-          </div>
-        </GlassCard>
-      </GsapReveal>
-    </div>
-  );
-}
-
-
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-8">
-                <div className="space-y-4">
-                  <div className="flex justify-between gap-1.5 md:gap-2">
-                    {otp.map((digit, index) => (
-                      <input
-                        key={index}
-                        ref={(el) => (otpInputs.current[index] = el)}
                         type="text"
                         inputMode="numeric"
                         maxLength={1}
@@ -337,20 +257,18 @@ export function LoginClient() {
                     <button
                       type="button"
                       onClick={() => {
-                        const ctx = gsap.context(() => {
-                          gsap.to(".login-content", {
-                            opacity: 0,
-                            y: 20,
-                            duration: 0.3,
-                            onComplete: () => {
-                              setStep("identification");
-                              gsap.fromTo(".login-content",
-                                { opacity: 0, y: -20 },
-                                { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
-                              );
-                            }
-                          });
-                        }, containerRef);
+                        gsap.to(".login-content", {
+                          opacity: 0,
+                          y: 20,
+                          duration: 0.3,
+                          onComplete: () => {
+                            setStep("identification");
+                            gsap.fromTo(".login-content",
+                              { opacity: 0, y: -20 },
+                              { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
+                            );
+                          }
+                        });
                       }}
                       className="text-[14px] font-bold text-[#1d1d1f]/30 hover:text-[#1d1d1f]/50 transition-colors flex items-center gap-1.5"
                     >
