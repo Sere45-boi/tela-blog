@@ -28,6 +28,9 @@ import {
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
 import { signOut } from "@/app/actions/user";
 import { toast } from "sonner";
+import { InactivityTracker } from "@/components/admin/InactivityTracker";
+import { useAdminActivity } from "@/hooks/useAdminActivity";
+import { Zap } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -42,6 +45,9 @@ export default function AdminLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Initialize activity tracking for the admin panel
+  useAdminActivity();
 
   useEffect(() => {
     const handleResize = () => {
@@ -120,10 +126,12 @@ export default function AdminLayout({
     { href: "/admin/articles", Icon: FileText, label: "Articles" },
     { href: "/admin/categories", Icon: Tags, label: "Categories" },
     { href: "/admin/campaigns", Icon: ImageIcon, label: "Campaigns" },
+    { href: "/admin/activity", Icon: Zap, label: "Activity" },
   ];
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-poppins selection:bg-[#41cc00]/30 selection:text-[#093C15]">
+      <InactivityTracker />
       {/* Sidebar Navigation */}
       <aside
         className={`fixed inset-y-0 left-0 bg-white/80 backdrop-blur-xl border-r border-[#41cc00]/10 flex flex-col z-50 overflow-hidden shadow-sm transition-all duration-300 
