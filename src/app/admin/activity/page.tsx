@@ -3,14 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { formatDistanceToNow } from "date-fns";
-import { 
-  Zap, 
-  Activity, 
-  User, 
-  Eye, 
-  PlusCircle, 
-  Edit3, 
-  Trash2, 
+import {
+  Zap,
+  Activity,
+  User,
+  Eye,
+  PlusCircle,
+  Edit3,
+  Trash2,
   ShieldCheck,
   Globe
 } from "lucide-react";
@@ -87,13 +87,13 @@ export default function ActivityPage() {
       <GsapReveal direction="up" className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-4xl font-black font-bricolage tracking-tight text-[#1d1d1f]">
-            Platform <span className="text-[#093C15]">Pulse</span>
+            Activity <span className="text-[#093C15]">Logs</span>
           </h1>
-          <p className="text-[#1d1d1f]/50 font-medium mt-1">Real-time audit logs of administrative activities.</p>
+          <p className="text-[#1d1d1f]/50 font-medium mt-1">Real-time user activities.</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md rounded-2xl border border-black/5">
           <div className="w-2 h-2 bg-[#41cc00] rounded-full animate-pulse" />
-          <span className="text-xs font-bold text-[#093C15] uppercase tracking-wider">Live Monitoring Active</span>
+          <span className="text-xs font-bold text-[#093C15] uppercase tracking-wider">Live Monitoring</span>
         </div>
       </GsapReveal>
 
@@ -123,7 +123,7 @@ export default function ActivityPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="font-bold text-[#1d1d1f] text-sm truncate">
@@ -141,12 +141,12 @@ export default function ActivityPage() {
                       </div>
 
                       <div className="hidden md:flex flex-col items-end opacity-0 group-hover:opacity-100 transition-opacity">
-                         <div className="flex items-center gap-1.5 px-2.5 py-1 bg-black/5 rounded-lg">
-                           <Globe className="w-3 h-3 text-[#1d1d1f]/40" />
-                           <span className="text-[10px] font-bold text-[#1d1d1f]/50 truncate max-w-[120px]">
-                             {log.path || "/"}
-                           </span>
-                         </div>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-black/5 rounded-lg">
+                          <Globe className="w-3 h-3 text-[#1d1d1f]/40" />
+                          <span className="text-[10px] font-bold text-[#1d1d1f]/50 truncate max-w-[120px]">
+                            {log.path || "/"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </GlassCard>
@@ -161,12 +161,12 @@ export default function ActivityPage() {
         </div>
 
         <div className="space-y-6">
-           <h2 className="text-lg font-bold text-[#1d1d1f] flex items-center gap-2 ml-1">
+          <h2 className="text-lg font-bold text-[#1d1d1f] flex items-center gap-2 ml-1">
             <Zap className="w-5 h-5 text-[#41cc00]" />
             Insights
           </h2>
-          
-          <GlassCard className="p-6 bg-gradient-to-br from-[#093C15] to-[#1d1d1f] text-white border-none shadow-xl shadow-[#093C15]/20">
+
+          <GlassCard className="p-6 bg-gradient-to-br from-[#093C15] to-[#1d1d1f] text-white border-none">
             <h3 className="font-bold mb-4 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#41cc00]" />
               Security Status
