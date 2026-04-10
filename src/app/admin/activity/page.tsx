@@ -35,36 +35,51 @@ export default function ActivityPage() {
   const supabase = createClient();
 
   const fetchLogs = async () => {
-    // 0. Check role first (Server Action would be safer, but this is a quick client check)
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    setLoading(true);
+    try {
+      // 1. Role Verification
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = "/login";
+        return;
+      }
 
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
 
-    if (prof?.role !== "admin") {
-      window.location.href = "/admin";
-      return;
-    }
+      if (profile?.role !== 'admin') {
+        window.location.href = "/admin";
+        return;
+      }
 
-    const { data, error } = await supabase
-      .from("admin_activity_logs")
-      .select(`
-        *,
-        profiles:user_id (full_name, avatar_url)
-      `)
-      .order("created_at", { ascending: false })
-      .limit(50);
+      // 2. Optimized Data Fetching
+      // We join with profiles(full_name, avatar_url) to show who did what
+      const { data, error } = await supabase
+        .from("admin_activity_logs")
+        .select(`
+          id,
+          action,
+          path,
+          created_at,
+          profiles:user_id (
+            full_name,
+            avatar_url
+          )
+        `)
+        .order("created_at", { ascending: false })
+        .limit(100);
 
-    if (error) {
-      console.error("Error fetching logs:", error);
-    } else {
+      if (error) throw error;
       setLogs(data as any);
+    } catch (err: any) {
+      console.error("Activity Fetch Error:", err.message);
+      toast.error("Could not load activity feed.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
