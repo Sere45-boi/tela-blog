@@ -137,18 +137,20 @@ export function SignupClient() {
             <CheckCircle2 className="w-10 h-10 text-[#41cc00]" />
           </div>
           <h1 className="text-3xl font-bold text-[#1d1d1f] font-bricolage mb-4">
-            {needsEmailConfirmation ? "Check Your Email" : "Welcome to the Team!"}
+            {needsEmailConfirmation ? "Verify Identity" : "Welcome aboard!"}
           </h1>
           <p className="text-[#1d1d1f]/60 mb-8 font-medium">
             {needsEmailConfirmation
-              ? "We've sent a confirmation link to your email address. Please click the link to verify your account before logging in."
-              : `Your account has been created and your permissions have been assigned. Redirecting you to the dashboard...`}
+              ? "Account created. Please check your email for a confirmation link to activate your author profile."
+              : `Your workspace identity is confirmed. We're setting up your dashboard permissions now...`}
           </p>
           {!needsEmailConfirmation && <Loader2 className="w-6 h-6 animate-spin text-[#41cc00] mx-auto" />}
           {needsEmailConfirmation && (
-            <Link href="/login">
-              <Button variant="secondary" className="w-full h-12 rounded-xl">Go to Login</Button>
-            </Link>
+            <div className="space-y-4">
+              <Link href="/login" className="block">
+                <Button variant="primary" className="w-full h-12 rounded-xl">Login</Button>
+              </Link>
+            </div>
           )}
         </GlassCard>
       </GsapReveal>

@@ -83,8 +83,32 @@ export async function validateInvitation(token: string) {
 export async function claimInvitation(token: string, userId: string) {
   const supabase = await createClient();
   
-  // Mark invitation as claimed
-  // This is a safety cleanup, as the trigger already handles this during signup.
+  // 1. Fetch the role associated with this invitation
+  const { data: inviteData, error: fetchError } = await supabase
+    .from("invitations")
+    .select("role")
+    .eq("token", token)
+    .single();
+
+  if (fetchError || !inviteData) {
+    console.error("Failed to fetch invitation data:", fetchError?.message);
+    throw new Error("Invitation not found or invalid.");
+  }
+
+  // 2. Update the profile with the invited role and set to active
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ 
+      role: inviteData.role,
+      is_active: true 
+    })
+    .eq("id", userId);
+
+  if (profileError) {
+    console.error("Failed to update profile role:", profileError.message);
+  }
+  
+  // 3. Mark invitation as claimed
   const { error: inviteError } = await supabase
     .from("invitations")
     .update({ claimed_at: new Date().toISOString() })
