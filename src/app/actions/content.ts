@@ -111,8 +111,6 @@ export async function upsertArticle(articleData: {
       featured_image: data.featured_image
     }).catch(err => console.error("Newsletter broadcast failed:", err));
   }
-  
-  if (error) throw new Error(error.message);
 
   // Log this action
   const isUpdate = !!id;
