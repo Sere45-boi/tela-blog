@@ -3,12 +3,18 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
+import { headers } from "next/headers";
+
 /**
  * Generates a unique invitation token and stores it in the database.
  * Only admins can call this.
  */
 export async function createInvitation(email: string, role: 'author' | 'admin' = 'author') {
   const supabase = await createClient();
+  const headersList = await headers();
+  const host = headersList.get("host");
+  const protocol = host?.includes("localhost") ? "http" : "https";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`;
   
   // Verify requester is admin
   const { data: { user } } = await supabase.auth.getUser();
@@ -46,7 +52,7 @@ export async function createInvitation(email: string, role: 'author' | 'admin' =
   // Return the full invite URL (this would normally be emailed)
   return { 
     token: data.token,
-    inviteUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/signup?invite=${data.token}`
+    inviteUrl: `${baseUrl}/signup?invite=${data.token}`
   };
 }
 
