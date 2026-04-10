@@ -112,6 +112,16 @@ export async function upsertArticle(articleData: {
     }).catch(err => console.error("Newsletter broadcast failed:", err));
   }
   
+  if (error) throw new Error(error.message);
+
+  // Log this action
+  const isUpdate = !!id;
+  await supabase.from("admin_activity_logs").insert({
+    user_id: user.id,
+    action: `${isUpdate ? 'Updated' : 'Created'} article: ${articleData.title} (Status: ${articleData.status})`,
+    path: `/admin/articles/editor?id=${data.id}`
+  });
+  
   revalidatePath("/admin/articles");
   revalidatePath("/");
   revalidatePath(`/blog/${articleData.slug}`);
@@ -122,6 +132,16 @@ export async function deleteArticle(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("articles").delete().eq("id", id);
   if (error) throw new Error(error.message);
+
+  // Log this action
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.from("admin_activity_logs").insert({
+      user_id: user.id,
+      action: `Deleted an article (ID: ${id})`,
+      path: "/admin/articles"
+    });
+  }
   
   revalidatePath("/admin/articles");
   revalidatePath("/");

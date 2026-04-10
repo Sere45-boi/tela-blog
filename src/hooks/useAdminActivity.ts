@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
@@ -23,14 +23,6 @@ export function useAdminActivity() {
       console.error("Failed to log activity:", error);
     }
   }, [pathname, supabase]);
-
-  // Automatically log page navigation
-  useEffect(() => {
-    if (pathname.startsWith("/admin")) {
-      const pageName = pathname === "/admin" ? "Dashboard" : pathname.split("/").pop()?.replace(/-/g, " ") || "Page";
-      logActivity(`Viewed ${pageName.charAt(0).toUpperCase() + pageName.slice(1)}`);
-    }
-  }, [pathname, logActivity]);
 
   return { logActivity };
 }

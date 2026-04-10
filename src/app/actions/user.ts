@@ -117,6 +117,13 @@ export async function deactivateUser(userId: string) {
     .eq("id", userId);
 
   if (error) throw new Error(error.message);
+
+  // Log this action
+  await supabase.from("admin_activity_logs").insert({
+    user_id: adminUser.id,
+    action: `Deactivated author profile`,
+    path: "/admin/users"
+  });
   
   revalidatePath("/admin/users");
   return { success: true };
@@ -150,6 +157,13 @@ export async function hardDeleteUser(userId: string) {
     .eq("id", userId);
 
   if (error) throw new Error(error.message);
+
+  // Log this action
+  await supabase.from("admin_activity_logs").insert({
+    user_id: adminUser.id,
+    action: `Permanently deleted author profile`,
+    path: "/admin/users"
+  });
   
   revalidatePath("/admin/users");
   return { success: true };

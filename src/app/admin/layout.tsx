@@ -23,14 +23,14 @@ import {
   ChevronDown,
   Lock,
   Menu,
-  X
+  X,
+  Zap
 } from "lucide-react";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
 import { signOut } from "@/app/actions/user";
 import { toast } from "sonner";
 import { InactivityTracker } from "@/components/admin/InactivityTracker";
 import { useAdminActivity } from "@/hooks/useAdminActivity";
-import { Zap } from "lucide-react";
 
 export default function AdminLayout({
   children,

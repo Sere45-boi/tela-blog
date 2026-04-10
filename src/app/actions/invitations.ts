@@ -47,6 +47,13 @@ export async function createInvitation(email: string, role: 'author' | 'admin' =
 
   if (error) throw new Error(error.message);
 
+  // Log this action
+  await supabase.from("admin_activity_logs").insert({
+    user_id: user.id,
+    action: `Sent invitation to ${email} (Role: ${role})`,
+    path: "/admin/users"
+  });
+
   revalidatePath("/admin/users");
   
   // Return the full invite URL (this would normally be emailed)
