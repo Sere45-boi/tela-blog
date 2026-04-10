@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
 import { GlassCard } from "@/components/ui/Card";
+import { toast } from "sonner";
 
 interface ActivityLog {
   id: string;
