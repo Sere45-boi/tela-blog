@@ -151,9 +151,9 @@ export function SignupClient() {
           {!needsEmailConfirmation && <Loader2 className="w-6 h-6 animate-spin text-[#41cc00] mx-auto" />}
           {needsEmailConfirmation && (
             <div className="space-y-4">
-              <Link href="/login" className="block">
-                <Button variant="primary" className="w-full h-12 rounded-xl">Login</Button>
-              </Link>
+              <p className="text-[12px] text-[#1d1d1f]/40">
+                Didn't get the email? Check your spam folder
+              </p>
             </div>
           )}
         </GlassCard>

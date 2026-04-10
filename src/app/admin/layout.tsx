@@ -126,7 +126,6 @@ export default function AdminLayout({
     { href: "/admin/articles", Icon: FileText, label: "Articles" },
     { href: "/admin/categories", Icon: Tags, label: "Categories" },
     { href: "/admin/campaigns", Icon: ImageIcon, label: "Campaigns" },
-    { href: "/admin/activity", Icon: Zap, label: "Activity" },
   ];
 
   return (
@@ -171,6 +170,10 @@ export default function AdminLayout({
             ))}
             {profile?.role === 'admin' && (
               <>
+                <Link href="/admin/activity" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] group ${(!isSidebarOpen && !isMobileMenuOpen) ? 'justify-center' : ''}`}>
+                  <Zap className="h-4 w-4 text-[#41cc00] shrink-0" />
+                  {(isSidebarOpen || isMobileMenuOpen) && <span className="text-[14px] font-semibold">Activity</span>}
+                </Link>
                 <Link href="/admin/users" onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#093C15]/5 text-[#1d1d1f] group ${(!isSidebarOpen && !isMobileMenuOpen) ? 'justify-center' : ''}`}>
                   <Users className="h-4 w-4 text-[#41cc00] shrink-0" />
                   {(isSidebarOpen || isMobileMenuOpen) && <span className="text-[14px] font-semibold">Authors</span>}

@@ -35,6 +35,21 @@ export default function ActivityPage() {
   const supabase = createClient();
 
   const fetchLogs = async () => {
+    // 0. Check role first (Server Action would be safer, but this is a quick client check)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (prof?.role !== "admin") {
+      window.location.href = "/admin";
+      return;
+    }
+
     const { data, error } = await supabase
       .from("admin_activity_logs")
       .select(`

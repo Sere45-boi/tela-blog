@@ -121,8 +121,9 @@ export function LoginClient() {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").trim().slice(0, 8);
-    if (!/^\d+$/.test(pastedData)) return;
+    // Strip hyphens, spaces, and other non-digits
+    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 8);
+    if (!pastedData) return;
 
     const newOtp = [...otp];
     pastedData.split("").forEach((char, i) => {
