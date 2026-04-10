@@ -351,7 +351,7 @@ export default function ArticleEditor() {
             <GsapReveal direction="up" delay={0.3}>
               <div className="bg-white rounded-3xl border border-black/5 p-8 shadow-sm h-full flex flex-col space-y-8">
                 <h3 className="text-sm font-bold text-[#1d1d1f] uppercase tracking-wider border-b border-black/5 pb-4 flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4 text-[#41cc00]" /> Visuals & Tags
+                  <ImageIcon className="w-4 h-4 text-[#41cc00]" /> Thumbnail
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -585,22 +585,7 @@ export default function ArticleEditor() {
           {/* Main Editorial Content */}
           <div className="relative z-10 w-full max-w-[900px] mx-auto pt-40 pb-32 px-6 sm:px-12">
 
-            {/* Hero Image */}
-            {formData.featured_image ? (
-              <GsapReveal direction="up" delay={0.1} className="w-full aspect-[21/9] rounded-[2.5rem] overflow-hidden mb-16 shadow-[0_30px_100px_rgba(0,0,0,0.12)] relative ring-1 ring-black/5 bg-black/5 group">
-                <img
-                  src={formData.featured_image}
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                  alt="Featured Hero"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              </GsapReveal>
-            ) : (
-              <div className="w-full aspect-[21/9] rounded-[2.5rem] bg-black/[0.02] border border-black/5 mb-16 flex items-center justify-center flex-col gap-4 text-black/20">
-                <ImageIcon className="w-12 h-12" />
-                <span className="text-sm font-bold uppercase tracking-widest">No Featured Image</span>
-              </div>
-            )}
+
 
             {/* Header Content */}
             <GsapReveal direction="up" delay={0.2} className="text-center max-w-[800px] mx-auto mb-16">

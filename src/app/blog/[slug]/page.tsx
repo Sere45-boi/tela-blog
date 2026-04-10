@@ -194,16 +194,7 @@ export default async function ArticlePage({
                 </div>
               </header>
 
-              {/* Cover image */}
-              {article.featured_image && (
-                <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-white rounded-[2rem] overflow-hidden mb-12 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-black/5">
-                  <img
-                    src={article.featured_image}
-                    alt={article.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+
 
               {/* Mobile social share */}
               <div className="md:hidden mb-8">
