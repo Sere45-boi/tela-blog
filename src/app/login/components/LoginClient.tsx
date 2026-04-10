@@ -119,6 +119,23 @@ export function LoginClient() {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").trim().slice(0, 8);
+    if (!/^\d+$/.test(pastedData)) return;
+
+    const newOtp = [...otp];
+    pastedData.split("").forEach((char, i) => {
+      if (i < 8) newOtp[i] = char;
+    });
+    
+    setOtp(newOtp);
+
+    // Focus the next empty slot or the last digit
+    const nextToFocus = Math.min(pastedData.length, 7);
+    otpInputs.current[nextToFocus]?.focus();
+  };
+
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = otp.join("");
@@ -228,6 +245,7 @@ export function LoginClient() {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(index, e)}
+                        onPaste={handlePaste}
                         className="w-full aspect-square text-center text-2xl font-bold bg-black/[0.03] border-2 border-transparent focus:border-[#41cc00]/30 focus:bg-white focus:ring-4 focus:ring-[#41cc00]/5 transition-all outline-none rounded-xl md:rounded-2xl text-[#093C15]"
                         autoFocus={index === 0}
                       />
