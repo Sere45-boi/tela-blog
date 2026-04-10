@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { GlassCard } from "@/components/ui/Card";
-import { Lock, Mail, User, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Mail, User, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
 import { validateInvitation, claimInvitation } from "@/app/actions/invitations";
 import { toast } from "sonner";
@@ -24,8 +24,6 @@ export function SignupClient() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    password: "",
-    confirmPassword: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -58,24 +56,17 @@ export function SignupClient() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
-
     setLoading(true);
 
     try {
+      // Generate a secure random password for the background auth record
+      // Since login is OTP-only, the user will never know or need this.
+      const secureRandomPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
+
       // 1. Sign up user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
-        password: formData.password,
+        password: secureRandomPassword,
         options: {
           data: {
             full_name: formData.fullName,
@@ -98,8 +89,7 @@ export function SignupClient() {
         setNeedsEmailConfirmation(true);
         toast.success("Account created! Please check your email.");
       } else {
-        toast.success("Account created successfully!");
-        // Redirect only if they actually have a session
+        toast.success("Welcome to the team!");
         setTimeout(() => {
           router.push("/admin");
           router.refresh();
@@ -185,11 +175,11 @@ export function SignupClient() {
               Join <span className="font-bold text-[#41cc00]">Pulse Team</span>
             </h1>
             <p className="text-[15px] text-[#1d1d1f]/60 font-medium font-poppins">
-              Create your account to start contributing.
+              Register your workspace identity to start contributing.
             </p>
           </div>
 
-          <form onSubmit={handleSignup} className="space-y-5">
+          <form onSubmit={handleSignup} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Full Name</label>
               <div className="relative">
@@ -199,7 +189,7 @@ export function SignupClient() {
                 <Input
                   type="text"
                   placeholder="Adeyemo Damilare"
-                  className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] font-medium"
+                  className="pl-11 h-14 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] font-bold text-lg"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
                   required
@@ -208,7 +198,7 @@ export function SignupClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Email Address</label>
+              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Work Email</label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
                   <Mail className="h-4 w-4" />
@@ -217,45 +207,9 @@ export function SignupClient() {
                   type="email"
                   readOnly
                   placeholder="name@example.com"
-                  className="pl-11 h-12 rounded-xl bg-black/[0.05] border-black/5 text-[#1d1d1f]/40 cursor-not-allowed font-medium"
+                  className="pl-11 h-14 rounded-xl bg-black/[0.05] border-black/5 text-[#1d1d1f]/40 cursor-not-allowed font-medium"
                   value={formData.email}
                 />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Password</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
-                    <Lock className="h-4 w-4" />
-                  </div>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] font-medium"
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Confirm</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
-                    <Lock className="h-4 w-4" />
-                  </div>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    className="pl-11 h-12 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] font-medium"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    required
-                  />
-                </div>
               </div>
             </div>
 
@@ -265,9 +219,9 @@ export function SignupClient() {
               </div>
             )}
 
-            <Button type="submit" variant="primary" className="mt-8 w-full group h-12 text-[15px] rounded-xl shadow-lg border-none" isLoading={loading}>
-              Create Account
-              {!loading && <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
+            <Button type="submit" variant="primary" className="mt-8 w-full group h-14 text-[16px] rounded-xl shadow-lg border-none font-bold" isLoading={loading}>
+              Accept Invitation
+              {!loading && <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />}
             </Button>
           </form>
 

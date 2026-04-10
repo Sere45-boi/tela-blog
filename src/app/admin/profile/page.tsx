@@ -5,8 +5,8 @@ import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { GlassCard } from "@/components/ui/Card";
-import { User, Camera, Loader2, Save, Mail, Linkedin, Info, Lock, Shield, RefreshCw } from "lucide-react";
-import { updateProfile, updateEmail, verifyEmailChange, updatePassword } from "@/app/actions/user";
+import { User, Camera, Loader2, Save, Mail, Linkedin, Info, Shield, RefreshCw } from "lucide-react";
+import { updateProfile, updateEmail, verifyEmailChange } from "@/app/actions/user";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { GsapReveal } from "@/components/GsapReveal";
@@ -44,9 +44,6 @@ export default function ProfilePage() {
     is_public: true,
   });
 
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [pwdLoading, setPwdLoading] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -141,29 +138,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-
-    setPwdLoading(true);
-    try {
-      await updatePassword(newPassword);
-      toast.success("Password updated successfully");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setPwdLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -405,49 +379,6 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* Password Update Section */}
-                <div className="pt-8 border-t border-black/5">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 rounded-xl bg-black/5 flex items-center justify-center">
-                      <Lock className="w-4 h-4 text-[#1d1d1f]/40" />
-                    </div>
-                    <h4 className="text-[14px] font-bold text-[#1d1d1f]">Access Authentication</h4>
-                  </div>
-
-                  <form onSubmit={handleUpdatePassword} className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-                    <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-black/30 uppercase tracking-widest ml-1">New Password</label>
-                      <Input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="••••••••••••"
-                        className="h-12 bg-black/[0.02] border-black/5 rounded-xl hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 transition-all"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-black/30 uppercase tracking-widest ml-1">Confirm Password</label>
-                      <Input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="••••••••••••"
-                        className="h-12 bg-black/[0.02] border-black/5 rounded-xl hover:border-[#41cc00]/20 focus:border-[#41cc00]/40 transition-all font-medium"
-                      />
-                    </div>
-                    <div className="md:col-span-2 mt-2">
-                      <Button
-                        type="submit"
-                        variant="secondary"
-                        disabled={pwdLoading}
-                        className="px-8 bg-white border border-black/5 text-[#41cc00] hover:bg-black/5 hover:text-[#093C15] font-bold rounded-xl transition-all shadow-sm w-full md:w-auto"
-                      >
-                        {pwdLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Shield className="w-4 h-4 mr-2" />}
-                        Update Password
-                      </Button>
-                    </div>
-                  </form>
-                </div>
 
                 <div className="p-4 rounded-2xl border border-black/5 bg-black/[0.02]">
                   <div className="flex items-start gap-3">

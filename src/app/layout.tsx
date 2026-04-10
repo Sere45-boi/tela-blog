@@ -58,6 +58,7 @@ export const metadata: Metadata = {
 
 import { Toaster } from "sonner";
 import { PageTracker } from "@/components/layout/PageTracker";
+import { SessionGuardian } from "@/components/admin/SessionGuardian";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { Suspense } from "react";
 import Script from "next/script";
@@ -110,6 +111,7 @@ export default function RootLayout({
 
         <Suspense fallback={null}>
           <PageTracker />
+          <SessionGuardian />
         </Suspense>
         <SmoothScroll>
           {children}
