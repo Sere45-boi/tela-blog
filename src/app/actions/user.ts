@@ -166,6 +166,29 @@ export async function updatePassword(password: string) {
   return { success: true };
 }
 
+export async function verifyUserAccess(email: string) {
+  const supabase = await createClient();
+  
+  // Check if a profile exists with this email and is active
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, is_active")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (error) throw new Error("Database lookup failed");
+  
+  if (!data) {
+    throw new Error("This email is not registered in our team database. Please contact an administrator for an invitation.");
+  }
+
+  if (data.is_active === false) {
+    throw new Error("This account has been deactivated. Please contact an administrator.");
+  }
+
+  return { success: true };
+}
+
 export async function signOut() {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();

@@ -43,6 +43,11 @@ export function LoginClient() {
 
     setLoading(true);
     try {
+      // 1. Pre-check: Is this email in our Team Registry?
+      const { verifyUserAccess } = await import("@/app/actions/user");
+      await verifyUserAccess(email);
+
+      // 2. If yes, proceed with OTP
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {

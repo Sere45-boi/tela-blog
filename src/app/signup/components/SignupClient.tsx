@@ -98,7 +98,11 @@ export function SignupClient() {
       }
 
     } catch (err: any) {
-      setError(err.message);
+      if (err.message?.includes("already registered") || err.message?.includes("User already exists")) {
+        setError("This email is already registered. You can proceed directly to Login to receive a secure code.");
+      } else {
+        setError(err.message);
+      }
       setLoading(false);
     }
   };
@@ -217,8 +221,17 @@ export function SignupClient() {
             </div>
 
             {error && (
-              <div className="rounded-xl bg-red-500/10 p-4 text-[13px] font-medium text-red-600 border border-red-500/20">
-                {error}
+              <div className="space-y-4">
+                <div className="rounded-xl bg-red-500/10 p-4 text-[13px] font-medium text-red-600 border border-red-500/20">
+                  {error}
+                </div>
+                {error.includes("already registered") && (
+                  <Link href="/login" className="block">
+                    <Button variant="secondary" className="w-full h-12 rounded-xl text-[#093C15] font-bold">
+                      Continue to Login
+                    </Button>
+                  </Link>
+                )}
               </div>
             )}
 
