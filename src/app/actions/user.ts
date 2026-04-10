@@ -100,7 +100,7 @@ export async function updateUserRole(userId: string, role: 'admin' | 'author') {
   return { success: true };
 }
 
-export async function deleteUser(userId: string) {
+export async function deactivateUser(userId: string) {
   const supabase = await createClient();
   const { data: { user: adminUser } } = await supabase.auth.getUser();
   
@@ -114,6 +114,39 @@ export async function deleteUser(userId: string) {
   const { error } = await supabase
     .from("profiles")
     .update({ is_active: false })
+    .eq("id", userId);
+
+  if (error) throw new Error(error.message);
+  
+  revalidatePath("/admin/users");
+  return { success: true };
+}
+
+export async function hardDeleteUser(userId: string) {
+  const supabase = await createClient();
+  const { data: { user: adminUser } } = await supabase.auth.getUser();
+  
+  if (!adminUser) throw new Error("Unauthorized");
+  
+  // Verify requester is admin
+  const { data: adminProfile } = await supabase.from('profiles').select('role').eq('id', adminUser.id).single();
+  if (adminProfile?.role !== 'admin') throw new Error("Only administrators can permanently delete users.");
+
+  // Check for articles first
+  const { count, error: countError } = await supabase
+    .from("articles")
+    .select("*", { count: 'exact', head: true })
+    .eq("author_id", userId);
+
+  if (countError) throw new Error(countError.message);
+  if (count && count > 0) {
+    throw new Error(`Cannot delete author. They have ${count} published articles. Reassign or delete their articles first.`);
+  }
+
+  // Permanent delete from profiles table
+  const { error } = await supabase
+    .from("profiles")
+    .delete()
     .eq("id", userId);
 
   if (error) throw new Error(error.message);

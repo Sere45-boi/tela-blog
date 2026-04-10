@@ -8,7 +8,7 @@ import { GsapReveal } from "@/components/GsapReveal";
 import { getUsers } from "@/app/actions/user";
 import { toast } from "sonner";
 import { createInvitation } from "@/app/actions/invitations";
-import { User, Mail, Shield, ShieldAlert, Loader2, MoreVertical, Search, ExternalLink, Copy, Check, X } from "lucide-react";
+import { User, Mail, Shield, ShieldAlert, Loader2, MoreVertical, Search, ExternalLink, Copy, Check, X, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export default function UsersPage() {
@@ -72,13 +72,28 @@ export default function UsersPage() {
   };
 
 
-  const handleDelete = async (userId: string) => {
+  const handleDeactivate = async (userId: string) => {
     if (!confirm("Are you sure you want to deactivate this author? Their articles will remain but they will lose dashboard access.")) return;
     setProcessingId(userId);
     try {
-      const { deleteUser } = await import("@/app/actions/user");
-      await deleteUser(userId);
+      const { deactivateUser } = await import("@/app/actions/user");
+      await deactivateUser(userId);
       toast.success("Author deactivated");
+      await fetchUsersAndSelf();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleHardDelete = async (userId: string) => {
+    if (!confirm("PERMANENT ACTION: Are you sure you want to completely delete this author profile? This cannot be undone.")) return;
+    setProcessingId(userId);
+    try {
+      const { hardDeleteUser } = await import("@/app/actions/user");
+      await hardDeleteUser(userId);
+      toast.success("Author permanently deleted");
       await fetchUsersAndSelf();
     } catch (error: any) {
       toast.error(error.message);
@@ -281,11 +296,19 @@ export default function UsersPage() {
                           </Link>
                           <button
                             disabled={processingId === user.id || user.is_active === false}
-                            onClick={() => handleDelete(user.id)}
-                            className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500 disabled:opacity-50"
+                            onClick={() => handleDeactivate(user.id)}
+                            className="p-2 hover:bg-yellow-50 rounded-lg transition-colors text-yellow-600 disabled:opacity-30"
                             title="Deactivate Author"
                           >
                             {processingId === user.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                          </button>
+                          <button
+                            disabled={processingId === user.id}
+                            onClick={() => handleHardDelete(user.id)}
+                            className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600 disabled:opacity-30"
+                            title="Delete Permanently"
+                          >
+                            {processingId === user.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                           </button>
                         </div>
                       )}
