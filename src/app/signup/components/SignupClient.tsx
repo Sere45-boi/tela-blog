@@ -68,6 +68,7 @@ export function SignupClient() {
         email: formData.email,
         password: secureRandomPassword,
         options: {
+          emailRedirectTo: `${window.location.origin}/login`,
           data: {
             full_name: formData.fullName,
           }
@@ -169,13 +170,13 @@ export function SignupClient() {
 
           <div className="mb-10 text-center">
             <div className="inline-block px-3 py-1 rounded-full bg-[#41cc00]/10 text-[#093C15] text-[10px] font-bold uppercase tracking-widest mb-4">
-              Invitation Confirmed
+              Invited by Admin
             </div>
             <h1 className="mb-2 text-3xl tracking-tight text-[#1d1d1f] font-bricolage">
               Join <span className="font-bold text-[#41cc00]">Pulse Team</span>
             </h1>
             <p className="text-[15px] text-[#1d1d1f]/60 font-medium font-poppins">
-              Register your workspace identity to start contributing.
+              Register to start contributing.
             </p>
           </div>
 
@@ -188,7 +189,7 @@ export function SignupClient() {
                 </div>
                 <Input
                   type="text"
-                  placeholder="Adeyemo Damilare"
+                  placeholder="Full Name"
                   className="pl-11 h-14 rounded-xl bg-black/[0.02] border-black/5 text-[#1d1d1f] font-bold text-lg"
                   value={formData.fullName}
                   onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
@@ -198,7 +199,7 @@ export function SignupClient() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Work Email</label>
+              <label className="text-[12px] font-bold text-[#1d1d1f]/50 uppercase tracking-wider ml-1">Email</label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#1d1d1f]/40">
                   <Mail className="h-4 w-4" />
@@ -224,10 +225,6 @@ export function SignupClient() {
               {!loading && <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />}
             </Button>
           </form>
-
-          <p className="mt-8 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
-            Already have an account? <Link href="/login" className="text-[#093C15] font-bold hover:underline">Sign in</Link>
-          </p>
         </GlassCard>
       </GsapReveal>
     </>

@@ -47,6 +47,7 @@ export function LoginClient() {
         email,
         options: {
           shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}/admin`
         }
       });
 
