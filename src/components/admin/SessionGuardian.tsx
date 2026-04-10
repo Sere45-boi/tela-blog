@@ -95,7 +95,7 @@ export function SessionGuardian() {
 
   // Ensure the breath token is set when the user logs in
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: any) => {
       if (event === "SIGNED_IN" && session) {
         sessionStorage.setItem(SESSION_CHECK_KEY, "active");
       }
