@@ -7,6 +7,7 @@ import { SearchBar } from "@/components/blog/SearchBar";
 import { Suspense } from "react";
 import { BlogContent, BlogGridSkeleton } from "@/components/blog/HomeStreaming";
 import { IntercomClient } from "@/components/blog/IntercomClient";
+import Image from "next/image";
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -117,7 +118,6 @@ export default async function Home({
         {/* INTERACTIVE FLOATING HERO */}
         <FloatingIconsHero
           title={siteSettings.hero_title || "Pulse by Tela"}
-          subtitle={siteSettings.hero_accent_text || "Insights and stories from Tela"}
           description={siteSettings.hero_description || "Stay up-to-date with the latest financial news. Discover helpful financial strategies, business tips, and trends for financial management"}
           ctaHref="#articles"
           icons={HERO_ICONS}
@@ -178,7 +178,7 @@ export default async function Home({
             <div className="lg:col-span-2">
               <div className="flex flex-col items-start gap-6">
                 <div className="mb-2">
-                  <img src="/images/IMG_2366.png" className="h-[40px] w-auto mix-blend-multiply opacity-90" alt="Tela Footer Logo" />
+                  <Image src="/images/IMG_2366.png" width={160} height={40} className="h-[40px] w-auto mix-blend-multiply opacity-90" alt="Tela Footer Logo" />
                 </div>
                 <p className="text-[15px] text-[#1d1d1f]/60 max-w-[300px] leading-relaxed font-medium">
                   {siteSettings.footer_description || "TELA a sub of Difi Financial Services LTD. TELA offers its financial services in partnership with licensed financial institutions in their respective jurisdictions."}

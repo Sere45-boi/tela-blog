@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const MOCK_ADS = [
   {
@@ -39,10 +40,12 @@ export function AdCarousel() {
     <div className="rounded-2xl overflow-hidden bg-white border border-black/5 shadow-sm">
       <a href={ad.destination_url} target="_blank" rel="noopener noreferrer" className="block group">
         <div className="aspect-[3/2] w-full overflow-hidden relative">
-          <img
+          <Image
             src={ad.image_url}
             alt={ad.title}
+            fill
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="300px"
           />
           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-4">
             <p className="text-white text-[13px] font-bold">{ad.title}</p>

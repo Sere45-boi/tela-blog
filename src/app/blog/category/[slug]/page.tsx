@@ -7,6 +7,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
 import { getCleanExcerpt } from "@/utils/excerpt";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -49,10 +50,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <GsapReveal key={article.id} direction="up" delay={0.05 * i}>
                 <Link href={`/blog/${article.slug}`} className="group flex flex-col h-full bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-shadow duration-500 border-none">
                   <div className="aspect-[4/3] w-full bg-[#f5f5f7] overflow-hidden relative">
-                    <img
+                    <Image
                       src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
                       alt={article.title}
+                      fill
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
                   <div className="flex-1 flex flex-col p-8">
@@ -67,9 +70,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                         const author = getAuthorAttribution(article.profiles);
                         return (
                           <>
-                            <img
+                            <Image
                               src={author.avatar_url}
                               alt={author.name}
+                              width={32}
+                              height={32}
                               className="w-8 h-8 rounded-full object-cover border border-black/5"
                             />
                             <span className="text-[#1d1d1f]">{author.name}</span>

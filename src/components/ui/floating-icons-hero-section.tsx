@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Briefcase, TrendingUp, BarChart3, PieChart, Globe, Wallet, ShieldCheck, Zap, MessageSquare, FileText, Video, MessageCircle, Layout } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 // --- Icon Definitions (Client Side) ---
 
@@ -51,13 +52,12 @@ interface IconData {
   icon: string;
   className: string;
   bgColor?: string;
-  iconColor?: string; // Optional custom color for the icon
+  iconColor?: string;
 }
 
 export interface FloatingIconsHeroProps {
   title: string;
-  subtitle?: string; // This is the small badge accent
-  description?: string; // This is the narrative paragraph
+  description?: string;
   ctaText?: string;
   ctaHref?: string;
   icons: IconData[];
@@ -65,112 +65,111 @@ export interface FloatingIconsHeroProps {
 }
 
 const Icon = ({
-  mouseX,
-  mouseY,
   iconData,
   index,
 }: {
-  mouseX: React.MutableRefObject<number>;
-  mouseY: React.MutableRefObject<number>;
   iconData: IconData;
   index: number;
 }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const innerRef = React.useRef<HTMLDivElement>(null);
   const IconComponent = ICON_MAP[iconData.icon] || Globe;
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 400, damping: 25 });
-  const springY = useSpring(y, { stiffness: 400, damping: 25 });
+  useGSAP(() => {
+    if (!containerRef.current || !innerRef.current) return;
 
-  React.useEffect(() => {
+    // Initial entrance animation
+    gsap.fromTo(containerRef.current, 
+      { opacity: 0, scale: 0.5 },
+      { opacity: 1, scale: 1, duration: 0.8, delay: index * 0.05, ease: "power4.out" }
+    );
+
+    // Floating animation
+    gsap.to(innerRef.current, {
+      y: "random(-10, 10)",
+      x: "random(-5, 5)",
+      rotation: "random(-3, 3)",
+      duration: 4 + Math.random() * 2,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (ref.current) {
-        const rect = ref.current.getBoundingClientRect();
-        const iconCenterX = rect.left + rect.width / 2;
-        const iconCenterY = rect.top + rect.height / 2;
-        
-        const distance = Math.sqrt(
-          Math.pow(e.clientX - iconCenterX, 2) +
-            Math.pow(e.clientY - iconCenterY, 2)
-        );
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const iconCenterX = rect.left + rect.width / 2;
+      const iconCenterY = rect.top + rect.height / 2;
+      
+      const distance = Math.sqrt(
+        Math.pow(e.clientX - iconCenterX, 2) +
+        Math.pow(e.clientY - iconCenterY, 2)
+      );
 
-        if (distance < 250) {
-          const angle = Math.atan2(
-            e.clientY - iconCenterY,
-            e.clientX - iconCenterX
-          );
-          const force = (1 - distance / 250) * 80;
-          x.set(-Math.cos(angle) * force);
-          y.set(-Math.sin(angle) * force);
-        } else {
-          x.set(0);
-          y.set(0);
-        }
+      if (distance < 250) {
+        const angle = Math.atan2(
+          e.clientY - iconCenterY,
+          e.clientX - iconCenterX
+        );
+        const force = (1 - distance / 250) * 80;
+        gsap.to(containerRef.current, {
+          x: -Math.cos(angle) * force,
+          y: -Math.sin(angle) * force,
+          duration: 0.6,
+          ease: "power2.out",
+        });
+      } else {
+        gsap.to(containerRef.current, {
+          x: 0,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+        });
       }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [x, y]);
+  }, { scope: containerRef });
 
   return (
-    <motion.div
-      ref={ref}
-      key={iconData.id}
-      style={{
-        x: springX,
-        y: springY,
-      }}
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{
-        delay: index * 0.05,
-        duration: 0.8,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+    <div
+      ref={containerRef}
       className={cn('absolute z-0 pointer-events-none group/icon', iconData.className)}
+      style={{ opacity: 0 }} // Hidden initially until GSAP kicks in
     >
-      <motion.div
+      <div
+        ref={innerRef}
         className={cn(
           "flex items-center justify-center w-14 h-14 md:w-16 md:h-16 p-3 rounded-[1.5rem] shadow-[0_8px_32px_rgb(0,0,0,0.06)] border border-white/40 backdrop-blur-xl transition-all duration-500",
           iconData.bgColor || "bg-white/40"
         )}
-        animate={{
-          y: [0, -10, 0, 10, 0],
-          x: [0, 5, 0, -5, 0],
-          rotate: [0, 3, 0, -3, 0],
-        }}
-        transition={{
-          duration: 6 + Math.random() * 4,
-          repeat: Infinity,
-          repeatType: 'mirror',
-          ease: 'easeInOut',
-        }}
       >
         <IconComponent className={cn("w-7 h-7 md:w-8 md:h-8 transition-colors duration-500", iconData.iconColor || "text-[#093C15]")} />
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 
 const FloatingIconsHero = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & FloatingIconsHeroProps
->(({ className, title, subtitle, description, ctaText, ctaHref, icons, children, ...props }, ref) => {
-  // Refs to track the raw mouse position
-  const mouseX = React.useRef(0);
-  const mouseY = React.useRef(0);
+>(({ className, title, description, ctaText, ctaHref, icons, children, ...props }, ref) => {
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    mouseX.current = event.clientX;
-    mouseY.current = event.clientY;
-  };
+  useGSAP(() => {
+    if (!contentRef.current) return;
+    
+    const elements = contentRef.current.children;
+    gsap.fromTo(elements, 
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power4.out", delay: 0.2 }
+    );
+  }, { scope: contentRef });
 
   return (
     <section
       ref={ref}
-      onMouseMove={handleMouseMove}
       className={cn(
         'relative w-full min-h-[80vh] flex items-center justify-center overflow-hidden bg-transparent',
         className
@@ -182,8 +181,6 @@ const FloatingIconsHero = React.forwardRef<
         {icons.map((iconData, index) => (
           <Icon
             key={iconData.id}
-            mouseX={mouseX}
-            mouseY={mouseY}
             iconData={iconData}
             index={index}
           />
@@ -191,46 +188,30 @@ const FloatingIconsHero = React.forwardRef<
       </div>
 
       {/* Container for the foreground content */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto py-20">
-        <motion.div
-          initial={{ opacity: 1, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-          {subtitle && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#41cc00]/10 border border-[#41cc00]/20 mb-8"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-[#41cc00] animate-pulse" />
-              <span className="text-[11px] font-bold tracking-[0.2em] text-[#093C15] uppercase">{subtitle}</span>
-            </motion.div>
-          )}
+      <div ref={contentRef} className="relative z-10 text-center px-6 max-w-5xl mx-auto py-20">
+        <h1 className="text-5xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-[#1d1d1f] leading-[1.05] mb-8 opacity-0 font-bricolage">
+          {title}
+        </h1>
 
-          <h1 className="text-5xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-[#1d1d1f] leading-[1.05] mb-8">
-            {title}
-          </h1>
-
-          {description && (
-            <p className="max-w-2xl mx-auto text-xl md:text-[24px] text-[#1d1d1f]/60 leading-[1.5] font-medium mb-12 font-poppins">
-              {description}
-            </p>
-          )}
-          
+        {description && (
+          <p className="max-w-2xl mx-auto text-xl md:text-[24px] text-[#1d1d1f]/60 leading-[1.5] font-medium mb-12 font-poppins opacity-0">
+            {description}
+          </p>
+        )}
+        
+        <div className="opacity-0">
           {children}
+        </div>
 
-          {ctaText && ctaHref && (
-            <div className="mt-12">
-              <Link href={ctaHref}>
-                <Button size="lg" className="h-14 px-10 rounded-full font-bold text-[16px] bg-[#093C15] hover:bg-[#093C15]/90 shadow-xl shadow-[#093C15]/10">
-                  {ctaText}
-                </Button>
-              </Link>
-            </div>
-          )}
-        </motion.div>
+        {ctaText && ctaHref && (
+          <div className="mt-12 opacity-0">
+            <Link href={ctaHref}>
+              <Button size="lg" className="h-14 px-10 rounded-full font-bold text-[16px] bg-[#093C15] hover:bg-[#093C15]/90 shadow-xl shadow-[#093C15]/10">
+                {ctaText}
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

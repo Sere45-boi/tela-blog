@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { GsapReveal } from "@/components/GsapReveal";
 import { getAuthorAttribution } from "@/utils/author";
 import { getCleanExcerpt } from "@/utils/excerpt";
+import Image from "next/image";
 
 export async function BlogContent({ search, siteSettings, categories, page = 1 }: { search?: string, siteSettings: any, categories: any[], page?: number }) {
   const limit = 8;
@@ -30,11 +31,13 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
             <Link href={`/blog/${featuredArticle.slug}`} className="group flex flex-col md:flex-row gap-8 lg:gap-16 rounded-[3.5rem] overflow-hidden bg-white shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:shadow-[0_45px_100px_rgba(0,0,0,0.15)] transition-all duration-700 border border-black/5 p-6 md:p-10 lg:p-12 items-center">
               {/* Image Section */}
               <div className="w-full md:w-[45%] lg:w-[42%] aspect-[4/3] md:aspect-square shrink-0 relative bg-[#f5f5f7] rounded-[2.5rem] overflow-hidden shadow-sm">
-                <img
+                <Image
                   src={featuredArticle.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
                   alt={featuredArticle.title}
+                  fill
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                  loading="eager"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <div className="absolute top-6 left-6">
                   <span className="px-5 py-2 rounded-full bg-white/90 backdrop-blur-md text-[#093C15] text-[13px] font-bold uppercase tracking-wider shadow-sm border border-white/20">
@@ -60,9 +63,11 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
                       const author = getAuthorAttribution(featuredArticle.profiles);
                       return (
                         <>
-                          <img
+                          <Image
                             src={author.avatar_url}
                             alt={author.name}
+                            width={56}
+                            height={56}
                             className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-white shadow-md"
                           />
                           <div className="flex flex-col">
@@ -121,10 +126,12 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
                 <Link href={`/blog/${article.slug}`} className="group relative flex flex-col aspect-square w-full rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_30px_70px_rgba(0,0,0,0.2)] transition-all duration-700">
                   {/* Full Background Image */}
                   <div className="absolute inset-0 z-0">
-                    <img
+                    <Image
                       src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
                       alt={article.title}
+                      fill
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     {/* Dark gradient overlay for readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
@@ -150,9 +157,11 @@ export async function BlogContent({ search, siteSettings, categories, page = 1 }
                           const author = getAuthorAttribution(article.profiles);
                           return (
                             <div className="flex items-center">
-                              <img
+                              <Image
                                 src={author.avatar_url}
                                 alt={author.name}
+                                width={28}
+                                height={28}
                                 className="w-7 h-7 rounded-full object-cover border-2 border-white/30 shadow-lg"
                                 title={author.name}
                               />

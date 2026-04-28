@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { ExternalLink } from "lucide-react";
 import { createNotification } from "@/app/actions/notifications";
+import Image from "next/image";
 
 interface Ad {
   id: string;
@@ -68,10 +69,12 @@ export function AdSpace({ position }: { position: string }) {
           {/* Square image with padding for premium look */}
           <div className="w-full p-3">
             <div className="w-full aspect-square overflow-hidden rounded-xl border border-black/5 bg-white">
-              <img
+              <Image
                 src={ad.image_url}
                 alt={ad.title}
+                fill
                 className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
+                sizes="(max-width: 768px) 100vw, 300px"
               />
             </div>
           </div>
@@ -150,10 +153,12 @@ export function AdSpace({ position }: { position: string }) {
           {/* Right Side: Square Image Container */}
           <div className="w-full md:w-[40%] shrink-0">
             <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-white/50 backdrop-blur-md border border-white/20">
-              <img
+              <Image
                 src={ad.image_url}
                 alt={ad.title}
+                fill
                 className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 40vw"
               />
             </div>
           </div>

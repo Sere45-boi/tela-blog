@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { GsapReveal } from "@/components/GsapReveal";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -30,10 +31,12 @@ export function MobileAppShowcase() {
           <GsapReveal key={idx} direction="up" delay={idx * 0.05} className="h-full">
             {item.type === "image" ? (
               <div className="relative aspect-square rounded-[2rem] overflow-hidden group">
-                <img
+                <Image
                   src={item.src}
                   alt={item.alt}
+                  fill
                   className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, 25vw"
                 />
               </div>
             ) : (

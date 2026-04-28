@@ -10,6 +10,7 @@ import { AdSpace } from "@/components/blog/AdSpace";
 import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
 import { EventLogger } from "@/components/blog/EventLogger";
+import Image from "next/image";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -175,9 +176,11 @@ export default async function ArticlePage({
 
                 <div className="flex items-center gap-4 border-y border-black/5 py-6">
                   <Link href="/about" className="flex items-center gap-4 group">
-                    <img
+                    <Image
                       src={author.avatar_url}
                       alt={author.name}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-full object-cover border border-black/5 group-hover:ring-4 group-hover:ring-[#41cc00]/10 transition-all"
                     />
                     <div className="flex-1">
@@ -247,9 +250,11 @@ export default async function ArticlePage({
                   {relatedArticles.length > 0 ? relatedArticles.map((post) => (
                     <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex gap-4">
                       <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-black/5 bg-black/[0.02]">
-                        <img
+                        <Image
                           src={post.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
                           alt={post.title}
+                          width={64}
+                          height={64}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       </div>

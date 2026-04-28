@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
 export function Navbar() {
@@ -13,10 +14,13 @@ export function Navbar() {
         <div className="flex h-[72px] items-center justify-between px-6 md:px-8">
           <div className="flex items-center gap-10">
             <Link href="/" className="flex items-center focus:outline-none shrink-0 border border-transparent hover:opacity-80 transition-opacity">
-              <img
+              <Image
                 src="/images/logo.PNG"
                 alt="Tela Logo"
+                width={120}
+                height={28}
                 className="object-contain h-[28px] w-auto mix-blend-multiply"
+                priority
               />
             </Link>
             <nav className="hidden md:flex items-center gap-8 text-[15px] font-medium text-[#093C15]/70">

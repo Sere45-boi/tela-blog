@@ -57,7 +57,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling - handled by Lenis in SmoothScroll component */
 html {
-  scroll-behavior: smooth;
+  /* Removed scroll-behavior: smooth to avoid conflict with Lenis */
 }
