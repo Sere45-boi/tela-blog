@@ -62,6 +62,7 @@ import { SessionGuardian } from "@/components/admin/SessionGuardian";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { Suspense } from "react";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function RootLayout({
   children,
@@ -117,6 +118,7 @@ export default function RootLayout({
           {children}
         </SmoothScroll>
         <Toaster position="top-right" richColors closeButton />
+        <SpeedInsights />
       </body>
     </html>
   );
