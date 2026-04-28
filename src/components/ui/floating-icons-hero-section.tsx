@@ -161,10 +161,14 @@ const FloatingIconsHero = React.forwardRef<
     if (!contentRef.current) return;
     
     const elements = contentRef.current.children;
-    gsap.fromTo(elements, 
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power4.out", delay: 0.2 }
-    );
+    gsap.from(elements, {
+      opacity: 0,
+      y: 30,
+      duration: 1,
+      stagger: 0.1,
+      ease: "power4.out",
+      delay: 0.2
+    });
   }, { scope: contentRef });
 
   return (
@@ -189,22 +193,22 @@ const FloatingIconsHero = React.forwardRef<
 
       {/* Container for the foreground content */}
       <div ref={contentRef} className="relative z-10 text-center px-6 max-w-5xl mx-auto py-20">
-        <h1 className="text-5xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-[#1d1d1f] leading-[1.05] mb-8 opacity-0 font-bricolage">
+        <h1 className="text-5xl md:text-7xl lg:text-[76px] font-bold tracking-tight text-[#1d1d1f] leading-[1.05] mb-8 font-bricolage">
           {title}
         </h1>
 
         {description && (
-          <p className="max-w-2xl mx-auto text-xl md:text-[24px] text-[#1d1d1f]/60 leading-[1.5] font-medium mb-12 font-poppins opacity-0">
+          <p className="max-w-2xl mx-auto text-xl md:text-[24px] text-[#1d1d1f]/60 leading-[1.5] font-medium mb-12 font-poppins">
             {description}
           </p>
         )}
         
-        <div className="opacity-0">
+        <div>
           {children}
         </div>
 
         {ctaText && ctaHref && (
-          <div className="mt-12 opacity-0">
+          <div className="mt-12">
             <Link href={ctaHref}>
               <Button size="lg" className="h-14 px-10 rounded-full font-bold text-[16px] bg-[#093C15] hover:bg-[#093C15]/90 shadow-xl shadow-[#093C15]/10">
                 {ctaText}
