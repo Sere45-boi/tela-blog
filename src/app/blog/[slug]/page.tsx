@@ -10,6 +10,7 @@ import { AdSpace } from "@/components/blog/AdSpace";
 import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
 import { EventLogger } from "@/components/blog/EventLogger";
+import { Footer } from "@/components/layout/Footer";
 import Image from "next/image";
 import { Suspense } from "react";
 
@@ -76,12 +77,9 @@ export default async function ArticlePage({
         <RelatedArticles slug={slug} />
       </Suspense>
 
-      <footer className="py-20 border-t border-black/5 bg-white/50 mt-20">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 text-center">
-          <Image src="/images/logo.PNG" alt="Tela Logo" width={120} height={28} className="mx-auto mb-8 opacity-40 grayscale" />
-          <p className="text-[#093C15]/40 text-sm font-medium">© {new Date().getFullYear()} Tela. All rights reserved.</p>
-        </div>
-      </footer>
+      <Suspense fallback={<div className="h-40" />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 }

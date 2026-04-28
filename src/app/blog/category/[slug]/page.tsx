@@ -9,6 +9,7 @@ import { getCleanExcerpt } from "@/utils/excerpt";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Suspense } from "react";
+import { Footer } from "@/components/layout/Footer";
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -32,11 +33,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         </div>
       </main>
 
-      <footer className="py-10 border-t border-black/5 mt-20">
-        <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
-          © {new Date().getFullYear()} Tela . All rights reserved.
-        </div>
-      </footer>
+      <Suspense fallback={<div className="h-40" />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 }
