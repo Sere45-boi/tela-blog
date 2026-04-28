@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getAuthorAttribution } from "@/utils/author";
 import { EventLogger } from "@/components/blog/EventLogger";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -31,19 +32,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${title} | Tela Blog`,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      siteName: "Tela Blog",
-      images: [image],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [image],
-    },
+    openGraph: { title, description, type: "article", siteName: "Tela Blog", images: [image] },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
@@ -56,43 +46,111 @@ export default async function ArticlePage({
 }) {
   const { slug } = await params;
   const { preview } = await searchParams;
-  const supabase = await createClient();
 
-  // Fetch article with author and category
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]" suppressHydrationWarning>
+      <Navbar />
+      
+      <main className="pt-32 pb-24 md:pt-40">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
+            <ChevronLeft className="w-4 h-4" />
+            Back to feed
+          </Link>
+
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+            <Suspense fallback={<ArticleSkeleton />}>
+              <ArticleContent slug={slug} preview={preview} />
+            </Suspense>
+
+            <aside className="w-full lg:w-[380px] space-y-10">
+              <Suspense fallback={<SidebarSkeleton />}>
+                <SidebarContent slug={slug} />
+              </Suspense>
+            </aside>
+          </div>
+        </div>
+      </main>
+
+      <Suspense fallback={null}>
+        <RelatedArticles slug={slug} />
+      </Suspense>
+
+      <footer className="py-20 border-t border-black/5 bg-white/50 mt-20">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 text-center">
+          <Image src="/images/logo.PNG" alt="Tela Logo" width={120} height={28} className="mx-auto mb-8 opacity-40 grayscale" />
+          <p className="text-[#093C15]/40 text-sm font-medium">© {new Date().getFullYear()} Tela. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+async function ArticleContent({ slug, preview }: { slug: string, preview?: string }) {
+  const supabase = await createClient();
   let query = supabase
     .from("articles")
     .select("*, profiles(full_name, avatar_url, bio, is_public), categories(name)")
     .eq("slug", slug);
 
-  // If not preview mode, only show articles that are live (published/scheduled and past date)
   if (preview !== "true") {
-    query = query
-      .or("status.eq.published,status.eq.scheduled")
-      .lte("published_at", new Date().toISOString());
+    query = query.or("status.eq.published,status.eq.scheduled").lte("published_at", new Date().toISOString());
   }
 
-  const { data: article, error } = await query.single();
-
-  if (error || !article) {
-    if (error) {
-      console.error(`[Blog Engine] Error fetching article "${slug}":`, error.message, error.details);
-    }
-    notFound();
-  }
-
-  // Increment view count if not in preview - safely handled
-  if (preview !== "true") {
-    try {
-      supabase.rpc('increment_article_view', { article_slug: slug }).then();
-    } catch (e) {
-      console.error("[Blog Engine] Failed to increment view count:", e);
-    }
-  }
+  const { data: article } = await query.single();
+  if (!article) notFound();
 
   const author = getAuthorAttribution(article.profiles);
 
-  // Fetch top read articles (excluding current)
-  const { data: topArticlesData } = await supabase
+  return (
+    <article className="flex-1 min-w-0">
+      <EventLogger type="read" targetName={article.title} link={`/blog/${slug}`} articleId={article.id} />
+      
+      <div className="mb-10">
+        <div className="flex items-center gap-4 mb-6">
+          <span className="px-4 py-1.5 rounded-full bg-[#41cc00]/10 text-[#093C15] text-[13px] font-bold tracking-wide uppercase">
+            {article.categories?.name || "Insights"}
+          </span>
+          <div className="flex items-center gap-2 text-[#093C15]/50 text-[14px] font-semibold">
+            <Clock className="w-4 h-4" />
+            <span>{Math.ceil((article.content?.length || 0) / 1500)} min read</span>
+          </div>
+        </div>
+
+        <h1 className="text-[32px] md:text-[56px] font-bold leading-[1.1] mb-8 tracking-tight text-[#1d1d1f] font-bricolage">
+          {article.title}
+        </h1>
+
+        <div className="flex items-center gap-4 p-1 pr-6 bg-white/50 border border-black/5 rounded-full w-fit">
+          <Image src={author.avatar_url} alt={author.name} width={44} height={44} className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm" />
+          <div>
+            <div className="text-[15px] font-bold text-[#1d1d1f]">{author.name}</div>
+            <div className="text-[13px] font-medium text-[#1d1d1f]/50">
+              {new Date(article.published_at || article.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="aspect-[21/9] w-full bg-[#f5f5f7] rounded-[2.5rem] overflow-hidden mb-12 relative shadow-2xl">
+        <Image src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"} alt={article.title} fill className="object-cover" priority />
+      </div>
+
+      <div className="prose prose-lg prose-slate max-w-none 
+        prose-headings:font-bricolage prose-headings:tracking-tight prose-headings:text-[#1d1d1f]
+        prose-p:text-[#1d1d1f]/80 prose-p:leading-[1.8] prose-p:font-medium
+        prose-strong:text-[#1d1d1f] prose-strong:font-bold
+        prose-img:rounded-[2rem] prose-img:shadow-xl
+        prose-a:text-[#41cc00] prose-a:no-underline hover:prose-a:underline"
+        dangerouslySetInnerHTML={{ __html: article.content }}
+      />
+    </article>
+  );
+}
+
+async function SidebarContent({ slug }: { slug: string }) {
+  const supabase = await createClient();
+  const { data: topArticles } = await supabase
     .from("articles")
     .select("slug, title, view_count")
     .eq("status", "published")
@@ -100,10 +158,44 @@ export default async function ArticlePage({
     .order("view_count", { ascending: false })
     .limit(3);
 
-  const topArticles = topArticlesData || [];
+  return (
+    <>
+      <div className="bg-white/60 border border-black/5 rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-xl bg-[#41cc00]/10 flex items-center justify-center text-[#093C15]">
+            <TrendingUp className="w-5 h-5" />
+          </div>
+          <h3 className="font-bold text-[18px] text-[#1d1d1f] font-bricolage">Top Stories</h3>
+        </div>
+        <div className="space-y-8">
+          {topArticles?.map((item, idx) => (
+            <Link key={item.slug} href={`/blog/${item.slug}`} className="group block">
+              <div className="flex gap-4">
+                <span className="text-[24px] font-bold text-[#41cc00]/20 font-bricolage group-hover:text-[#41cc00]/40 transition-colors">0{idx + 1}</span>
+                <div>
+                  <h4 className="font-bold text-[16px] leading-tight text-[#1d1d1f] group-hover:text-[#093C15] transition-colors line-clamp-2 mb-2">
+                    {item.title}
+                  </h4>
+                  <div className="text-[13px] font-bold text-[#1d1d1f]/30 uppercase tracking-wider">
+                    {((item.view_count || 0) / 1000).toFixed(1)}k reads
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+      <AdSpace position="article_sidebar" />
+    </>
+  );
+}
 
-  // Fetch related articles (same category, excluding current)
-  const { data: relatedArticlesData } = await supabase
+async function RelatedArticles({ slug }: { slug: string }) {
+  const supabase = await createClient();
+  const { data: article } = await supabase.from("articles").select("category_id").eq("slug", slug).single();
+  if (!article) return null;
+
+  const { data: related } = await supabase
     .from("articles")
     .select("slug, title, featured_image, created_at")
     .eq("category_id", article.category_id)
@@ -112,199 +204,54 @@ export default async function ArticlePage({
     .order("created_at", { ascending: false })
     .limit(3);
 
-  const relatedArticles = relatedArticlesData || [];
-
-  const formatViews = (views?: number) => {
-    if (!views) return "0";
-    if (views >= 1000) return (views / 1000).toFixed(1) + "k";
-    return views.toString();
-  };
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: article.title,
-    description: article.meta_description || article.excerpt,
-    image: article.featured_image || article.og_image_url,
-    author: { "@type": "Person", name: author.name },
-    publisher: { "@type": "Organization", name: "Tela", logo: { "@type": "ImageObject", url: "/images/logo.PNG" } },
-    datePublished: article.published_at || article.created_at,
-    mainEntityOfPage: { "@type": "WebPage", "@id": `https://tela.ng/blog/${slug}` },
-  };
+  if (!related || related.length === 0) return null;
 
   return (
-    <>
-      {/* JSON-LD for SEO */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]" suppressHydrationWarning>
-        <Navbar />
-        <EventLogger
-          type="read"
-          targetName={article.title}
-          link={`/blog/${slug}`}
-          articleId={article.id}
-        />
-
-        {preview === "true" && (
-          <div className="fixed top-20 left-0 right-0 z-[60] bg-[#093C15] text-[#41cc00] py-2 px-4 text-center font-bold text-sm flex items-center justify-center gap-2">
-            <AlertCircle className="w-4 h-4" />
-            PREVIEW MODE — This post is currently {article.status.toUpperCase()}
+    <section className="bg-white/30 py-24 border-t border-black/5">
+      <div className="max-w-7xl mx-auto px-6 md:px-8">
+        <div className="flex items-center justify-between mb-12">
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-6 h-6 text-[#41cc00]" />
+            <h2 className="text-2xl md:text-3xl font-bold font-bricolage text-[#1d1d1f]">Related Stories</h2>
           </div>
-        )}
-
-        <main className="pt-32 pb-24 md:pt-40">
-          <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-24 flex flex-col lg:flex-row gap-12 lg:gap-20">
-
-            {/* MAIN ARTICLE COLUMN */}
-            <article className="flex-1 min-w-0 max-w-[800px]">
-
-              <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
-                <ChevronLeft className="w-4 h-4" />
-                Back
-              </Link>
-
-              <header className="mb-12">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-[#41cc00] font-bold tracking-[0.15em] text-[12px] uppercase">
-                    {(article.categories as any)?.name || "Insights"}
-                  </span>
-                </div>
-                <h1 className="text-3xl md:text-[40px] lg:text-[48px] font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-8 leading-[1.1]">
-                  {article.title}
-                </h1>
-
-                <div className="flex items-center gap-4 border-y border-black/5 py-6">
-                  <Link href="/about" className="flex items-center gap-4 group">
-                    <Image
-                      src={author.avatar_url}
-                      alt={author.name}
-                      width={48}
-                      height={48}
-                      className="w-12 h-12 rounded-full object-cover border border-black/5 group-hover:ring-4 group-hover:ring-[#41cc00]/10 transition-all"
-                    />
-                    <div className="flex-1">
-                      <div className="text-[16px] font-bold text-[#1d1d1f] group-hover:text-[#41cc00] transition-colors">{author.name}</div>
-                      <div className="text-[14px] text-[#1d1d1f]/60 font-medium font-poppins">
-                        {article.read_time_minutes || 4} min read • {new Date(article.published_at || article.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
-                      </div>
-                    </div>
-                  </Link>
-                  {/* Social share inline on desktop */}
-                  <div className="hidden md:block ml-auto">
-                    <SocialShareButtons title={article.title} slug={slug} />
-                  </div>
-                </div>
-              </header>
-
-
-
-              {/* Mobile social share */}
-              <div className="md:hidden mb-8">
-                <SocialShareButtons title={article.title} slug={slug} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {related.map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="group block h-full">
+              <div className="aspect-[16/10] bg-[#f5f5f7] rounded-[2rem] overflow-hidden mb-6 shadow-sm border border-black/5">
+                <Image src={post.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"} alt={post.title} width={400} height={250} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               </div>
-
-              <div
-                className="max-w-none font-poppins leading-relaxed prose prose-lg prose-headings:font-bricolage prose-a:text-[#093C15] prose-img:rounded-2xl"
-                dangerouslySetInnerHTML={{ __html: article.content || "" }}
-              />
-
-              {/* Dynamic Ads from Backend */}
-              <AdSpace position="article_bottom" />
-
-              {/* Tags Section */}
-              {article.tags && article.tags.length > 0 && (
-                <div className="mt-12 flex flex-wrap gap-2">
-                  {article.tags.map((tag: string) => (
-                    <span key={tag} className="px-4 py-2 rounded-xl bg-black/[0.03] text-[13px] font-bold text-[#1d1d1f]/60 hover:bg-[#41cc00]/10 hover:text-[#093C15] transition-colors cursor-default">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Bottom share bar */}
-              <div className="mt-16 pt-8 border-t border-black/5">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-4">
-                  <p className="text-[15px] text-[#1d1d1f]/60 font-medium">Enjoyed this article? Share it with your network.</p>
-                  <div className="w-full sm:w-auto">
-                    <SocialShareButtons title={article.title} slug={slug} />
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            {/* RIGHT SIDEBAR */}
-            <aside className="hidden lg:block w-[340px] shrink-0 space-y-8 sticky top-32 self-start">
-
-              {/* Ad Space */}
-              <AdSpace position="sidebar" />
-
-              {/* Related Articles */}
-              <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
-                <div className="flex items-center gap-2 mb-5">
-                  <Sparkles className="w-4 h-4 text-[#41cc00]" />
-                  <h3 className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wider">Related Articles</h3>
-                </div>
-                <div className="space-y-6">
-                  {relatedArticles.length > 0 ? relatedArticles.map((post) => (
-                    <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex gap-4">
-                      <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-black/5 bg-black/[0.02]">
-                        <Image
-                          src={post.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
-                          alt={post.title}
-                          width={64}
-                          height={64}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-[14px] font-bold text-[#1d1d1f] leading-snug group-hover:text-[#093C15] transition-colors line-clamp-2">
-                          {post.title}
-                        </h4>
-                        <span className="text-[11px] text-[#1d1d1f]/40 font-bold mt-1 block uppercase tracking-wider">
-                          {new Date(post.created_at).toLocaleDateString("en-US", { month: 'short', day: 'numeric' })}
-                        </span>
-                      </div>
-                    </Link>
-                  )) : (
-                    <div className="text-[13px] text-black/40 font-medium">No related articles found.</div>
-                  )}
-                </div>
-              </div>
-
-              {/* Top Read */}
-              <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
-                <div className="flex items-center gap-2 mb-5">
-                  <TrendingUp className="w-4 h-4 text-[#41cc00]" />
-                  <h3 className="text-[14px] font-bold text-[#1d1d1f] uppercase tracking-wider">Top Read</h3>
-                </div>
-                <div className="space-y-4">
-                  {topArticles.length > 0 ? topArticles.map((post, i) => (
-                    <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex items-start gap-3">
-                      <span className="text-[24px] font-bold text-[#41cc00]/30 leading-none mt-0.5">{i + 1}</span>
-                      <div>
-                        <h4 className="text-[15px] font-semibold text-[#1d1d1f] leading-snug group-hover:text-[#093C15] transition-colors line-clamp-2">
-                          {post.title}
-                        </h4>
-                        <span className="text-[12px] text-[#1d1d1f]/40 font-medium mt-1 block">{formatViews(post.view_count)} views</span>
-                      </div>
-                    </Link>
-                  )) : (
-                    <div className="text-[13px] text-black/40 font-medium">No trending articles yet.</div>
-                  )}
-                </div>
-              </div>
-            </aside>
-          </div>
-        </main>
-
-        <footer className="py-10 border-t border-black/5">
-          <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
-            © {new Date().getFullYear()} Tela. All rights reserved.
-          </div>
-        </footer>
+              <h3 className="text-[19px] font-bold text-[#1d1d1f] group-hover:text-[#093C15] transition-colors leading-snug line-clamp-2">
+                {post.title}
+              </h3>
+            </Link>
+          ))}
+        </div>
       </div>
-    </>
+    </section>
+  );
+}
+
+function ArticleSkeleton() {
+  return (
+    <div className="flex-1 animate-pulse">
+      <div className="h-6 w-32 bg-black/5 rounded-full mb-8" />
+      <div className="h-16 w-full bg-black/5 rounded-xl mb-12" />
+      <div className="aspect-[21/9] bg-black/5 rounded-[2.5rem] mb-12" />
+      <div className="space-y-4">
+        <div className="h-4 w-full bg-black/5 rounded" />
+        <div className="h-4 w-[90%] bg-black/5 rounded" />
+        <div className="h-4 w-[95%] bg-black/5 rounded" />
+      </div>
+    </div>
+  );
+}
+
+function SidebarSkeleton() {
+  return (
+    <div className="w-full animate-pulse space-y-8">
+      <div className="h-[400px] bg-black/5 rounded-[2.5rem]" />
+      <div className="h-[200px] bg-black/5 rounded-[2.5rem]" />
+    </div>
   );
 }

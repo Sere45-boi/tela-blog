@@ -8,9 +8,40 @@ import { getAuthorAttribution } from "@/utils/author";
 import { getCleanExcerpt } from "@/utils/excerpt";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { Suspense } from "react";
+
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
+      <Navbar />
+
+      <main className="pt-32 pb-24 md:pt-40">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </Link>
+
+          <Suspense fallback={<CategorySkeleton />}>
+            <CategoryContent slug={slug} />
+          </Suspense>
+        </div>
+      </main>
+
+      <footer className="py-10 border-t border-black/5 mt-20">
+        <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
+          © {new Date().getFullYear()} Tela . All rights reserved.
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+async function CategoryContent({ slug }: { slug: string }) {
   const supabase = await createClient();
 
   const { data: category } = await supabase
@@ -26,81 +57,78 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const { data: articles } = await getPublishedArticles(1, 20, slug);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#f3fbf3] to-[#e4fce4] font-sans selection:bg-[#41cc00]/30 selection:text-[#093C15]">
-      <Navbar />
+    <>
+      <GsapReveal direction="up" className="mb-16 text-center md:text-left">
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-6">
+          {category.name}
+        </h1>
+        <p className="text-xl text-[#1d1d1f]/60 max-w-2xl font-medium">
+          Explore our latest insights, guides, and stories about {category.name.toLowerCase()}.
+        </p>
+      </GsapReveal>
 
-      <main className="pt-32 pb-24 md:pt-40">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-[#093C15]/70 hover:text-[#093C15] font-semibold text-[14px] mb-10 transition-colors">
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </Link>
-
-          <GsapReveal direction="up" className="mb-16 text-center md:text-left">
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1d1d1f] font-bricolage mb-6">
-              {category.name}
-            </h1>
-            <p className="text-xl text-[#1d1d1f]/60 max-w-2xl font-medium">
-              Explore our latest insights, guides, and stories about {category.name.toLowerCase()}.
-            </p>
-          </GsapReveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-12">
-            {articles?.map((article: any, i: number) => (
-              <GsapReveal key={article.id} direction="up" delay={0.05 * i}>
-                <Link href={`/blog/${article.slug}`} className="group flex flex-col h-full bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-shadow duration-500 border-none">
-                  <div className="aspect-[4/3] w-full bg-[#f5f5f7] overflow-hidden relative">
-                    <Image
-                      src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
-                      alt={article.title}
-                      fill
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="flex-1 flex flex-col p-8">
-                    <h4 className="text-[21px] font-bold mb-3 text-[#1d1d1f] line-clamp-2 leading-[1.2] tracking-tight group-hover:text-[#093C15] transition-colors">
-                      {article.title}
-                    </h4>
-                    <p className="text-[#1d1d1f]/60 line-clamp-3 mb-8 text-[17px] leading-relaxed font-medium">
-                      {getCleanExcerpt(article.content || article.excerpt, 180)}
-                    </p>
-                    <div className="flex items-center gap-3 mt-auto text-[14px] font-semibold text-[#1d1d1f]/50">
-                      {(() => {
-                        const author = getAuthorAttribution(article.profiles);
-                        return (
-                          <>
-                            <Image
-                              src={author.avatar_url}
-                              alt={author.name}
-                              width={32}
-                              height={32}
-                              className="w-8 h-8 rounded-full object-cover border border-black/5"
-                            />
-                            <span className="text-[#1d1d1f]">{author.name}</span>
-                          </>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                </Link>
-              </GsapReveal>
-            ))}
-
-            {(!articles || articles.length === 0) && (
-              <div className="col-span-full py-20 text-center">
-                <p className="text-[#1d1d1f]/40 font-bold text-xl">No articles found in this category yet.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-12">
+        {articles?.map((article: any, i: number) => (
+          <GsapReveal key={article.id} direction="up" delay={0.05 * i}>
+            <Link href={`/blog/${article.slug}`} className="group flex flex-col h-full bg-white rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-shadow duration-500 border-none">
+              <div className="aspect-[4/3] w-full bg-[#f5f5f7] overflow-hidden relative">
+                <Image
+                  src={article.featured_image || "https://images.unsplash.com/photo-1551288049-bebda4e38f71"}
+                  alt={article.title}
+                  fill
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
               </div>
-            )}
-          </div>
-        </div>
-      </main>
+              <div className="flex-1 flex flex-col p-8">
+                <h4 className="text-[21px] font-bold mb-3 text-[#1d1d1f] line-clamp-2 leading-[1.2] tracking-tight group-hover:text-[#093C15] transition-colors">
+                  {article.title}
+                </h4>
+                <p className="text-[#1d1d1f]/60 line-clamp-3 mb-8 text-[17px] leading-relaxed font-medium">
+                  {getCleanExcerpt(article.content || article.excerpt, 180)}
+                </p>
+                <div className="flex items-center gap-3 mt-auto text-[14px] font-semibold text-[#1d1d1f]/50">
+                  {(() => {
+                    const author = getAuthorAttribution(article.profiles);
+                    return (
+                      <>
+                        <Image
+                          src={author.avatar_url}
+                          alt={author.name}
+                          width={32}
+                          height={32}
+                          className="w-8 h-8 rounded-full object-cover border border-black/5"
+                        />
+                        <span className="text-[#1d1d1f]">{author.name}</span>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            </Link>
+          </GsapReveal>
+        ))}
 
-      <footer className="py-10 border-t border-black/5 mt-20">
-        <div className="container mx-auto px-4 text-center text-[13px] text-[#1d1d1f]/40 font-medium">
-          © {new Date().getFullYear()} Tela . All rights reserved.
-        </div>
-      </footer>
+        {(!articles || articles.length === 0) && (
+          <div className="col-span-full py-20 text-center">
+            <p className="text-[#1d1d1f]/40 font-bold text-xl">No articles found in this category yet.</p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function CategorySkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-12 w-48 bg-black/5 rounded-xl mb-6" />
+      <div className="h-6 w-96 bg-black/5 rounded-lg mb-16" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="aspect-[4/3] bg-black/5 rounded-[2rem]" />
+        ))}
+      </div>
     </div>
   );
 }
