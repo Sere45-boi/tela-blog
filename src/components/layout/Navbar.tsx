@@ -10,7 +10,7 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[60] pt-6 flex justify-center w-full px-4 md:px-8 pointer-events-none transition-transform duration-300">
-      <div className="pointer-events-auto rounded-[2rem] bg-white/80 backdrop-blur-2xl border border-black/5 shadow-[0_8px_32px_rgb(0,0,0,0.06)] w-full max-w-[1000px] transition-all duration-500 hover:bg-white/95 overflow-hidden">
+      <div className="pointer-events-auto rounded-[2rem] bg-white/80 backdrop-blur-xl md:backdrop-blur-2xl border border-black/5 shadow-[0_8px_32px_rgb(0,0,0,0.06)] w-full max-w-[1000px] transition-all duration-500 hover:bg-white/95 overflow-hidden">
         <div className="flex h-[72px] items-center justify-between px-6 md:px-8">
           <div className="flex items-center gap-10">
             <Link href="/" className="flex items-center focus:outline-none shrink-0 border border-transparent hover:opacity-80 transition-opacity">
