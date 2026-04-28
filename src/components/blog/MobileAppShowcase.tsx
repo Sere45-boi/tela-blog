@@ -10,7 +10,11 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const GRID_ITEMS = [
+type GridItem = 
+  | { type: "image"; src: string; alt: string }
+  | { type: "metric"; title: string; value: number; suffix: string; bg: string; textColor: string };
+
+const GRID_ITEMS: GridItem[] = [
   // ROW 1
   { type: "image", src: "/images/girltela.jpg", alt: "Tela Girl" },
   { type: "metric", title: "Total Invoices Sent", value: 8000, suffix: "k", bg: "bg-[#f8f9fa]", textColor: "text-[#1d1d1f]" },
@@ -49,7 +53,7 @@ export function MobileAppShowcase() {
   );
 }
 
-function MetricCard({ item }: { item: any }) {
+function MetricCard({ item }: { item: Extract<GridItem, { type: "metric" }> }) {
   const countRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
